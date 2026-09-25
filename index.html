@@ -94,12 +94,38 @@ input[type=color]{width:100%;height:44px;border:1px solid #262c47;border-radius:
   display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 14px;}
 
 footer{margin-top:20px;text-align:center;color:var(--sub);font-size:.78rem;}
+
+.icon-btn{background:none;border:1px solid #232841;color:var(--sub);width:34px;height:34px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;text-decoration:none;}
+.icon-btn:hover{color:var(--teal);border-color:var(--teal);}
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;opacity:0;pointer-events:none;transition:opacity .25s ease;}
+.drawer-overlay.open{opacity:1;pointer-events:auto;}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:78%;max-width:300px;background:var(--card);border-right:1px solid #1e2338;
+  z-index:50;transform:translateX(-100%);transition:transform .28s ease;padding:calc(20px + env(safe-area-inset-top,0px)) 18px 20px;overflow-y:auto;}
+.drawer.open{transform:translateX(0);}
+.drawer .d-user{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #1e2338;}
+.drawer .d-user img{width:46px;height:46px;border-radius:50%;object-fit:cover;background:#232841;}
+.drawer .d-user .d-name{font-weight:700;font-size:.92rem;}
+.drawer .d-user .d-email{color:var(--sub);font-size:.74rem;}
+.drawer nav.d-links{display:flex;flex-direction:column;gap:4px;}
+.drawer a.d-link{display:flex;align-items:center;gap:12px;padding:11px 10px;border-radius:10px;color:var(--text);text-decoration:none;font-size:.88rem;}
+.drawer a.d-link:hover{background:#1a1f33;}
+.drawer a.d-link .ic{width:20px;text-align:center;}
+.drawer .d-close{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:14px;background:none;border:none;color:var(--sub);font-size:1.3rem;cursor:pointer;}
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(13,15,22,.96);backdrop-filter:blur(6px);
+  border-top:1px solid #1e2338;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));display:flex;justify-content:space-around;}
+.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--sub);text-decoration:none;font-size:.64rem;padding:4px 8px;}
+.bottom-nav a.active{color:var(--teal);}
+.bottom-nav a .ic{font-size:1.15rem;}
+body{padding-bottom:70px;}
 </style>
 </head>
 <body>
 
 <nav>
   <div class="navwrap">
+  <button class="icon-btn" id="btn-menu" style="position:absolute;left:14px;top:calc(14px + env(safe-area-inset-top,0px));" aria-label="Menu">&#9776;</button>
+  <a href="connexion.html" class="icon-btn" id="auth-icon" style="position:absolute;right:14px;top:calc(14px + env(safe-area-inset-top,0px));" aria-label="Connexion">&#128273;</a>
     <div class="brand"><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAAAAAAD/6xaJSlACEQAAAAEAABZ/anVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAAFllqdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3VybjpjMnBhOjAxOTJjNjMxLWZlNzEtNGM2OC1iZjI1LWEwMGJkMmYxOWNjZgAAAAOUanVtYgAAAClqdW1kYzJhcwARABCAAACqADibcQNjMnBhLmFzc2VydGlvbnMAAAAAuWp1bWIAAABEanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5pbmdyZWRpZW50LnYzAAAAABhjMnNogMFMH6z5vrLVYArqr6PJhgAAAG1jYm9yo2lkYzpmb3JtYXRqaW1hZ2UvanBlZ2ppbnN0YW5jZUlEeCx4bXA6aWlkOjg0NGJmNTZkLTQyNTYtNDkzZC04YjVlLTJkNTk3ZjQ0NTA3OGxyZWxhdGlvbnNoaXBocGFyZW50T2YAAAHianVtYgAAAEFqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmFjdGlvbnMudjIAAAAAGGMyc2jNduS8iQkvsluTPpF4FdokAAABmWNib3KiZ2FjdGlvbnOComZhY3Rpb25rYzJwYS5vcGVuZWRqcGFyYW1ldGVyc6FraW5ncmVkaWVudHOBomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCBKbsm6xkdcbs9ln0vVe/yQG+D6rWImJH78QeqgY4oHXaRmYWN0aW9ueB1jb20uYW50aHJvcGljLmNsYXVkZS5wcm92aWRlZGpwYXJhbWV0ZXJzoXgfY29tLmFudGhyb3BpYy5vcmlnaW4tY29uZmlkZW5jZWd1bmtub3dua2Rlc2NyaXB0aW9ueGZDbGF1ZGUgcHJvdmlkZWQgdGhpcyBmaWxlIGF0IHRoZSByZXF1ZXN0IG9mIGEgdXNlciBhbmQgbWF5IGhhdmUgY3JlYXRlZCBvciBtb2RpZmllZCB0aGUgZmlsZSBjb250ZW50cy5tc29mdHdhcmVBZ2VudKFkbmFtZWZDbGF1ZGVyYWxsQWN0aW9uc0luY2x1ZGVk9QAAAMhqdW1iAAAAQGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaGFzaC5kYXRhAAAAABhjMnNoyN75/TSHEx8H0cyuAEF1MAAAAIBjYm9ypWNhbGdmc2hhMjU2Y3BhZE4AAAAAAAAAAAAAAAAAAGRoYXNoWCDmelFsSG5W9yuVKLKCxZg+SnWasQ7gSA02147BtMavlGRuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBRmbGVuZ3RoGRaLAAACPmp1bWIAAAAnanVtZGMyY2wAEQAQgAAAqgA4m3EDYzJwYS5jbGFpbS52MgAAAAIPY2JvcqVjYWxnZnNoYTI1NmlzaWduYXR1cmV4TXNlbGYjanVtYmY9L2MycGEvdXJuOmMycGE6MDE5MmM2MzEtZmU3MS00YzY4LWJmMjUtYTAwYmQyZjE5Y2NmL2MycGEuc2lnbmF0dXJlamluc3RhbmNlSUR4LHhtcDppaWQ6YzU2NDk1YjYtOTZlZS00YzkzLWIzYjUtZjJmOTgzMmQwYmVicmNyZWF0ZWRfYXNzZXJ0aW9uc4OiY3VybHgtc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5pbmdyZWRpZW50LnYzZGhhc2hYIEpuybrGR1xuz2WfS9V7/JAb4PqtYiYkfvxB6qBjigddomN1cmx4KnNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuYWN0aW9ucy52MmRoYXNoWCBprfe+12eAvQ7xqs47q3fT13PCyRpSFfc25t1eVuZIqqJjdXJseClzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmhhc2guZGF0YWRoYXNoWCDg5x9ZSLAdEruLPd1cCBM0mfOq2kFYPxZC57RJ6qrRKXRjbGFpbV9nZW5lcmF0b3JfaW5mb6NkbmFtZW9BbnRocm9waWMgRmlsZXNndmVyc2lvbmUxLjAuMGtzcGVjVmVyc2lvbmUyLjQuMAAAEDhqdW1iAAAAKGp1bWRjMmNzABEAEIAAAKoAOJtxA2MycGEuc2lnbmF0dXJlAAAAEAhjYm9y0oRZAhKiASYYIVkCCjCCAgYwggGNoAMCAQICFEDloAruwjnQvriD+gZCBT1nVRMAMAoGCCqGSM49BAMDMEkxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMS4wLAYDVQQDEyVBbnRocm9waWMgQ29udGVudCBDcmVkZW50aWFscyBSb290IENBMB4XDTI2MDgwNzE4NDM1NloXDTI4MDgwNjE5NDM1NlowRDEXMBUGA1UEChMOQW50aHJvcGljLCBQQkMxKTAnBgNVBAMTIEFudGhyb3BpYyBDbGF1ZGUgQ29udGVudCBTaWduaW5nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEmHoKa8tQGAUU1TS9QqU5W0Tp2N3XsvlK7BfQt6YWKwEzd2R3/dzKPEUDdCjlLjp9fT+KFjRVnuZ9v0oXvTe3k6NYMFYwDgYDVR0PAQH/BAQDAgeAMBUGA1UdJQQOMAwGCisGAQQBg+heAgEwDAYDVR0TAQH/BAIwADAfBgNVHSMEGDAWgBTOUeIEgU5kWyP448TPmj6cwddcwjAKBggqhkjOPQQDAwNnADBkAjAxcx0UngF60stVjs5G4T2eiptsBk5mf9oCtfJPAUBl8qs/PEXa8+gk1/X5QJ2DVcYCMHBfXN31YapiSqYvlIWrDVDJKOvXMl+kkz37Wt0PBI8sw486Mq6JeOhT+lRR4b1HCaFjcGFkWQ2eAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA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" alt="PC-INFORMATIQUE"><b>PC-INFORMATIQUE</b></div>
     <div class="navlinks">
       <a href="#realisations"><span class="ic">📁</span>Réalisations</a>
@@ -107,6 +133,33 @@ footer{margin-top:20px;text-align:center;color:var(--sub);font-size:.78rem;}
     </div>
   </div>
 </nav>
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<aside class="drawer" id="drawer">
+  <button class="d-close" id="drawer-close" aria-label="Fermer">&times;</button>
+  <div class="d-user" id="drawer-user" style="display:none;">
+    <img id="drawer-avatar" src="" alt="">
+    <div>
+      <div class="d-name" id="drawer-name">&mdash;</div>
+      <div class="d-email" id="drawer-email">&mdash;</div>
+    </div>
+  </div>
+  <nav class="d-links">
+    <a href="index.html" class="d-link"><span class="ic">&#127968;</span>Accueil</a>
+    <a href="index.html#realisations" class="d-link"><span class="ic">&#128193;</span>Realisations</a>
+    <a href="index.html#demande" class="d-link"><span class="ic">&#10133;</span>Nouvelle demande</a>
+    <a href="profil.html" class="d-link" id="drawer-profil" style="display:none;"><span class="ic">&#128100;</span>Mon profil</a>
+    <a href="connexion.html" class="d-link" id="drawer-login"><span class="ic">&#128273;</span>Connexion</a>
+    <a href="#" class="d-link" id="drawer-logout" style="display:none;color:#ff6b6b;"><span class="ic">&#128682;</span>Deconnexion</a>
+  </nav>
+</aside>
+
+<div class="bottom-nav">
+  <a href="index.html" class="active"><span class="ic">&#127968;</span><span class="lbl">Accueil</span></a>
+  <a href="index.html#realisations"><span class="ic">&#128193;</span><span class="lbl">Projets</span></a>
+  <a href="index.html#demande"><span class="ic">&#10133;</span><span class="lbl">Demande</span></a>
+  <a href="connexion.html" id="bottom-auth"><span class="ic">&#128273;</span><span class="lbl">Connexion</span></a>
+</div>
+
 
 <div class="wrap">
 
@@ -395,7 +448,67 @@ render();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-app-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-auth-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+  if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  var auth = firebase.auth();
+
+  var drawer = document.getElementById('drawer');
+  var overlay = document.getElementById('drawer-overlay');
+  function openDrawer(){ drawer.classList.add('open'); overlay.classList.add('open'); }
+  function closeDrawer(){ drawer.classList.remove('open'); overlay.classList.remove('open'); }
+  document.getElementById('btn-menu').addEventListener('click', openDrawer);
+  document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+  overlay.addEventListener('click', closeDrawer);
+
+  var authIcon = document.getElementById('auth-icon');
+  var bottomAuth = document.getElementById('bottom-auth');
+  var dUser = document.getElementById('drawer-user');
+  var dName = document.getElementById('drawer-name');
+  var dEmail = document.getElementById('drawer-email');
+  var dAvatar = document.getElementById('drawer-avatar');
+  var dProfil = document.getElementById('drawer-profil');
+  var dLogin = document.getElementById('drawer-login');
+  var dLogout = document.getElementById('drawer-logout');
+
+  dLogout.addEventListener('click', function(e){
+    e.preventDefault();
+    auth.signOut().then(function(){ closeDrawer(); location.href='index.html'; });
+  });
+
+  auth.onAuthStateChanged(function(user){
+    if(user){
+      authIcon.href = 'profil.html';
+      authIcon.innerHTML = '&#128100;';
+      authIcon.setAttribute('aria-label','Mon profil');
+      bottomAuth.href = 'profil.html';
+      bottomAuth.querySelector('.ic').innerHTML = '&#128100;';
+      bottomAuth.querySelector('.lbl').textContent = 'Profil';
+      dUser.style.display = 'flex';
+      dName.textContent = user.displayName || 'Membre';
+      dEmail.textContent = user.email || '';
+      dAvatar.src = user.photoURL || 'images/logo-pc-informatique.png';
+      dProfil.style.display = 'flex';
+      dLogin.style.display = 'none';
+      dLogout.style.display = 'flex';
+    } else {
+      authIcon.href = 'connexion.html';
+      authIcon.innerHTML = '&#128273;';
+      authIcon.setAttribute('aria-label','Connexion');
+      bottomAuth.href = 'connexion.html';
+      bottomAuth.querySelector('.ic').innerHTML = '&#128273;';
+      bottomAuth.querySelector('.lbl').textContent = 'Connexion';
+      dUser.style.display = 'none';
+      dProfil.style.display = 'none';
+      dLogin.style.display = 'flex';
+      dLogout.style.display = 'none';
+    }
+  });
+})();
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </body>
 </html>
