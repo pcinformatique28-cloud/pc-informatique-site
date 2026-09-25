@@ -182,7 +182,8 @@ document.getElementById('photo-input').addEventListener('change', async (e)=>{
     await db.collection('membres').doc(currentUser.uid).update({ photoURL: url });
     document.getElementById('avatar').src = url;
   }catch(err){
-    alert("Impossible d'envoyer la photo. Réessaie.");
+    console.error(err);
+    alert("Erreur upload: " + (err && err.message ? err.message : err));
   }finally{
     label.textContent = original;
     e.target.value = '';
