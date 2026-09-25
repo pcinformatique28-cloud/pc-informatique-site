@@ -1,0 +1,37 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Règle par défaut : tout est fermé. Rien n'est lisible ni écrivable
+    // tant qu'une règle plus bas ne l'autorise pas explicitement.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ------------------------------------------------------------------
+    // Collection "admins" — verrouillée. Un utilisateur ne peut jamais
+    // s'auto-attribuer le rôle admin (même schéma que sur GSC/AMBI241).
+    // ------------------------------------------------------------------
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false; // seul un ajout manuel via la console Firebase
+    }
+
+    // ------------------------------------------------------------------
+    // Collection "demandes" — formulaire de contact / devis du site.
+    // Désactivée pour l'instant (create: if false) : à activer quand le
+    // formulaire de contact sera branché sur le site, avec validation
+    // stricte des champs pour éviter le spam/l'injection.
+    // ------------------------------------------------------------------
+    match /demandes/{id} {
+      allow create: if false;
+      // Exemple à activer plus tard :
+      // allow create: if request.resource.data.keys().hasOnly(['nom','email','message','createdAt'])
+      //   && request.resource.data.nom is string && request.resource.data.nom.size() < 100
+      //   && request.resource.data.email is string && request.resource.data.email.size() < 150
+      //   && request.resource.data.message is string && request.resource.data.message.size() < 2000;
+      allow read, update, delete: if false; // lecture réservée à l'admin (via console ou panneau admin.html plus tard)
+    }
+  }
+}
