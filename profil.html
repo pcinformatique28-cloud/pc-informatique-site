@@ -17,8 +17,9 @@
   }
   header{
     background:var(--surface); border-bottom:1px solid var(--border);
-    padding:14px 20px; display:flex; justify-content:space-between; align-items:center;
+    padding:14px 20px; display:flex; justify-content:space-between; align-items:center; gap:10px;
   }
+  header .brand{flex:1; text-align:center;}
   header .brand{font-weight:700; font-size:15px;}
   header button{
     background:none; border:1px solid var(--border); border-radius:8px; padding:8px 14px;
@@ -77,6 +78,7 @@
 </head>
 <body>
 <header>
+  <a href="index.html" id="btn-back" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--muted);font-size:13px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;">&larr; Accueil</a>
   <div class="brand">PC-INFORMATIQUE · Espace membre</div>
   <button id="btn-logout">Déconnexion</button>
 </header>
@@ -280,15 +282,33 @@ async function loadProjets(){
   });
 }
 
-document.getElementById('btn-logout').addEventListener('click', ()=> auth.signOut());
+document.getElementById('btn-logout').addEventListener('click', async ()=>{
+  const btn = document.getElementById('btn-logout');
+  btn.disabled = true;
+  btn.textContent = 'Déconnexion...';
+  try{
+    await auth.signOut();
+    location.href = 'index.html';
+  }catch(err){
+    console.error(err);
+    btn.disabled = false;
+    btn.textContent = 'Déconnexion';
+    alert("Erreur lors de la déconnexion, réessaie.");
+  }
+});
 
 auth.onAuthStateChanged(async user=>{
   if(!user){ location.href = 'connexion.html'; return; }
   currentUser = user;
-  await loadProfil();
-  await loadProjets();
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
+  try{
+    await loadProfil();
+    await loadProjets();
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  }catch(err){
+    console.error(err);
+    document.getElementById('loading').textContent = "Erreur: " + (err && err.message ? err.message : err);
+  }
 });
 </script>
 </body>
