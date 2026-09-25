@@ -179,7 +179,7 @@ document.getElementById('photo-input').addEventListener('change', async (e)=>{
   label.textContent = "Envoi…";
   try{
     const url = await uploadToCloudinary(file);
-    await db.collection('membres').doc(currentUser.uid).update({ photoURL: url });
+    await db.collection('membres').doc(currentUser.uid).set({ photoURL: url }, { merge: true });
     document.getElementById('avatar').src = url;
   }catch(err){
     console.error(err);
@@ -198,7 +198,7 @@ document.getElementById('btn-save-profil').addEventListener('click', async ()=>{
   if(!nom){ showMsg(msg, "Le nom ne peut pas être vide.", false); return; }
   btn.disabled = true;
   try{
-    await db.collection('membres').doc(currentUser.uid).update({ nom, bio });
+    await db.collection('membres').doc(currentUser.uid).set({ nom, bio }, { merge: true });
     showMsg(msg, "Profil mis à jour.", true);
   }catch(err){
     showMsg(msg, "Erreur lors de l'enregistrement.", false);
