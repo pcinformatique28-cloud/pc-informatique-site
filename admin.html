@@ -31,6 +31,13 @@ nav{position:sticky;top:0;z-index:20;background:rgba(13,15,22,.94);backdrop-filt
 .empty{text-align:left;color:var(--sub);font-size:.85rem;padding:20px 0;}
 #gate{max-width:320px;margin:80px auto;text-align:left;}
 #gate input{width:100%;background:#0f1220;border:1px solid #262c47;color:var(--text);border-radius:10px;padding:11px 12px;font-size:.9rem;margin:10px 0;}
+#gate label{display:block;font-size:.78rem;color:var(--sub);margin:10px 0 4px;}
+.pwrap{position:relative;}
+.pwrap input{padding-right:42px;}
+.eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;user-select:none;font-size:1rem;opacity:.75;}
+.link{font-size:.8rem;color:var(--teal);text-align:right;cursor:pointer;margin:4px 0 4px;}
+.msg-ok{color:var(--ok);font-size:.78rem;}
+.msg-bad{color:var(--bad);font-size:.78rem;}
 .btn{padding:12px;border-radius:12px;border:none;font-weight:700;font-size:.86rem;cursor:pointer;width:100%;}
 .btn.primary{background:linear-gradient(90deg,var(--teal),var(--pink));color:#0d0f16;}
 .btn.ghost{background:transparent;border:1px solid #2c3350;color:#dfe2ee;}
@@ -58,13 +65,21 @@ nav{position:sticky;top:0;z-index:20;background:rgba(13,15,22,.94);backdrop-filt
 
 <div id="gate" class="wrap">
   <h3 style="text-align:left">Accès admin</h3>
-  <p style="color:var(--sub);font-size:.82rem;text-align:left">Code d'accès requis.</p>
-  <input type="password" id="pass" placeholder="Code admin">
-  <button class="btn primary" id="btn-enter">Entrer</button>
-  <p id="pass-err" style="color:var(--bad);font-size:.78rem;display:none;text-align:left">Code incorrect.</p>
+  <p style="color:var(--sub);font-size:.82rem;text-align:left">Connectez-vous avec votre compte admin.</p>
+  <label>E-mail</label>
+  <input type="email" id="login-email" placeholder="votre@email.com" autocomplete="username">
+  <label>Mot de passe</label>
+  <div class="pwrap">
+    <input type="password" id="login-pass" placeholder="Mot de passe" autocomplete="current-password">
+    <span class="eye" id="eye-toggle">👁️</span>
+  </div>
+  <div class="link" id="forgot-link">Mot de passe oublié ?</div>
+  <button class="btn primary" id="btn-enter">Se connecter</button>
+  <p id="gate-msg" style="display:none;margin-top:10px;"></p>
 </div>
 
 <div class="wrap" id="dash" style="display:none">
+  <div style="text-align:right;margin:14px 0 -6px"><span class="link" id="btn-logout">Se déconnecter</span></div>
   <div class="tabs">
     <div class="tab on" data-f="nouveau">🕓 Nouvelles</div>
     <div class="tab" data-f="valide">✅ Validées</div>
@@ -78,10 +93,14 @@ nav{position:sticky;top:0;z-index:20;background:rgba(13,15,22,.94);backdrop-filt
   <div class="sheet" id="sheet"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-app-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
 <script>
 // ============ CONFIG — identique à index.html ============
 const firebaseConfig = { apiKey:"AIzaSyCx2D6b8TFGW-GBxb25t4MUqpoQj_cQCtk", authDomain:"pc-informatique-site.firebaseapp.com", projectId:"pc-informatique-site", storageBucket:"pc-informatique-site.firebasestorage.app", messagingSenderId:"43208715297", appId:"1:43208715297:web:02e946d321ae3a31ab0760" };
-const ADMIN_PASSCODE = "9215"; // à changer avant mise en ligne
 const EMAILJS_PUBLIC_KEY="REMPLACER", EMAILJS_SERVICE_ID="REMPLACER", EMAILJS_TPL_CLIENT_OK="REMPLACER", EMAILJS_TPL_CLIENT_NO="REMPLACER";
 const EMAILJS_READY = EMAILJS_PUBLIC_KEY !== "REMPLACER";
 // ===========================================================
@@ -113,27 +132,61 @@ function buildPlan(d){
   return [...steps];
 }
 
-// ---- Gate ----
-if(sessionStorage.getItem('pcadmin_ok')==='1') showDash();
-document.getElementById('btn-enter').addEventListener('click', ()=>{
-  if(document.getElementById('pass').value === ADMIN_PASSCODE){
-    sessionStorage.setItem('pcadmin_ok','1'); showDash();
-  } else { document.getElementById('pass-err').style.display='block'; }
-});
-function showDash(){
-  document.getElementById('gate').style.display='none';
-  document.getElementById('dash').style.display='block';
-  initFirebase(); loadList();
-}
-
 // ---- Firebase ----
-let db=null;
-function initFirebase(){
-  if(!window.firebase) return;
-  if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  db = firebase.firestore();
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+let db = firebase.firestore();
+
+// ---- Œil afficher/masquer ----
+document.getElementById('eye-toggle').addEventListener('click', ()=>{
+  const inp = document.getElementById('login-pass');
+  const eye = document.getElementById('eye-toggle');
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  eye.textContent = show ? '🙈' : '👁️';
+});
+
+function gateMsg(text, ok){
+  const m = document.getElementById('gate-msg');
+  m.textContent = text; m.className = ok ? 'msg-ok' : 'msg-bad'; m.style.display = 'block';
 }
 
+// ---- Connexion ----
+document.getElementById('btn-enter').addEventListener('click', ()=>{
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if(!email || !pass){ gateMsg('Renseignez e-mail et mot de passe.', false); return; }
+  auth.signInWithEmailAndPassword(email, pass).catch(err=>{
+    gateMsg(err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found'
+      ? 'E-mail ou mot de passe incorrect.' : 'Erreur de connexion : ' + err.message, false);
+  });
+});
+
+// ---- Mot de passe oublié ----
+document.getElementById('forgot-link').addEventListener('click', ()=>{
+  const email = document.getElementById('login-email').value.trim();
+  if(!email){ gateMsg('Entrez d\'abord votre e-mail ci-dessus, puis touchez à nouveau "Mot de passe oublié ?".', false); return; }
+  auth.sendPasswordResetEmail(email).then(()=>{
+    gateMsg('E-mail de réinitialisation envoyé à ' + email + '. Vérifiez votre boîte de réception.', true);
+  }).catch(err=>{
+    gateMsg(err.code === 'auth/user-not-found' ? 'Aucun compte admin avec cet e-mail.' : 'Erreur : ' + err.message, false);
+  });
+});
+
+// ---- Déconnexion ----
+document.getElementById('btn-logout').addEventListener('click', ()=> auth.signOut());
+
+// ---- Bascule gate/dash selon l'état de connexion ----
+auth.onAuthStateChanged(user=>{
+  if(user){
+    document.getElementById('gate').style.display='none';
+    document.getElementById('dash').style.display='block';
+    loadList();
+  } else {
+    document.getElementById('gate').style.display='block';
+    document.getElementById('dash').style.display='none';
+  }
+});
 let ALL=[]; let filter='nouveau';
 function loadList(){
   if(!db) return;
@@ -231,8 +284,4 @@ function decide(id, status){
 }
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-app-compat.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-firestore-compat.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-</body>
 </html>
