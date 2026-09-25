@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PC-INFORMATIQUE — Admin</title>
+<style>
+:root{
+  --bg:#0d0f16; --card:#141826; --text:#f2f3f7; --sub:#9aa1b4;
+  --teal:#33d9c4; --pink:#ff4fa3; --ok:#5ee06a; --bad:#ff5c5c; --wait:#f2c94c;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+a{color:inherit;}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px 60px;}
+nav{position:sticky;top:0;z-index:20;background:rgba(13,15,22,.94);backdrop-filter:blur(6px);border-bottom:1px solid #1e2338;
+  padding:calc(14px + env(safe-area-inset-top,0px)) 16px 14px;}
+.navwrap{max-width:640px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.navwrap b{font-size:.95rem;}
+.tabs{display:flex;gap:8px;margin:16px 0;flex-wrap:wrap;}
+.tab{font-size:.75rem;padding:7px 12px;border-radius:20px;border:1px solid #232841;color:var(--sub);cursor:pointer;user-select:none;}
+.tab.on{color:#0d0f16;background:linear-gradient(90deg,var(--teal),var(--pink));border:none;font-weight:700;}
+.card{background:var(--card);border:1px solid #1e2338;border-radius:16px;padding:14px 16px;margin-bottom:12px;cursor:pointer;}
+.card h4{margin:0 0 4px;font-size:.95rem;}
+.card p{margin:0;color:var(--sub);font-size:.78rem;line-height:1.5;}
+.badge{display:inline-block;font-size:.62rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:8px;margin-bottom:6px;}
+.b-nouveau{background:rgba(242,201,76,.15);color:var(--wait);}
+.b-valide{background:rgba(94,224,106,.15);color:var(--ok);}
+.b-refuse{background:rgba(255,92,92,.15);color:var(--bad);}
+.empty{text-align:left;color:var(--sub);font-size:.85rem;padding:20px 0;}
+#gate{max-width:320px;margin:80px auto;text-align:left;}
+#gate input{width:100%;background:#0f1220;border:1px solid #262c47;color:var(--text);border-radius:10px;padding:11px 12px;font-size:.9rem;margin:10px 0;}
+.btn{padding:12px;border-radius:12px;border:none;font-weight:700;font-size:.86rem;cursor:pointer;width:100%;}
+.btn.primary{background:linear-gradient(90deg,var(--teal),var(--pink));color:#0d0f16;}
+.btn.ghost{background:transparent;border:1px solid #2c3350;color:#dfe2ee;}
+.btn.bad{background:var(--bad);color:#160404;}
+.overlay{position:fixed;inset:0;background:rgba(6,7,12,.72);z-index:30;display:none;align-items:flex-end;justify-content:center;}
+.overlay.on{display:flex;}
+.sheet{background:var(--card);border-top:1px solid #1e2338;border-radius:20px 20px 0 0;max-width:640px;width:100%;max-height:88vh;overflow-y:auto;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px));}
+.sheet h3{margin:0 0 10px;}
+.sheet .row{font-size:.85rem;line-height:1.7;color:#dfe2ee;text-align:left;margin-bottom:2px;}
+.sheet .row b{color:var(--teal);}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+.thumbs img{width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #262c47;}
+.actions{display:flex;gap:10px;margin-top:18px;}
+.close{float:right;color:var(--sub);font-size:1.1rem;cursor:pointer;}
+.plan{margin-top:14px;background:#0f1220;border:1px solid #262c47;border-radius:12px;padding:12px 14px;}
+.plan h4{margin:0 0 8px;font-size:.85rem;color:var(--teal);}
+.plan ol{margin:0;padding-left:18px;font-size:.8rem;line-height:1.7;color:#dfe2ee;text-align:left;}
+.wa-btn{display:block;text-align:center;text-decoration:none;margin-top:10px;padding:11px;border-radius:10px;background:#25d366;color:#062012;font-weight:700;font-size:.82rem;}
+.note{font-size:.72rem;color:var(--sub);margin-top:8px;line-height:1.5;text-align:left;}
+</style>
+</head>
+<body>
+
+<nav><div class="navwrap"><b>🔧 PC-INFORMATIQUE — Admin</b><span id="count" style="font-size:.75rem;color:var(--sub)"></span></div></nav>
+
+<div id="gate" class="wrap">
+  <h3 style="text-align:left">Accès admin</h3>
+  <p style="color:var(--sub);font-size:.82rem;text-align:left">Code d'accès requis.</p>
+  <input type="password" id="pass" placeholder="Code admin">
+  <button class="btn primary" id="btn-enter">Entrer</button>
+  <p id="pass-err" style="color:var(--bad);font-size:.78rem;display:none;text-align:left">Code incorrect.</p>
+</div>
+
+<div class="wrap" id="dash" style="display:none">
+  <div class="tabs">
+    <div class="tab on" data-f="nouveau">🕓 Nouvelles</div>
+    <div class="tab" data-f="valide">✅ Validées</div>
+    <div class="tab" data-f="refuse">❌ Refusées</div>
+    <div class="tab" data-f="all">Toutes</div>
+  </div>
+  <div id="list"></div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script>
+// ============ CONFIG — identique à index.html ============
+const firebaseConfig = { apiKey:"REMPLACER", authDomain:"", projectId:"", storageBucket:"", messagingSenderId:"", appId:"" };
+const ADMIN_PASSCODE = "REMPLACER-PAR-UN-CODE"; // à changer avant mise en ligne
+const EMAILJS_PUBLIC_KEY="REMPLACER", EMAILJS_SERVICE_ID="REMPLACER", EMAILJS_TPL_CLIENT_OK="REMPLACER", EMAILJS_TPL_CLIENT_NO="REMPLACER";
+const EMAILJS_READY = EMAILJS_PUBLIC_KEY !== "REMPLACER";
+// ===========================================================
+
+// ---- Feuille de route : outils gratuits selon le type + fonctionnalités choisies ----
+const TOOL_MAP = {
+  type: {
+    "Site vitrine": ["Hébergement gratuit : GitHub Pages ou Firebase Hosting", "Structure HTML/CSS/JS sur mesure"],
+    "Site e-commerce / boutique en ligne": ["Firebase Hosting + Firestore (catalogue produits)", "Commande via lien Mobile Money ou WhatsApp"],
+    "Application mobile": ["PWA installable (manifest.json + service worker)", "Firebase Hosting"],
+    "PWA (application web installable)": ["Firebase Hosting", "manifest.json + service worker (installable)", "Firebase Firestore pour les données"],
+    "Logiciel de gestion (caisse, stock)": ["Firebase Firestore (base de données temps réel)", "Firebase Authentication (comptes utilisateurs)"],
+    "Autre": ["Outils à définir selon le besoin précis du client"]
+  },
+  features: {
+    "Formulaire de contact": ["EmailJS (envoi d'e-mails gratuit)"],
+    "Paiement en ligne / Mobile Money": ["Lien direct Airtel Money / Moov Money", "PayPal pour les paiements internationaux"],
+    "Espace client / connexion": ["Firebase Authentication (gratuit)"],
+    "Panneau d'administration": ["Page admin.html sécurisée reliée à Firestore (comme celle-ci)"],
+    "Notifications": ["EmailJS (e-mail) + lien WhatsApp (wa.me) pour notification manuelle instantanée"],
+    "Carte / géolocalisation": ["Leaflet.js + fonds de carte OpenStreetMap (gratuit)"],
+    "Multilingue": ["Dictionnaires JS i18n faits main (gratuit, sans service tiers)"]
+  }
+};
+function buildPlan(d){
+  const steps = new Set();
+  (TOOL_MAP.type[d.type]||[]).forEach(s=>steps.add(s));
+  (d.features||[]).forEach(f=>(TOOL_MAP.features[f]||[]).forEach(s=>steps.add(s)));
+  return [...steps];
+}
+
+// ---- Gate ----
+if(sessionStorage.getItem('pcadmin_ok')==='1') showDash();
+document.getElementById('btn-enter').addEventListener('click', ()=>{
+  if(document.getElementById('pass').value === ADMIN_PASSCODE){
+    sessionStorage.setItem('pcadmin_ok','1'); showDash();
+  } else { document.getElementById('pass-err').style.display='block'; }
+});
+function showDash(){
+  document.getElementById('gate').style.display='none';
+  document.getElementById('dash').style.display='block';
+  initFirebase(); loadList();
+}
+
+// ---- Firebase ----
+let db=null;
+function initFirebase(){
+  if(!window.firebase) return;
+  if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+}
+
+let ALL=[]; let filter='nouveau';
+function loadList(){
+  if(!db) return;
+  db.collection('demandes').orderBy('createdAt','desc').onSnapshot(snap=>{
+    ALL = snap.docs.map(doc=>({id:doc.id, ...doc.data()}));
+    document.getElementById('count').textContent = ALL.length + ' demande(s)';
+    render();
+    const urlId = new URLSearchParams(location.search).get('id');
+    if(urlId){ const d = ALL.find(x=>x.id===urlId); if(d) openSheet(d); }
+  });
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on')); t.classList.add('on');
+  filter = t.dataset.f; render();
+}));
+function render(){
+  const list = document.getElementById('list');
+  const items = filter==='all' ? ALL : ALL.filter(d=>d.status===filter);
+  if(!items.length){ list.innerHTML = '<div class="empty">Aucune demande ici pour le moment.</div>'; return; }
+  list.innerHTML = items.map(d=>`
+    <div class="card" onclick="openSheet(${JSON.stringify(d).replace(/"/g,'&quot;')})">
+      <span class="badge b-${d.status}">${d.status}</span>
+      <h4>${d.nom||'Sans nom'} — ${d.structure||''}</h4>
+      <p>${d.type||'-'} · ${d.secteur||'-'} · ${d.tel||''}</p>
+    </div>`).join('');
+}
+
+// ---- Fiche détail ----
+function openSheet(d){
+  const overlay = document.getElementById('overlay');
+  const plan = d.plan || buildPlan(d);
+  document.getElementById('sheet').innerHTML = `
+    <span class="close" onclick="closeSheet()">✕</span>
+    <span class="badge b-${d.status}">${d.status}</span>
+    <h3>${d.nom||'-'}</h3>
+    <div class="row"><b>Tél :</b> ${d.tel||'-'} ${d.email?('· <b>Email :</b> '+d.email):''}</div>
+    <div class="row"><b>Structure :</b> ${d.structure||'-'} (${d.secteur||'-'}, ${d.ville||'-'})</div>
+    <div class="row"><b>Type :</b> ${d.type||'-'}</div>
+    <div class="row"><b>Fonctionnalités :</b> ${(d.features||[]).join(', ')||'-'}</div>
+    <div class="row"><b>Description :</b> ${d.description||'-'}</div>
+    <div class="row"><b>Budget :</b> ${d.budget||'-'} · <b>Délai :</b> ${d.delai||'-'}</div>
+    <div class="row"><b>Nom commercial :</b> ${d.nomCommercial||'-'} · <b>Slogan :</b> ${d.slogan||'-'}</div>
+    <div class="row"><b>Devise :</b> ${d.devise||'-'} · <b>Couleurs :</b> ${d.couleur1||''} / ${d.couleur2||''}</div>
+    <div class="row"><b>Textes fournis :</b> ${d.textes ? d.textes : '—'}</div>
+    <div class="thumbs">${(d.images||[]).map(i=>`<img src="${i}">`).join('')}</div>
+    <div class="plan"><h4>🛠️ Feuille de route (outils gratuits)</h4><ol>${plan.map(s=>`<li>${s}</li>`).join('')}</ol></div>
+    ${d.status==='nouveau' ? `
+      <div class="actions">
+        <button class="btn primary" onclick="decide('${d.id}','valide')">Valider</button>
+        <button class="btn bad" onclick="decide('${d.id}','refuse')">Refuser</button>
+      </div>` : `
+      <a class="wa-btn" id="wa-resend" href="#" target="_blank">📲 Renvoyer la notification WhatsApp au client</a>
+    `}
+    <p class="note">La notification WhatsApp au client s'ouvre en un tap dans WhatsApp (le numéro client n'étant pas relié à un compte professionnel automatisé, l'envoi se confirme manuellement). L'e-mail, lui, part automatiquement si un e-mail est renseigné.</p>
+  `;
+  overlay.classList.add('on');
+  if(d.status!=='nouveau'){
+    const msg = d.status==='valide' ? clientMsgOk(d) : clientMsgRefuse(d);
+    document.getElementById('wa-resend').href = `https://wa.me/${cleanTel(d.tel)}?text=${encodeURIComponent(msg)}`;
+  }
+  window._current = d;
+}
+function closeSheet(){ document.getElementById('overlay').classList.remove('on'); history.replaceState(null,'','admin.html'); }
+document.getElementById('overlay').addEventListener('click', e=>{ if(e.target.id==='overlay') closeSheet(); });
+
+function cleanTel(t){ return (t||'').replace(/[^0-9+]/g,'').replace(/^0/,'241').replace('+',''); }
+
+function clientMsgOk(d){
+  const plan = d.plan || buildPlan(d);
+  return `Bonjour ${d.nom}, bonne nouvelle ! ✅\nVotre demande "${d.nomCommercial||d.structure||d.type}" auprès de PC-INFORMATIQUE est *validée*.\nNous démarrons la réalisation. Étapes prévues :\n${plan.map((s,i)=>`${i+1}. ${s}`).join('\n')}\nNous revenons vers vous dès l'avancement. Merci de votre confiance !`;
+}
+function clientMsgRefuse(d){
+  return `Bonjour ${d.nom}, merci pour votre demande auprès de PC-INFORMATIQUE.\nAprès étude, nous ne pouvons pas la prendre en charge dans l'état actuel. N'hésitez pas à nous recontacter pour en discuter ou préciser votre besoin.\n✉️ pcinformatique28@gmail.com · 📞 +241 60 14 19 24`;
+}
+
+function decide(id, status){
+  const d = ALL.find(x=>x.id===id);
+  if(!d) return;
+  const plan = status==='valide' ? buildPlan(d) : null;
+  const update = { status, decidedAt: new Date().toISOString() };
+  if(plan) update.plan = plan;
+  db.collection('demandes').doc(id).update(update).then(()=>{
+    const updated = {...d, ...update};
+    // E-mail auto au client si adresse fournie
+    if(EMAILJS_READY && window.emailjs && d.email){
+      try{
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+        const tpl = status==='valide' ? EMAILJS_TPL_CLIENT_OK : EMAILJS_TPL_CLIENT_NO;
+        emailjs.send(EMAILJS_SERVICE_ID, tpl, { to_email:d.email, nom:d.nom, message: status==='valide'?clientMsgOk(updated):clientMsgRefuse(updated) });
+      }catch(e){ console.error(e); }
+    }
+    closeSheet();
+    openSheet(updated);
+  });
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-app-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</body>
+</html>
