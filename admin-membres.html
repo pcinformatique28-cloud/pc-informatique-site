@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin — Membres & Projets — PC-INFORMATIQUE</title>
+<style>
+  :root{
+    --bg:#f5f6f8; --surface:#ffffff; --text:#151824; --muted:#6b7280;
+    --primary:#2454ff; --primary-dark:#173bd1; --border:#e2e5ea;
+    --danger:#dc2626; --success:#16a34a; --warn:#b45309; --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
+  }
+  header{
+    background:var(--surface); border-bottom:1px solid var(--border);
+    padding:14px 20px; display:flex; justify-content:space-between; align-items:center;
+  }
+  header .brand{font-weight:700; font-size:15px;}
+  header button{
+    background:none; border:1px solid var(--border); border-radius:8px; padding:8px 14px;
+    font-size:13px; cursor:pointer; color:var(--muted);
+  }
+  header button:hover{color:var(--danger); border-color:var(--danger);}
+
+  /* Gate de connexion */
+  #gate{
+    max-width:380px; margin:60px auto; background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:28px; display:flex; flex-direction:column; gap:10px;
+  }
+  #gate h1{font-size:18px; margin:0 0 8px;}
+  #gate input{padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px;}
+  #gate button{padding:11px; border:none; border-radius:8px; background:var(--primary); color:#fff; font-weight:600; cursor:pointer;}
+  #gate button:hover{background:var(--primary-dark);}
+  #gate .gmsg{font-size:13px; min-height:16px;}
+  #gate .gmsg.err{color:var(--danger);}
+  #gate .gmsg.ok{color:var(--success);}
+
+  main{max-width:900px; margin:0 auto; padding:24px 16px 60px; display:none;}
+  .tabs{display:flex; gap:8px; margin-bottom:18px;}
+  .tab{
+    padding:9px 16px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;
+    border:1px solid var(--border); background:var(--surface); color:var(--muted);
+  }
+  .tab.active{background:var(--primary); color:#fff; border-color:var(--primary);}
+  .panel{display:none;}
+  .panel.active{display:block;}
+  .stats{display:flex; gap:12px; margin-bottom:18px; flex-wrap:wrap;}
+  .stat{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:14px 18px; flex:1; min-width:120px;
+  }
+  .stat .num{font-size:22px; font-weight:800;}
+  .stat .lbl{font-size:12px; color:var(--muted);}
+  .filters{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;}
+  .filters button{
+    padding:7px 12px; border-radius:20px; border:1px solid var(--border); background:var(--surface);
+    font-size:12px; cursor:pointer; color:var(--muted);
+  }
+  .filters button.active{background:var(--text); color:#fff; border-color:var(--text);}
+  .row{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:14px 16px; margin-bottom:10px; display:flex; gap:14px; align-items:flex-start;
+  }
+  .row img.avatar{width:44px; height:44px; border-radius:50%; object-fit:cover; background:#e2e5ea; flex-shrink:0;}
+  .row .body{flex:1; min-width:0;}
+  .row .title{font-weight:700; font-size:14px;}
+  .row .sub{font-size:12px; color:var(--muted); margin-top:2px;}
+  .row .desc{font-size:13px; color:var(--muted); margin-top:6px; white-space:pre-wrap;}
+  .row img.thumb{max-width:160px; border-radius:6px; margin-top:8px; display:block;}
+  .row .actions{display:flex; gap:6px; flex-shrink:0; flex-wrap:wrap;}
+  .btn-sm{
+    padding:6px 11px; border-radius:7px; font-size:12px; font-weight:600; border:1px solid var(--border);
+    background:var(--surface); cursor:pointer; color:var(--text);
+  }
+  .btn-sm.ok{color:var(--success); border-color:#bbf7d0;}
+  .btn-sm.ok:hover{background:#f0fdf4;}
+  .btn-sm.no{color:var(--danger); border-color:#fecaca;}
+  .btn-sm.no:hover{background:#fef2f2;}
+  .badge{font-size:11px; font-weight:700; padding:3px 8px; border-radius:20px; white-space:nowrap;}
+  .badge.en_attente{background:#fffbeb; color:var(--warn);}
+  .badge.valide{background:#f0fdf4; color:var(--success);}
+  .badge.refuse{background:#fef2f2; color:var(--danger);}
+  .badge.type{background:#eef2ff; color:var(--primary-dark);}
+  .empty{font-size:13px; color:var(--muted); text-align:center; padding:30px 0;}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">PC-INFORMATIQUE · Admin membres & projets</div>
+  <button id="btn-logout" style="display:none;">Déconnexion</button>
+</header>
+
+<div id="gate">
+  <h1>Connexion admin</h1>
+  <input type="email" id="login-email" placeholder="votre@email.com" autocomplete="username">
+  <input type="password" id="login-pass" placeholder="Mot de passe" autocomplete="current-password">
+  <button id="btn-login">Se connecter</button>
+  <div class="gmsg" id="gate-msg"></div>
+</div>
+
+<main id="app">
+  <div class="stats">
+    <div class="stat"><div class="num" id="s-membres">–</div><div class="lbl">Membres inscrits</div></div>
+    <div class="stat"><div class="num" id="s-attente">–</div><div class="lbl">Projets en attente</div></div>
+    <div class="stat"><div class="num" id="s-valides">–</div><div class="lbl">Projets validés</div></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="projets">Projets</div>
+    <div class="tab" data-tab="membres">Membres</div>
+  </div>
+
+  <div class="panel active" id="panel-projets">
+    <div class="filters">
+      <button class="active" data-filter="tous">Tous</button>
+      <button data-filter="en_attente">En attente</button>
+      <button data-filter="valide">Validés</button>
+      <button data-filter="refuse">Refusés</button>
+    </div>
+    <div id="projets-list"></div>
+  </div>
+
+  <div class="panel" id="panel-membres">
+    <div id="membres-list"></div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-app-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = { apiKey:"AIzaSyCx2D6b8TFGW-GBxb25t4MUqpoQj_cQCtk", authDomain:"pc-informatique-site.firebaseapp.com", projectId:"pc-informatique-site", storageBucket:"pc-informatique-site.firebasestorage.app", messagingSenderId:"43208715297", appId:"1:43208715297:web:02e946d321ae3a31ab0760" };
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='44' height='44'><rect width='44' height='44' fill='%23e2e5ea'/></svg>";
+
+function gateMsg(text, ok){
+  const el = document.getElementById('gate-msg');
+  el.textContent = text;
+  el.className = 'gmsg ' + (ok ? 'ok' : 'err');
+}
+function escapeHtml(str){
+  return (str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+document.getElementById('btn-login').addEventListener('click', ()=>{
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  auth.signInWithEmailAndPassword(email, pass).catch(err=>{
+    gateMsg(err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found'
+      ? "E-mail ou mot de passe incorrect." : "Erreur : " + err.message, false);
+  });
+});
+document.getElementById('btn-logout').addEventListener('click', ()=> auth.signOut());
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+let currentFilter = 'tous';
+let allProjets = [];
+let membresIndex = {}; // uid -> {nom, photoURL}
+
+document.querySelectorAll('.filters button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderProjets();
+  });
+});
+
+function renderProjets(){
+  const list = document.getElementById('projets-list');
+  const statutLabel = { en_attente:"En attente", valide:"Validé", refuse:"Refusé" };
+  const typeLabel = { personnel:"Personnel", collaboration:"Collaboration" };
+
+  const filtered = currentFilter === 'tous' ? allProjets : allProjets.filter(p => p.statut === currentFilter);
+
+  if(filtered.length === 0){
+    list.innerHTML = '<div class="empty">Aucun projet ici.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(p=>{
+    const membre = membresIndex[p.membreId] || {};
+    return `
+    <div class="row">
+      <img class="avatar" src="${membre.photoURL || DEFAULT_AVATAR}" alt="">
+      <div class="body">
+        <div class="title">${escapeHtml(p.titre)} <span class="badge type">${typeLabel[p.type]||p.type}</span></div>
+        <div class="sub">Par ${escapeHtml(membre.nom || 'Membre inconnu')} · <span class="badge ${p.statut}">${statutLabel[p.statut]||p.statut}</span></div>
+        ${p.description ? `<div class="desc">${escapeHtml(p.description)}</div>` : ''}
+        ${p.imageURL ? `<img class="thumb" src="${p.imageURL}" alt="">` : ''}
+        ${p.lien ? `<div class="sub"><a href="${escapeHtml(p.lien)}" target="_blank" rel="noopener">${escapeHtml(p.lien)}</a></div>` : ''}
+      </div>
+      <div class="actions">
+        <button class="btn-sm ok" data-action="valider" data-id="${p.id}">Valider</button>
+        <button class="btn-sm no" data-action="refuser" data-id="${p.id}">Refuser</button>
+        <button class="btn-sm no" data-action="supprimer" data-id="${p.id}">Suppr.</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('[data-action]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+      if(action === 'valider') await db.collection('projets').doc(id).update({ statut:'valide' });
+      if(action === 'refuser') await db.collection('projets').doc(id).update({ statut:'refuse' });
+      if(action === 'supprimer'){
+        if(!confirm('Supprimer définitivement ce projet ?')) return;
+        await db.collection('projets').doc(id).delete();
+      }
+      await loadProjets();
+    });
+  });
+}
+
+async function loadProjets(){
+  const snap = await db.collection('projets').get();
+  allProjets = [];
+  snap.forEach(doc => allProjets.push({ id: doc.id, ...doc.data() }));
+  allProjets.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+
+  document.getElementById('s-attente').textContent = allProjets.filter(p=>p.statut==='en_attente').length;
+  document.getElementById('s-valides').textContent = allProjets.filter(p=>p.statut==='valide').length;
+  renderProjets();
+}
+
+async function loadMembres(){
+  const snap = await db.collection('membres').get();
+  const membres = [];
+  snap.forEach(doc => {
+    const d = { id: doc.id, ...doc.data() };
+    membres.push(d);
+    membresIndex[doc.id] = d;
+  });
+  membres.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+
+  document.getElementById('s-membres').textContent = membres.length;
+
+  const list = document.getElementById('membres-list');
+  if(membres.length === 0){
+    list.innerHTML = '<div class="empty">Aucun membre inscrit.</div>';
+    return;
+  }
+
+  list.innerHTML = membres.map(m => `
+    <div class="row">
+      <img class="avatar" src="${m.photoURL || DEFAULT_AVATAR}" alt="">
+      <div class="body">
+        <div class="title">${escapeHtml(m.nom || 'Sans nom')} ${m.actif === false ? '<span class="badge refuse">Désactivé</span>' : ''}</div>
+        <div class="sub">${escapeHtml(m.email || '')}</div>
+        ${m.bio ? `<div class="desc">${escapeHtml(m.bio)}</div>` : ''}
+      </div>
+      <div class="actions">
+        <button class="btn-sm ${m.actif === false ? 'ok' : 'no'}" data-action="toggle" data-id="${m.id}" data-actif="${m.actif !== false}">
+          ${m.actif === false ? 'Réactiver' : 'Désactiver'}
+        </button>
+        <button class="btn-sm no" data-action="supprimer" data-id="${m.id}">Suppr.</button>
+      </div>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('[data-action]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+      if(action === 'toggle'){
+        const actif = btn.dataset.actif === 'true';
+        await db.collection('membres').doc(id).update({ actif: !actif });
+      }
+      if(action === 'supprimer'){
+        if(!confirm("Supprimer définitivement ce membre ? Son compte de connexion restera actif, seul son profil est retiré.")) return;
+        await db.collection('membres').doc(id).delete();
+      }
+      await loadMembres();
+      await loadProjets();
+    });
+  });
+}
+
+auth.onAuthStateChanged(async user=>{
+  if(!user){
+    document.getElementById('gate').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('btn-logout').style.display = 'none';
+    return;
+  }
+  const adminDoc = await db.collection('admins').doc(user.uid).get();
+  if(!adminDoc.exists){
+    gateMsg("Ce compte n'a pas les droits admin.", false);
+    auth.signOut();
+    return;
+  }
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('btn-logout').style.display = 'inline-block';
+  await loadMembres();
+  await loadProjets();
+});
+</script>
+</body>
+</html>

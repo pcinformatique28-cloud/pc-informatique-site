@@ -9,6 +9,15 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    function isAdmin() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
     // ------------------------------------------------------------------
     // Collection "admins" — verrouillée. Un utilisateur ne peut jamais
     // s'auto-attribuer le rôle admin (même schéma que sur GSC/AMBI241).
@@ -20,18 +29,68 @@ service cloud.firestore {
 
     // ------------------------------------------------------------------
     // Collection "demandes" — formulaire de contact / devis du site.
-    // Désactivée pour l'instant (create: if false) : à activer quand le
-    // formulaire de contact sera branché sur le site, avec validation
-    // stricte des champs pour éviter le spam/l'injection.
+    // Désactivée pour l'instant (create: if false).
     // ------------------------------------------------------------------
     match /demandes/{id} {
       allow create: if false;
-      // Exemple à activer plus tard :
-      // allow create: if request.resource.data.keys().hasOnly(['nom','email','message','createdAt'])
-      //   && request.resource.data.nom is string && request.resource.data.nom.size() < 100
-      //   && request.resource.data.email is string && request.resource.data.email.size() < 150
-      //   && request.resource.data.message is string && request.resource.data.message.size() < 2000;
-      allow read, update, delete: if false; // lecture réservée à l'admin (via console ou panneau admin.html plus tard)
+      allow read, update, delete: if false;
+    }
+
+    // ------------------------------------------------------------------
+    // Collection "membres" — un document par compte inscrit.
+    // Champs attendus : nom, email, bio, photoURL, createdAt, actif
+    // ------------------------------------------------------------------
+    match /membres/{uid} {
+      // Profils publics (annuaire des membres sur le site)
+      allow read: if true;
+
+      // Un membre crée uniquement son propre document, à l'inscription
+      allow create: if isSignedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['nom','email','bio','photoURL','createdAt','actif'])
+        && request.resource.data.nom is string && request.resource.data.nom.size() > 0 && request.resource.data.nom.size() < 100
+        && request.resource.data.email is string
+        && request.resource.data.actif == true;
+
+      // Un membre modifie son propre profil, mais ne peut pas se désactiver
+      // lui-même ni changer son email de compte via Firestore
+      allow update: if (isSignedIn() && request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['nom','bio','photoURL'])
+        ) || isAdmin();
+
+      // Seul l'admin peut supprimer un compte membre
+      allow delete: if isAdmin();
+    }
+
+    // ------------------------------------------------------------------
+    // Collection "projets" — projets personnels et collaborations,
+    // rattachés à un membre via membreId.
+    // Champs attendus : membreId, titre, description, type, lien,
+    // imageURL, statut, createdAt
+    // ------------------------------------------------------------------
+    match /projets/{id} {
+      // Visible publiquement si validé ; sinon visible par son auteur
+      // et par l'admin uniquement.
+      allow read: if resource.data.statut == 'valide'
+        || (isSignedIn() && resource.data.membreId == request.auth.uid)
+        || isAdmin();
+
+      allow create: if isSignedIn()
+        && request.resource.data.membreId == request.auth.uid
+        && request.resource.data.keys().hasOnly(['membreId','titre','description','type','lien','imageURL','statut','createdAt'])
+        && request.resource.data.titre is string && request.resource.data.titre.size() > 0 && request.resource.data.titre.size() < 150
+        && request.resource.data.description is string && request.resource.data.description.size() < 3000
+        && request.resource.data.type in ['personnel','collaboration']
+        && request.resource.data.statut == 'en_attente';
+
+      // L'auteur peut modifier le contenu (repasse en attente de
+      // validation) ; l'admin peut changer le statut librement.
+      allow update: if (isSignedIn() && resource.data.membreId == request.auth.uid
+          && request.resource.data.membreId == resource.data.membreId
+          && request.resource.data.statut == 'en_attente'
+        ) || isAdmin();
+
+      allow delete: if (isSignedIn() && resource.data.membreId == request.auth.uid) || isAdmin();
     }
   }
 }

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mon profil — PC-INFORMATIQUE</title>
+<style>
+  :root{
+    --bg:#f5f6f8; --surface:#ffffff; --text:#151824; --muted:#6b7280;
+    --primary:#2454ff; --primary-dark:#173bd1; --border:#e2e5ea;
+    --danger:#dc2626; --success:#16a34a; --warn:#b45309; --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
+  }
+  header{
+    background:var(--surface); border-bottom:1px solid var(--border);
+    padding:14px 20px; display:flex; justify-content:space-between; align-items:center;
+  }
+  header .brand{font-weight:700; font-size:15px;}
+  header button{
+    background:none; border:1px solid var(--border); border-radius:8px; padding:8px 14px;
+    font-size:13px; cursor:pointer; color:var(--muted);
+  }
+  header button:hover{color:var(--danger); border-color:var(--danger);}
+  main{max-width:640px; margin:0 auto; padding:24px 16px 60px;}
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px; margin-bottom:20px;}
+  h2{font-size:16px; margin:0 0 16px;}
+  .photo-row{display:flex; align-items:center; gap:16px; margin-bottom:20px;}
+  .avatar{
+    width:84px; height:84px; border-radius:50%; object-fit:cover; background:#e2e5ea;
+    border:1px solid var(--border); flex-shrink:0;
+  }
+  .photo-actions label{
+    display:inline-block; background:var(--primary); color:#fff; padding:8px 14px;
+    border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;
+  }
+  .photo-actions label:hover{background:var(--primary-dark);}
+  .photo-actions input[type=file]{display:none;}
+  .photo-actions .hint{font-size:12px; color:var(--muted); margin-top:6px;}
+  label.field{display:block; font-size:13px; font-weight:600; margin:14px 0 6px;}
+  input,textarea,select{
+    width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px;
+    font-size:14px; background:#fbfbfc; font-family:inherit;
+  }
+  textarea{resize:vertical; min-height:80px;}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--primary); outline-offset:1px; background:#fff;}
+  .btn{
+    padding:10px 16px; border:none; border-radius:8px; font-size:14px; font-weight:600;
+    cursor:pointer; background:var(--primary); color:#fff;
+  }
+  .btn:hover{background:var(--primary-dark);}
+  .btn:disabled{opacity:.6; cursor:default;}
+  .btn-outline{background:none; border:1px solid var(--border); color:var(--text);}
+  .btn-outline:hover{border-color:var(--primary); color:var(--primary);}
+  .btn-danger{background:none; color:var(--danger); border:1px solid transparent; padding:6px 10px; font-size:12px;}
+  .btn-danger:hover{background:#fef2f2;}
+  .msg{font-size:13px; margin-top:12px; padding:9px 12px; border-radius:8px; display:none;}
+  .msg.err{display:block; background:#fef2f2; color:var(--danger);}
+  .msg.ok{display:block; background:#f0fdf4; color:var(--success);}
+  .proj{border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:12px;}
+  .proj-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+  .proj-title{font-weight:700; font-size:14px;}
+  .proj-desc{font-size:13px; color:var(--muted); margin-top:4px; white-space:pre-wrap;}
+  .badge{font-size:11px; font-weight:700; padding:3px 8px; border-radius:20px; white-space:nowrap;}
+  .badge.en_attente{background:#fffbeb; color:var(--warn);}
+  .badge.valide{background:#f0fdf4; color:var(--success);}
+  .badge.refuse{background:#fef2f2; color:var(--danger);}
+  .badge.type{background:#eef2ff; color:var(--primary-dark); margin-left:6px;}
+  .proj img{max-width:100%; border-radius:6px; margin-top:8px; display:block;}
+  .proj a.lien{font-size:12px; color:var(--primary); display:inline-block; margin-top:6px;}
+  .empty{font-size:13px; color:var(--muted); text-align:center; padding:20px 0;}
+  #loading{text-align:center; padding:60px 0; color:var(--muted);}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">PC-INFORMATIQUE · Espace membre</div>
+  <button id="btn-logout">Déconnexion</button>
+</header>
+
+<div id="loading">Chargement…</div>
+
+<main id="app" style="display:none;">
+  <div class="card">
+    <h2>Mon profil</h2>
+    <div class="photo-row">
+      <img class="avatar" id="avatar" src="" alt="Photo de profil">
+      <div class="photo-actions">
+        <label for="photo-input" id="photo-label">Changer la photo</label>
+        <input type="file" id="photo-input" accept="image/*">
+        <div class="hint">JPG ou PNG, moins de 5 Mo</div>
+      </div>
+    </div>
+    <label class="field" for="nom">Nom</label>
+    <input id="nom" type="text">
+    <label class="field" for="bio">Bio</label>
+    <textarea id="bio" placeholder="Quelques mots sur toi…"></textarea>
+    <div style="margin-top:16px;"><button class="btn" id="btn-save-profil">Enregistrer</button></div>
+    <div class="msg" id="msg-profil"></div>
+  </div>
+
+  <div class="card">
+    <h2>Ajouter un projet</h2>
+    <label class="field" for="p-titre">Titre</label>
+    <input id="p-titre" type="text" placeholder="Nom du projet">
+    <label class="field" for="p-type">Type</label>
+    <select id="p-type">
+      <option value="personnel">Projet personnel</option>
+      <option value="collaboration">Collaboration / projet d'équipe</option>
+    </select>
+    <label class="field" for="p-desc">Description</label>
+    <textarea id="p-desc" placeholder="En quoi consiste le projet ?"></textarea>
+    <label class="field" for="p-lien">Lien (optionnel)</label>
+    <input id="p-lien" type="url" placeholder="https://…">
+    <label class="field" for="p-image">Image (optionnel)</label>
+    <input type="file" id="p-image" accept="image/*">
+    <div style="margin-top:16px;"><button class="btn" id="btn-add-projet">Envoyer pour validation</button></div>
+    <div class="msg" id="msg-projet"></div>
+  </div>
+
+  <div class="card">
+    <h2>Mes projets</h2>
+    <div id="projets-list"></div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-app-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = { apiKey:"AIzaSyCx2D6b8TFGW-GBxb25t4MUqpoQj_cQCtk", authDomain:"pc-informatique-site.firebaseapp.com", projectId:"pc-informatique-site", storageBucket:"pc-informatique-site.firebasestorage.app", messagingSenderId:"43208715297", appId:"1:43208715297:web:02e946d321ae3a31ab0760" };
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const CLOUD_NAME = "zbof0xbh";
+const UPLOAD_PRESET = "pc_membres";
+const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='84' height='84'><rect width='84' height='84' fill='%23e2e5ea'/></svg>";
+
+let currentUser = null;
+
+async function uploadToCloudinary(file){
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', UPLOAD_PRESET);
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method:'POST', body: fd });
+  if(!res.ok) throw new Error('Échec upload Cloudinary');
+  const data = await res.json();
+  return data.secure_url;
+}
+
+function showMsg(el, text, ok){
+  el.textContent = text;
+  el.className = 'msg ' + (ok ? 'ok' : 'err');
+}
+
+function escapeHtml(str){
+  return (str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function loadProfil(){
+  const doc = await db.collection('membres').doc(currentUser.uid).get();
+  const d = doc.data() || {};
+  document.getElementById('nom').value = d.nom || '';
+  document.getElementById('bio').value = d.bio || '';
+  document.getElementById('avatar').src = d.photoURL || DEFAULT_AVATAR;
+}
+
+document.getElementById('photo-input').addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const label = document.getElementById('photo-label');
+  const original = label.textContent;
+  label.textContent = "Envoi…";
+  try{
+    const url = await uploadToCloudinary(file);
+    await db.collection('membres').doc(currentUser.uid).update({ photoURL: url });
+    document.getElementById('avatar').src = url;
+  }catch(err){
+    alert("Impossible d'envoyer la photo. Réessaie.");
+  }finally{
+    label.textContent = original;
+    e.target.value = '';
+  }
+});
+
+document.getElementById('btn-save-profil').addEventListener('click', async ()=>{
+  const btn = document.getElementById('btn-save-profil');
+  const msg = document.getElementById('msg-profil');
+  const nom = document.getElementById('nom').value.trim();
+  const bio = document.getElementById('bio').value.trim();
+  if(!nom){ showMsg(msg, "Le nom ne peut pas être vide.", false); return; }
+  btn.disabled = true;
+  try{
+    await db.collection('membres').doc(currentUser.uid).update({ nom, bio });
+    showMsg(msg, "Profil mis à jour.", true);
+  }catch(err){
+    showMsg(msg, "Erreur lors de l'enregistrement.", false);
+  }finally{
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('btn-add-projet').addEventListener('click', async ()=>{
+  const btn = document.getElementById('btn-add-projet');
+  const msg = document.getElementById('msg-projet');
+  const titre = document.getElementById('p-titre').value.trim();
+  const type = document.getElementById('p-type').value;
+  const description = document.getElementById('p-desc').value.trim();
+  const lien = document.getElementById('p-lien').value.trim();
+  const fileInput = document.getElementById('p-image');
+
+  if(!titre){ showMsg(msg, "Le titre est obligatoire.", false); return; }
+
+  btn.disabled = true; btn.textContent = "Envoi…";
+  try{
+    let imageURL = "";
+    if(fileInput.files[0]){
+      imageURL = await uploadToCloudinary(fileInput.files[0]);
+    }
+    await db.collection('projets').add({
+      membreId: currentUser.uid,
+      titre, description, type, lien, imageURL,
+      statut: 'en_attente',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showMsg(msg, "Projet envoyé, en attente de validation par l'admin.", true);
+    document.getElementById('p-titre').value = '';
+    document.getElementById('p-desc').value = '';
+    document.getElementById('p-lien').value = '';
+    fileInput.value = '';
+    loadProjets();
+  }catch(err){
+    showMsg(msg, "Erreur lors de l'envoi du projet.", false);
+  }finally{
+    btn.disabled = false; btn.textContent = "Envoyer pour validation";
+  }
+});
+
+async function loadProjets(){
+  const list = document.getElementById('projets-list');
+  const snap = await db.collection('projets').where('membreId','==', currentUser.uid).get();
+  const projets = [];
+  snap.forEach(doc => projets.push({ id: doc.id, ...doc.data() }));
+  projets.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+
+  if(projets.length === 0){
+    list.innerHTML = '<div class="empty">Aucun projet pour l\'instant.</div>';
+    return;
+  }
+
+  const statutLabel = { en_attente:"En attente", valide:"Validé", refuse:"Refusé" };
+  const typeLabel = { personnel:"Personnel", collaboration:"Collaboration" };
+
+  list.innerHTML = projets.map(p => `
+    <div class="proj">
+      <div class="proj-top">
+        <div>
+          <span class="proj-title">${escapeHtml(p.titre)}</span>
+          <span class="badge type">${typeLabel[p.type]||p.type}</span>
+        </div>
+        <span class="badge ${p.statut}">${statutLabel[p.statut]||p.statut}</span>
+      </div>
+      ${p.description ? `<div class="proj-desc">${escapeHtml(p.description)}</div>` : ''}
+      ${p.imageURL ? `<img src="${p.imageURL}" alt="">` : ''}
+      ${p.lien ? `<a class="lien" href="${escapeHtml(p.lien)}" target="_blank" rel="noopener">${escapeHtml(p.lien)}</a><br>` : ''}
+      <button class="btn-danger" data-id="${p.id}">Supprimer</button>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.btn-danger').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      if(!confirm('Supprimer ce projet ?')) return;
+      await db.collection('projets').doc(btn.dataset.id).delete();
+      loadProjets();
+    });
+  });
+}
+
+document.getElementById('btn-logout').addEventListener('click', ()=> auth.signOut());
+
+auth.onAuthStateChanged(async user=>{
+  if(!user){ location.href = 'connexion.html'; return; }
+  currentUser = user;
+  await loadProfil();
+  await loadProjets();
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+});
+</script>
+</body>
+</html>
