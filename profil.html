@@ -77,6 +77,11 @@
   .proj a.lien{font-size:12px; color:var(--primary); display:inline-block; margin-top:6px;}
   .empty{font-size:13px; color:var(--muted); text-align:center; padding:20px 0;}
   #loading{text-align:center; padding:60px 0; color:var(--muted);}
+  body{background:linear-gradient(160deg,#eafbf8 0%,#fdeef6 100%) !important;}
+  input[readonly],textarea[readonly]{background:transparent !important;border-color:transparent !important;color:var(--text);cursor:default;}
+  .profil-head{display:flex;align-items:center;justify-content:space-between;}
+  .edit-icon{background:none;border:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--muted);padding:4px 10px;border-radius:6px;}
+  .edit-icon:hover{color:var(--primary);background:#f0fdfb;}
 </style>
 </head>
 <body>
@@ -90,7 +95,10 @@
 
 <main id="app" style="display:none;">
   <div class="card">
-    <h2>Mon profil</h2>
+    <div class="profil-head">
+      <h2>Mon profil</h2>
+      <button type="button" id="btn-edit-profil" class="edit-icon" title="Modifier" style="display:none;">Modifier</button>
+    </div>
     <div class="photo-row">
       <img class="avatar" id="avatar" src="" alt="Photo de profil">
       <div class="photo-actions">
@@ -172,7 +180,21 @@ async function loadProfil(){
   document.getElementById('nom').value = d.nom || '';
   document.getElementById('bio').value = d.bio || '';
   document.getElementById('avatar').src = d.photoURL || DEFAULT_AVATAR;
+  setProfilEditMode(!d.nom);
 }
+
+function setProfilEditMode(on){
+  const nom = document.getElementById('nom');
+  const bio = document.getElementById('bio');
+  const btnSave = document.getElementById('btn-save-profil');
+  const btnEdit = document.getElementById('btn-edit-profil');
+  nom.readOnly = !on;
+  bio.readOnly = !on;
+  btnSave.parentElement.style.display = on ? '' : 'none';
+  btnEdit.style.display = on ? 'none' : '';
+}
+
+document.getElementById('btn-edit-profil').addEventListener('click', ()=> setProfilEditMode(true));
 
 document.getElementById('photo-input').addEventListener('change', async (e)=>{
   const file = e.target.files[0];
@@ -203,6 +225,7 @@ document.getElementById('btn-save-profil').addEventListener('click', async ()=>{
   try{
     await db.collection('membres').doc(currentUser.uid).set({ nom, bio }, { merge: true });
     showMsg(msg, "Profil mis à jour.", true);
+    setProfilEditMode(false);
   }catch(err){
     showMsg(msg, "Erreur lors de l'enregistrement.", false);
   }finally{
