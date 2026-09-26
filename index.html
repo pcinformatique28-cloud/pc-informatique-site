@@ -204,6 +204,9 @@ nav:not(.d-links){position:sticky!important;top:0!important;z-index:25!important
 
 /* ===== PATCH v8 : cercles parfaitement ronds ===== */
 .brand img{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.icon-btn{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.drawer .d-user img{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.drawer a.d-link .ic{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.about-creator .ac-avatar{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.success .tick{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.d-user img{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.d-link .ic{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}
+
+/* ===== PATCH v9 : positionnement About + icone drawer ===== */
+.about-btn-wrap{text-align:center!important;}
 </style>
 </head>
 <body>
@@ -238,7 +241,7 @@ nav:not(.d-links){position:sticky!important;top:0!important;z-index:25!important
     <a href="index.html#demande" class="d-link"><span class="ic">&#10133;</span>Nouvelle demande</a>
     <a href="profil.html" class="d-link" id="drawer-profil" style="display:none;"><span class="ic">&#128100;</span>Mon profil</a>
     <a href="admin.html" class="d-link" id="drawer-admin" style="display:none;"><span class="ic">&#9881;</span>Tableau de bord</a>
-    <a href="#" class="d-link" onclick="openSheet('about-sheet');return false;"><span class="ic">&#8505;</span>A propos</a>
+    <a href="#" class="d-link" onclick="openSheet('about-sheet');return false;"><span class="ic" style="color:#12142b;font-weight:800;">i</span>A propos</a>
     <a href="#" class="d-link" onclick="openSheet('notif-sheet');return false;"><span class="ic">&#128276;</span>Parametres notifications</a>
     <a href="connexion.html" class="d-link" id="drawer-login"><span class="ic">&#128273;</span>Connexion</a>
     <a href="#" class="d-link" id="drawer-logout" style="display:none;color:#ff6b6b;"><span class="ic">&#128682;</span>Deconnexion</a>
@@ -321,7 +324,7 @@ function toggleCard(id){
 }
 </script>
 
-<div class="about-btn-wrap"><button onclick="openSheet('about-sheet')">&#8505;&nbsp; A propos de PC-INFORMATIQUE</button></div>
+
 
 <div class="section-title" id="demande"><h2>Nouvelle demande de projet</h2><span>6 étapes</span></div>
 
@@ -418,6 +421,7 @@ function toggleCard(id){
     </form>
   </div>
 
+<div class="about-btn-wrap" style="text-align:center;margin:34px 0 18px;"><button onclick="openSheet('about-sheet')">&#8505;&nbsp; A propos de PC-INFORMATIQUE</button></div>
   <footer>PC-INFORMATIQUE — Services informatiques &amp; création d'applications web/mobile</footer>
 </div>
 
