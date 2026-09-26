@@ -183,13 +183,16 @@ footer{margin-top:20px;text-align:center;color:var(--sub);font-size:.78rem;}
 body{padding-bottom:70px;}
 
 /* ===== Overrides demandés (header vert chromé, hauteur, bordures) ===== */
-nav{background:linear-gradient(100deg,#052e1c 0%,#0b6b3a 25%,#3fce7c 45%,#eafff0 55%,#3fce7c 65%,#0b6b3a 85%,#052e1c 100%)!important;padding:6px 14px!important;}
+nav:not(.d-links){background:linear-gradient(100deg,#0b6b3a 0%,#12864a 50%,#0b6b3a 100%)!important;padding:6px 14px!important;}
 .header-row{gap:6px!important;}
 .header-row .brand img{width:28px!important;height:28px!important;}
 .header-row .brand b{font-size:.98rem!important;}
 .navlinks a,.card,.card.pcinfo-self,.formbox,.btn.ghost,.icon-btn,.opt,.upload-box,.thumbs img,.about-tabs button,.about-pane p,.about-btn-wrap button,input[type=text],input[type=email],input[type=tel],input[type=number],textarea,input[type=color]{border-color:#000!important;border-width:2px!important;}
 .card.pcinfo-self{cursor:default;}
 .card.pcinfo-self .card-head{cursor:default;justify-content:center;}
+
+.card{margin-bottom:14px!important;}
+.card:last-of-type{margin-bottom:0!important;}
 </style>
 </head>
 <body>
