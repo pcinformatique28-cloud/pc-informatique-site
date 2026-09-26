@@ -976,5 +976,118 @@ loadNotifPrefs();
 })();
 </script>
 
+
+<script>
+(function(){
+  document.addEventListener("DOMContentLoaded", function(){
+
+    var fab = document.getElementById("install-fab");
+    var closeBtn = document.getElementById("install-fab-close");
+    if(fab){
+      fab.style.background = "#FFD500";
+      fab.style.color = "#1a1a2e";
+      fab.style.padding = "6px 12px";
+      fab.style.fontSize = "0.72rem";
+      fab.style.gap = "6px";
+      fab.style.touchAction = "none";
+
+      if(closeBtn){
+        closeBtn.style.width = "16px";
+        closeBtn.style.height = "16px";
+        closeBtn.style.fontSize = "0.7rem";
+        closeBtn.style.background = "rgba(26,26,46,.18)";
+        closeBtn.style.color = "#1a1a2e";
+      }
+
+      var dragging = false, startX, startY, origX, origY, moved = false;
+
+      fab.addEventListener("touchstart", function(e){
+        if(closeBtn && e.target === closeBtn) return;
+        dragging = true;
+        moved = false;
+        var t = e.touches[0];
+        var rect = fab.getBoundingClientRect();
+        startX = t.clientX; startY = t.clientY;
+        origX = rect.left; origY = rect.top;
+        fab.style.position = "fixed";
+      }, {passive:true});
+
+      fab.addEventListener("touchmove", function(e){
+        if(!dragging) return;
+        var t = e.touches[0];
+        var dx = t.clientX - startX, dy = t.clientY - startY;
+        if(Math.abs(dx) > 5 || Math.abs(dy) > 5) moved = true;
+        fab.style.left = (origX + dx) + "px";
+        fab.style.top = (origY + dy) + "px";
+        fab.style.right = "auto";
+        fab.style.bottom = "auto";
+      }, {passive:true});
+
+      fab.addEventListener("touchend", function(e){
+        dragging = false;
+        if(moved){
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+    }
+
+    document.querySelectorAll("*").forEach(function(el){
+      if(el.children.length === 0 && el.textContent.trim() === "Vos informations"){
+        var card = el.closest("div");
+        if(card){
+          card.style.removeProperty("border-color");
+          card.style.removeProperty("border-width");
+          card.style.removeProperty("border-style");
+          card.querySelectorAll("input").forEach(function(inp){
+            inp.style.borderColor = "#FFD500";
+            inp.style.borderWidth = "2px";
+            inp.style.borderStyle = "solid";
+          });
+        }
+      }
+    });
+
+    document.querySelectorAll("p").forEach(function(p){
+      if(p.textContent.indexOf("Conseil, programmation") !== -1){
+        p.style.textAlign = "justify";
+        p.style.textAlignLast = "left";
+        p.style.hyphens = "auto";
+      }
+    });
+
+    var chrome = [
+      ["#FF9494","#FF6B6B","#E14F4F"],
+      ["#7EEDE3","#4ECDC4","#35A79F"],
+      ["#FFEB85","#FFD93D","#E6BE00"],
+      ["#C5F5EA","#95E1D3","#6BC4B3"],
+      ["#C9B6FC","#A78BFA","#8560E8"],
+      ["#FFB067","#F97316","#D65F0A"],
+      ["#8FDBFB","#38BDF8","#159FDE"],
+      ["#FBA8D0","#F472B6","#E1499A"]
+    ];
+    var sidebarLinks = document.querySelectorAll(".sidebar a, nav.sidebar a, #sideMenu a, .side-menu a, .drawer a, .menu-lateral a");
+    if(sidebarLinks.length === 0){
+      var candidates = document.querySelectorAll("div, ul, nav");
+      for(var i=0;i<candidates.length;i++){
+        var links = candidates[i].querySelectorAll(":scope > a, :scope > div > a, :scope > li > a");
+        if(links.length >= 5){ sidebarLinks = links; break; }
+      }
+    }
+    sidebarLinks.forEach(function(a, i){
+      var c = chrome[i % chrome.length];
+      a.style.background = "linear-gradient(135deg, " + c[0] + " 0%, " + c[1] + " 55%, " + c[2] + " 100%)";
+      a.style.boxShadow = "inset 0 1px 1px rgba(255,255,255,.6), inset 0 -2px 4px rgba(0,0,0,.25), 0 3px 6px rgba(0,0,0,.35)";
+      a.style.color = "#1a1a2e";
+      a.style.textShadow = "0 1px 0 rgba(255,255,255,.25)";
+      a.querySelectorAll("*").forEach(function(child){
+        child.style.color = "#1a1a2e";
+      });
+    });
+
+  });
+})();
+</script>
+
 </body>
 </html>
