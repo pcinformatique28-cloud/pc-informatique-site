@@ -8,3 +8,5 @@ main
 *.bak3
 images/icon-preview.png
 *.bak4
+__pycache__/
+*.pyc
