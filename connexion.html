@@ -102,7 +102,7 @@ document.getElementById('btn-submit').addEventListener('click', async ()=>{
   btn.disabled = true; btn.textContent = "Connexion…";
   try{
     const cred = await auth.signInWithEmailAndPassword(email, pass);
-    location.href = (cred.user.uid === ADMIN_UID) ? 'admin.html' : 'profil.html';
+    location.href = 'profil.html';
   }catch(err){
     const code = err.code;
     const text = (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found')
@@ -126,7 +126,7 @@ document.getElementById('btn-reset').addEventListener('click', async (e)=>{
 });
 
 auth.onAuthStateChanged(user=>{
-  if(user) location.href = (user.uid === ADMIN_UID) ? 'admin.html' : 'profil.html';
+  if(user) location.href = 'profil.html';
 });
 </script>
 </body>

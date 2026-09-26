@@ -88,7 +88,6 @@
 <header>
   <a href="index.html" id="btn-back" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--muted);font-size:13px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;">&larr; Accueil</a>
   <div class="brand">PC-INFORMATIQUE · Espace membre</div>
-  <a href="admin.html" id="btn-admin" style="display:none;align-items:center;gap:6px;text-decoration:none;color:#0d0f16;font-size:13px;background:linear-gradient(90deg,var(--primary),var(--primary-dark));border-radius:8px;padding:8px 12px;font-weight:700;">&#9881; Admin</a>
   <button id="btn-logout">Déconnexion</button>
 </header>
 
@@ -153,8 +152,6 @@ const db = firebase.firestore();
 const CLOUD_NAME = "zbof0xbh";
 const UPLOAD_PRESET = "pc_membres";
 const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='84' height='84'><rect width='84' height='84' fill='%23e2e5ea'/></svg>";
-
-const ADMIN_UID = "QFC18HxRAZabqYD85S5eA7VLC5D3";
 let currentUser = null;
 
 async function uploadToCloudinary(file){
@@ -329,7 +326,6 @@ document.getElementById('btn-logout').addEventListener('click', async ()=>{
 auth.onAuthStateChanged(async user=>{
   if(!user){ location.href = 'connexion.html'; return; }
   currentUser = user;
-  if(user.uid === ADMIN_UID){ document.getElementById('btn-admin').style.display = 'inline-flex'; }
   try{
     await loadProfil();
     await loadProjets();

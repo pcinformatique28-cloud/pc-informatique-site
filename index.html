@@ -152,6 +152,7 @@ body{padding-bottom:70px;}
     <a href="index.html#realisations" class="d-link"><span class="ic">&#128193;</span>Realisations</a>
     <a href="index.html#demande" class="d-link"><span class="ic">&#10133;</span>Nouvelle demande</a>
     <a href="profil.html" class="d-link" id="drawer-profil" style="display:none;"><span class="ic">&#128100;</span>Mon profil</a>
+    <a href="admin.html" class="d-link" id="drawer-admin" style="display:none;"><span class="ic">&#9881;</span>Tableau de bord</a>
     <a href="connexion.html" class="d-link" id="drawer-login"><span class="ic">&#128273;</span>Connexion</a>
     <a href="#" class="d-link" id="drawer-logout" style="display:none;color:#ff6b6b;"><span class="ic">&#128682;</span>Deconnexion</a>
   </nav>
@@ -476,6 +477,8 @@ render();
   var dProfil = document.getElementById('drawer-profil');
   var dLogin = document.getElementById('drawer-login');
   var dLogout = document.getElementById('drawer-logout');
+  var dAdmin = document.getElementById('drawer-admin');
+  var ADMIN_UID = "QFC18HxRAZabqYD85S5eA7VLC5D3";
 
   dLogout.addEventListener('click', function(e){
     e.preventDefault();
@@ -497,6 +500,7 @@ render();
       dProfil.style.display = 'flex';
       dLogin.style.display = 'none';
       dLogout.style.display = 'flex';
+      dAdmin.style.display = (user.uid === ADMIN_UID) ? 'flex' : 'none';
     } else {
       authIcon.href = 'connexion.html';
       authIcon.innerHTML = '&#128273;';
@@ -506,6 +510,7 @@ render();
       bottomAuth.querySelector('.lbl').textContent = 'Connexion';
       dUser.style.display = 'none';
       dProfil.style.display = 'none';
+      dAdmin.style.display = 'none';
       dLogin.style.display = 'flex';
       dLogout.style.display = 'none';
     }
