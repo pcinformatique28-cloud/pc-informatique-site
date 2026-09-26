@@ -79,7 +79,7 @@
   .proj a.lien{font-size:12px; color:var(--primary); display:inline-block; margin-top:6px;}
   .empty{font-size:13px; color:var(--muted); text-align:center; padding:20px 0;}
   #loading{text-align:center; padding:60px 0; color:var(--muted);}
-  body{background:linear-gradient(160deg,#eafbf8 0%,#fdeef6 100%) !important;}
+  body{background:linear-gradient(160deg,#eaf2ff 0%,#dce8ff 100%) !important;}
   input[readonly],textarea[readonly]{background:transparent !important;border-color:transparent !important;color:var(--text);cursor:default;}
   .profil-head{display:flex;align-items:center;justify-content:space-between;}
   .edit-icon{background:none;border:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--muted);padding:4px 10px;border-radius:6px;}
@@ -155,6 +155,7 @@ const CLOUD_NAME = "zbof0xbh";
 const UPLOAD_PRESET = "pc_membres";
 const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='84' height='84'><rect width='84' height='84' fill='%23e2e5ea'/></svg>";
 let currentUser = null;
+let editingProjetId = null;
 
 async function uploadToCloudinary(file){
   const fd = new FormData();
@@ -251,13 +252,22 @@ document.getElementById('btn-add-projet').addEventListener('click', async ()=>{
     if(fileInput.files[0]){
       imageURL = await uploadToCloudinary(fileInput.files[0]);
     }
-    await db.collection('projets').add({
-      membreId: currentUser.uid,
-      titre, description, type, lien, imageURL,
-      statut: 'en_attente',
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    showMsg(msg, "Projet envoyé, en attente de validation par l'admin.", true);
+    if(editingProjetId){
+      const update = { titre, description, type, lien };
+      if(imageURL) update.imageURL = imageURL;
+      await db.collection('projets').doc(editingProjetId).update(update);
+      showMsg(msg, "Projet mis à jour.", true);
+      editingProjetId = null;
+      document.getElementById('btn-add-projet').textContent = 'Envoyer pour validation';
+    } else {
+      await db.collection('projets').add({
+        membreId: currentUser.uid,
+        titre, description, type, lien, imageURL,
+        statut: 'en_attente',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      showMsg(msg, "Projet envoyé, en attente de validation par l'admin.", true);
+    }
     document.getElementById('p-titre').value = '';
     document.getElementById('p-desc').value = '';
     document.getElementById('p-lien').value = '';
@@ -295,7 +305,7 @@ async function loadProjets(){
         <span class="badge ${p.statut}">${statutLabel[p.statut]||p.statut}</span>
       </div>
       ${p.description ? `<div class="proj-desc">${escapeHtml(p.description)}</div>` : ''}
-      ${p.imageURL ? `<img src="${p.imageURL}" alt="">` : ''}
+      ${p.imageURL ? `<img src="${p.imageURL}" alt="" style="cursor:pointer;" data-edit-id="${p.id}">` : ''}
       ${p.lien ? `<a class="lien" href="${escapeHtml(p.lien)}" target="_blank" rel="noopener">${escapeHtml(p.lien)}</a><br>` : ''}
       <button class="btn-danger" data-id="${p.id}">Supprimer</button>
     </div>
@@ -306,6 +316,20 @@ async function loadProjets(){
       if(!confirm('Supprimer ce projet ?')) return;
       await db.collection('projets').doc(btn.dataset.id).delete();
       loadProjets();
+    });
+  });
+
+  list.querySelectorAll('img[data-edit-id]').forEach(img=>{
+    img.addEventListener('click', ()=>{
+      const p = projets.find(x => x.id === img.dataset.editId);
+      if(!p) return;
+      editingProjetId = p.id;
+      document.getElementById('p-titre').value = p.titre || '';
+      document.getElementById('p-type').value = p.type || 'personnel';
+      document.getElementById('p-desc').value = p.description || '';
+      document.getElementById('p-lien').value = p.lien || '';
+      document.getElementById('btn-add-projet').textContent = 'Enregistrer les modifications';
+      document.getElementById('p-titre').scrollIntoView({behavior:'smooth', block:'center'});
     });
   });
 }
