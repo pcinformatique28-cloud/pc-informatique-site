@@ -28,6 +28,7 @@ nav{position:sticky;top:0;z-index:20;background:rgba(13,15,22,.94);backdrop-filt
 .b-nouveau{background:rgba(242,201,76,.15);color:var(--wait);}
 .b-valide{background:rgba(94,224,106,.15);color:var(--ok);}
 .b-refuse{background:rgba(255,92,92,.15);color:var(--bad);}
+.b-en_attente{background:rgba(242,201,76,.15);color:var(--wait);}
 .empty{text-align:left;color:var(--sub);font-size:.85rem;padding:20px 0;}
 #gate{max-width:320px;margin:80px auto;text-align:left;}
 #gate input{width:100%;background:#0f1220;border:1px solid #262c47;color:var(--text);border-radius:10px;padding:11px 12px;font-size:.9rem;margin:10px 0;}
@@ -80,6 +81,11 @@ nav{position:sticky;top:0;z-index:20;background:rgba(13,15,22,.94);backdrop-filt
 
 <div class="wrap" id="dash" style="display:none">
   <div style="text-align:right;margin:14px 0 -6px"><span class="link" id="btn-logout">Se déconnecter</span></div>
+  <div class="modebar" style="display:flex;gap:8px;margin:14px 0;">
+    <div class="tab on" id="mode-demandes">Demandes</div>
+    <div class="tab" id="mode-projets">Projets membres</div>
+  </div>
+  <div id="sec-demandes">
   <div class="tabs">
     <div class="tab on" data-f="nouveau">🕓 Nouvelles</div>
     <div class="tab" data-f="valide">✅ Validées</div>
@@ -87,6 +93,16 @@ nav{position:sticky;top:0;z-index:20;background:rgba(13,15,22,.94);backdrop-filt
     <div class="tab" data-f="all">Toutes</div>
   </div>
   <div id="list"></div>
+  </div>
+  <div id="sec-projets" style="display:none">
+    <div class="tabs">
+      <div class="tab on" data-fp="en_attente">En attente</div>
+      <div class="tab" data-fp="valide">Valides</div>
+      <div class="tab" data-fp="refuse">Refuses</div>
+      <div class="tab" data-fp="all">Tous</div>
+    </div>
+    <div id="list-projets"></div>
+  </div>
 </div>
 
 <div class="overlay" id="overlay">
@@ -183,6 +199,7 @@ auth.onAuthStateChanged(user=>{
     document.getElementById('gate').style.display='none';
     document.getElementById('dash').style.display='block';
     loadList();
+    loadProjets();
   } else if(user){
     auth.signOut();
     gateMsg("Ce compte n'a pas les droits administrateur.", false);
@@ -286,6 +303,53 @@ function decide(id, status){
     openSheet(updated);
   });
 }
+
+let ALLP = []; let filterP = 'en_attente';
+function loadProjets(){
+  if(!db) return;
+  db.collection('projets').orderBy('createdAt','desc').onSnapshot(snap=>{
+    ALLP = snap.docs.map(doc=>({id:doc.id, ...doc.data()}));
+    renderProjets();
+  });
+}
+function renderProjets(){
+  const list = document.getElementById('list-projets');
+  const items = filterP==='all' ? ALLP : ALLP.filter(p=>p.statut===filterP);
+  if(!items.length){ list.innerHTML = '<div class="empty">Aucun projet ici pour le moment.</div>'; return; }
+  list.innerHTML = items.map(p=>`
+    <div class="card">
+      <span class="badge b-${p.statut}">${p.statut}</span>
+      <h4>${p.titre||'Sans titre'}</h4>
+      <p>${p.type||'-'}</p>
+      <p>${p.description||''}</p>
+      ${p.imageURL ? `<div class="thumbs"><img src="${p.imageURL}"></div>` : ''}
+      ${p.lien ? `<p><a href="${p.lien}" target="_blank" style="color:var(--teal)">${p.lien}</a></p>` : ''}
+      ${p.statut==='en_attente' ? `
+        <div class="actions">
+          <button class="btn primary" onclick="decideProjet('${p.id}','valide')">Valider</button>
+          <button class="btn bad" onclick="decideProjet('${p.id}','refuse')">Refuser</button>
+        </div>` : ''}
+    </div>`).join('');
+}
+document.querySelectorAll('#sec-projets .tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('#sec-projets .tab').forEach(x=>x.classList.remove('on')); t.classList.add('on');
+  filterP = t.dataset.fp; renderProjets();
+}));
+function decideProjet(id, status){
+  db.collection('projets').doc(id).update({ statut: status, decidedAt: new Date().toISOString() });
+}
+document.getElementById('mode-demandes').addEventListener('click', ()=>{
+  document.getElementById('mode-demandes').classList.add('on');
+  document.getElementById('mode-projets').classList.remove('on');
+  document.getElementById('sec-demandes').style.display='block';
+  document.getElementById('sec-projets').style.display='none';
+});
+document.getElementById('mode-projets').addEventListener('click', ()=>{
+  document.getElementById('mode-projets').classList.add('on');
+  document.getElementById('mode-demandes').classList.remove('on');
+  document.getElementById('sec-demandes').style.display='none';
+  document.getElementById('sec-projets').style.display='block';
+});
 </script>
 
 </html>
