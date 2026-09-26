@@ -20,12 +20,13 @@
     position:relative; background:var(--surface); border-bottom:1px solid var(--border);
     padding:14px 20px; display:flex; justify-content:space-between; align-items:center; gap:10px;
   }
-  header .brand{flex:1; text-align:center;}
+  header .brand{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;}
+  .head-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
   header .brand{font-weight:700; font-size:15px;}
   header::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--pink));}
   header button{
-    background:none; border:1px solid var(--border); border-radius:8px; padding:8px 14px;
-    font-size:13px; cursor:pointer; color:var(--muted);
+    background:none; border:1px solid var(--border); border-radius:8px; padding:8px 10px;
+    font-size:12px; cursor:pointer; color:var(--muted);
   }
   header button:hover{color:var(--danger); border-color:var(--danger);}
   main{max-width:640px; margin:0 auto; padding:24px 16px 60px;}
@@ -92,8 +93,8 @@
 <header>
   <a href="index.html" id="btn-back" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--muted);font-size:13px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;">&larr; Accueil</a>
   <div class="brand">PC-INFORMATIQUE · Espace membre</div>
-  <span class="bell" id="profil-bell" title="Notifications">&#128276;<span class="bell-badge" id="profil-bell-badge" style="display:none;"></span></span>
-  <button id="btn-logout">Déconnexion</button>
+  <span class="head-right"><span class="bell" id="profil-bell" title="Notifications">&#128276;<span class="bell-badge" id="profil-bell-badge" style="display:none;"></span></span>
+  <button id="btn-logout">Déconnexion</button></span>
 </header>
 
 <div id="loading">Chargement…</div>
