@@ -210,9 +210,29 @@ nav:not(.d-links){position:sticky!important;top:0!important;z-index:25!important
 
 /* ===== PATCH v10 : paragraphes justifies (About/Legal/etc.) ===== */
 .about-pane p,.sheet p{text-align:justify!important;text-justify:inter-word!important;hyphens:auto!important;}
+
+/* ===== PATCH v11 : bouton flottant "Installer l'app" ===== */
+.install-fab{
+  position:fixed;top:calc(70px + env(safe-area-inset-top,0px));right:14px;z-index:70;
+  display:none;align-items:center;gap:8px;
+  background:linear-gradient(90deg,var(--teal),var(--pink));color:#0d0f16;font-weight:700;font-size:.82rem;
+  padding:10px 16px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.35);cursor:pointer;
+  animation:fabIn .3s ease;border:none;
+}
+.install-fab.show{display:inline-flex;}
+.install-fab .install-fab-close{
+  background:rgba(13,15,22,.18);border:none;color:#0d0f16;width:20px;height:20px;border-radius:50%;
+  font-size:.85rem;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+  flex-shrink:0;aspect-ratio:1/1;
+}
+@keyframes fabIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:none;}}
 </style>
 </head>
 <body>
+<button type="button" id="install-fab" class="install-fab">
+  <span id="install-fab-label">&#128241; Installer l'app</span>
+  <span id="install-fab-close" class="install-fab-close">&times;</span>
+</button>
 
 <nav>
   <div class="navwrap">
@@ -792,5 +812,56 @@ function saveNotifPref(key, val){
 loadNotifPrefs();
 </script>
 
+
+<script>
+(function(){
+  var deferredPrompt = null;
+  var fab = document.getElementById('install-fab');
+  var closeBtn = document.getElementById('install-fab-close');
+  var DISMISS_KEY = 'pcinfo_install_dismissed_at';
+  var DISMISS_DAYS = 3;
+
+  function isDismissedRecently(){
+    var v = localStorage.getItem(DISMISS_KEY);
+    if(!v) return false;
+    return (Date.now() - parseInt(v,10)) < DISMISS_DAYS*24*60*60*1000;
+  }
+  function isStandalone(){
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    if(!isStandalone() && !isDismissedRecently() && fab){
+      fab.classList.add('show');
+    }
+  });
+
+  if(fab){
+    fab.addEventListener('click', function(e){
+      if(e.target === closeBtn) return;
+      if(deferredPrompt){
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.finally(function(){
+          fab.classList.remove('show');
+          deferredPrompt = null;
+        });
+      }
+    });
+  }
+  if(closeBtn){
+    closeBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      fab.classList.remove('show');
+      localStorage.setItem(DISMISS_KEY, String(Date.now()));
+    });
+  }
+  window.addEventListener('appinstalled', function(){
+    if(fab) fab.classList.remove('show');
+    localStorage.setItem(DISMISS_KEY, String(Date.now()));
+  });
+})();
+</script>
 </body>
 </html>
