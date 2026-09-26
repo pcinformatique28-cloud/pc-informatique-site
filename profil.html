@@ -63,6 +63,8 @@
   .btn-outline:hover{border-color:var(--primary); color:var(--primary);}
   .btn-danger{background:none; color:var(--danger); border:1px solid transparent; padding:6px 10px; font-size:12px;}
   .btn-danger:hover{background:#fef2f2;}
+  .bell{position:relative;font-size:1.05rem;color:#0e9488;cursor:pointer;display:inline-flex;}
+  .bell-badge{position:absolute;top:-6px;right:-10px;background:var(--danger);color:#fff;font-size:.6rem;font-weight:800;border-radius:10px;padding:1px 5px;line-height:1;}
   .msg{font-size:13px; margin-top:12px; padding:9px 12px; border-radius:8px; display:none;}
   .msg.err{display:block; background:#fef2f2; color:var(--danger);}
   .msg.ok{display:block; background:#f0fdf4; color:var(--success);}
@@ -90,6 +92,7 @@
 <header>
   <a href="index.html" id="btn-back" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--muted);font-size:13px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;">&larr; Accueil</a>
   <div class="brand">PC-INFORMATIQUE · Espace membre</div>
+  <span class="bell" id="profil-bell" title="Notifications">&#128276;<span class="bell-badge" id="profil-bell-badge" style="display:none;"></span></span>
   <button id="btn-logout">Déconnexion</button>
 </header>
 
@@ -264,6 +267,7 @@ document.getElementById('btn-add-projet').addEventListener('click', async ()=>{
         membreId: currentUser.uid,
         titre, description, type, lien, imageURL,
         statut: 'en_attente',
+        vu: true,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       showMsg(msg, "Projet envoyé, en attente de validation par l'admin.", true);
@@ -355,12 +359,35 @@ auth.onAuthStateChanged(async user=>{
   try{
     await loadProfil();
     await loadProjets();
+    startMemberNotifs();
     document.getElementById('loading').style.display = 'none';
     document.getElementById('app').style.display = 'block';
   }catch(err){
     console.error(err);
     document.getElementById('loading').textContent = "Erreur: " + (err && err.message ? err.message : err);
   }
+});
+
+let unseenNotifCount = 0;
+function startMemberNotifs(){
+  db.collection('projets').where('membreId','==',currentUser.uid).where('vu','==', false)
+    .onSnapshot(snap=>{
+      unseenNotifCount = snap.size;
+      updateProfilBell();
+    });
+}
+function updateProfilBell(){
+  const badge = document.getElementById('profil-bell-badge');
+  if(!badge) return;
+  if(unseenNotifCount>0){ badge.textContent = unseenNotifCount; badge.style.display='inline-block'; }
+  else{ badge.style.display='none'; }
+}
+document.getElementById('profil-bell').addEventListener('click', async ()=>{
+  const snap = await db.collection('projets').where('membreId','==',currentUser.uid).where('vu','==', false).get();
+  const batch = db.batch();
+  snap.forEach(doc=> batch.update(doc.ref, { vu:true }));
+  if(!snap.empty) await batch.commit();
+  document.getElementById('projets-list').scrollIntoView({behavior:'smooth', block:'start'});
 });
 </script>
 </body>
