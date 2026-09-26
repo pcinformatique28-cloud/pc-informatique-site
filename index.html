@@ -8,6 +8,9 @@
 <meta property="og:url" content="https://pcinformatique28-cloud.github.io/pc-informatique-site/">
 <meta property="og:type" content="website">
 <meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d0f16">
+<link rel="apple-touch-icon" href="images/icon-192.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>PC-INFORMATIQUE — Sites, applications &amp; PWA sur mesure</title>
 <style>
@@ -541,6 +544,14 @@ render();
     location.href = 'profil.html';
   });
 })();
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(err => console.error("SW error:", err));
+  });
+}
 </script>
 </body>
 </html>
