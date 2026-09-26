@@ -177,11 +177,15 @@ document.getElementById('forgot-link').addEventListener('click', ()=>{
 document.getElementById('btn-logout').addEventListener('click', ()=> auth.signOut());
 
 // ---- Bascule gate/dash selon l'état de connexion ----
+const ADMIN_UID = "QFC18HxRAZabqYD85S5eA7VLC5D3";
 auth.onAuthStateChanged(user=>{
-  if(user){
+  if(user && user.uid === ADMIN_UID){
     document.getElementById('gate').style.display='none';
     document.getElementById('dash').style.display='block';
     loadList();
+  } else if(user){
+    auth.signOut();
+    gateMsg("Ce compte n'a pas les droits administrateur.", false);
   } else {
     document.getElementById('gate').style.display='block';
     document.getElementById('dash').style.display='none';

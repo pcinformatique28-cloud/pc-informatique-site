@@ -85,6 +85,7 @@
 const firebaseConfig = { apiKey:"AIzaSyCx2D6b8TFGW-GBxb25t4MUqpoQj_cQCtk", authDomain:"pc-informatique-site.firebaseapp.com", projectId:"pc-informatique-site", storageBucket:"pc-informatique-site.firebasestorage.app", messagingSenderId:"43208715297", appId:"1:43208715297:web:02e946d321ae3a31ab0760" };
 if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const ADMIN_UID = "QFC18HxRAZabqYD85S5eA7VLC5D3";
 
 const msgEl = document.getElementById('msg');
 function showMsg(text, ok){
@@ -100,8 +101,8 @@ document.getElementById('btn-submit').addEventListener('click', async ()=>{
 
   btn.disabled = true; btn.textContent = "Connexion…";
   try{
-    await auth.signInWithEmailAndPassword(email, pass);
-    location.href = 'profil.html';
+    const cred = await auth.signInWithEmailAndPassword(email, pass);
+    location.href = (cred.user.uid === ADMIN_UID) ? 'admin.html' : 'profil.html';
   }catch(err){
     const code = err.code;
     const text = (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found')
@@ -125,7 +126,7 @@ document.getElementById('btn-reset').addEventListener('click', async (e)=>{
 });
 
 auth.onAuthStateChanged(user=>{
-  if(user) location.href = 'profil.html';
+  if(user) location.href = (user.uid === ADMIN_UID) ? 'admin.html' : 'profil.html';
 });
 </script>
 </body>
