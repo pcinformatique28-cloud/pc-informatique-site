@@ -863,5 +863,118 @@ loadNotifPrefs();
   });
 })();
 </script>
+
+<script>
+(function(){
+  document.addEventListener("DOMContentLoaded", function(){
+
+    var fab = document.getElementById("fab");
+    if(fab){
+      fab.style.background = "#FFD500";
+      fab.style.color = "#111";
+      fab.style.transform = "scale(0.8)";
+      fab.style.transformOrigin = "center";
+      fab.style.touchAction = "none";
+      if(getComputedStyle(fab).position === "static"){
+        fab.style.position = "fixed";
+      }
+
+      var closeBtn = document.getElementById("closeBtn");
+      var dragging = false, startX, startY, origX, origY, moved = false;
+
+      fab.addEventListener("touchstart", function(e){
+        if(closeBtn && e.target === closeBtn) return;
+        dragging = true;
+        moved = false;
+        var t = e.touches[0];
+        var rect = fab.getBoundingClientRect();
+        startX = t.clientX; startY = t.clientY;
+        origX = rect.left; origY = rect.top;
+      }, {passive:true});
+
+      fab.addEventListener("touchmove", function(e){
+        if(!dragging) return;
+        var t = e.touches[0];
+        var dx = t.clientX - startX, dy = t.clientY - startY;
+        if(Math.abs(dx) > 5 || Math.abs(dy) > 5) moved = true;
+        fab.style.left = (origX + dx) + "px";
+        fab.style.top = (origY + dy) + "px";
+        fab.style.right = "auto";
+        fab.style.bottom = "auto";
+      }, {passive:true});
+
+      fab.addEventListener("touchend", function(e){
+        dragging = false;
+        if(moved){
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+    }
+
+    document.querySelectorAll("*").forEach(function(el){
+      if(el.children.length === 0 && el.textContent.trim() === "Vos informations"){
+        var card = el.closest("div");
+        if(card){
+          card.style.borderColor = "#FFD500";
+          card.style.borderWidth = "2px";
+          card.style.borderStyle = "solid";
+        }
+      }
+    });
+
+    var menuColors = ["#FF6B6B","#4ECDC4","#FFD93D","#95E1D3","#A78BFA","#F97316","#38BDF8","#F472B6"];
+    var sidebarLinks = document.querySelectorAll(".sidebar a, nav.sidebar a, #sideMenu a, .side-menu a, .drawer a, .menu-lateral a");
+    if(sidebarLinks.length === 0){
+      var candidates = document.querySelectorAll("div, ul, nav");
+      for(var i=0;i<candidates.length;i++){
+        var links = candidates[i].querySelectorAll(":scope > a, :scope > div > a, :scope > li > a");
+        if(links.length >= 5){ sidebarLinks = links; break; }
+      }
+    }
+    sidebarLinks.forEach(function(a, i){
+      a.style.background = menuColors[i % menuColors.length];
+    });
+
+    function linkify(root){
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+      var emailRe = /[\w.+-]+@[\w-]+\.[\w.-]+/g;
+      var phoneRe = /(\+241[\s.]?\d{2}[\s.]?\d{2}[\s.]?\d{2}[\s.]?\d{2})/g;
+      var nodes = [];
+      var n;
+      while(n = walker.nextNode()) nodes.push(n);
+      nodes.forEach(function(node){
+        var parentTag = node.parentNode.tagName;
+        if(parentTag === "A" || parentTag === "SCRIPT" || parentTag === "STYLE") return;
+        var text = node.nodeValue;
+        emailRe.lastIndex = 0; phoneRe.lastIndex = 0;
+        if(emailRe.test(text) || phoneRe.test(text)){
+          emailRe.lastIndex = 0; phoneRe.lastIndex = 0;
+          var out = text
+            .replace(emailRe, function(m){ return '<a href="mailto:'+m+'" style="color:inherit;text-decoration:underline;">'+m+'</a>'; })
+            .replace(phoneRe, function(m){ return '<a href="tel:'+m.replace(/[\s.]/g,'')+'" style="color:inherit;text-decoration:underline;">'+m+'</a>'; });
+          var span = document.createElement("span");
+          span.innerHTML = out;
+          node.parentNode.replaceChild(span, node);
+        }
+      });
+    }
+    linkify(document.body);
+
+    document.querySelectorAll("p").forEach(function(p){
+      if(p.textContent.indexOf("Conseil, programmation") !== -1){
+        p.style.background = "rgba(255,255,255,0.05)";
+        p.style.border = "1px solid rgba(255,255,255,0.15)";
+        p.style.borderRadius = "12px";
+        p.style.padding = "16px";
+        p.style.textAlign = "left";
+        p.style.lineHeight = "1.6";
+      }
+    });
+
+  });
+})();
+</script>
+
 </body>
 </html>
