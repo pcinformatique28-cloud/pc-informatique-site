@@ -1,0 +1,9 @@
+patch_*.py
+dedupe_*.py
+fix_*.py
+apply_real_icons.sh
+main
+*.bak
+*.bak2
+*.bak3
+images/icon-preview.png
