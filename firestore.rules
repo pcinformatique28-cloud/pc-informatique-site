@@ -32,8 +32,10 @@ service cloud.firestore {
     // Désactivée pour l'instant (create: if false).
     // ------------------------------------------------------------------
     match /demandes/{id} {
-      allow create: if false;
-      allow read, update, delete: if false;
+      allow create: if request.resource.data.nom is string
+        && request.resource.data.nom.size() > 0
+        && request.resource.data.status == 'nouveau';
+      allow read, update, delete: if isAdmin();
     }
 
     // ------------------------------------------------------------------
