@@ -227,7 +227,6 @@ auth.onAuthStateChanged(user=>{
     document.getElementById('dash').style.display='block';
     loadList();
     loadProjets();
-    alert('Ton UID admin (à copier) : ' + user.uid);
     startAdminNotifs();
   } else if(user){
     auth.signOut();
