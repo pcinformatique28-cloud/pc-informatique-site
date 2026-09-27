@@ -73,6 +73,7 @@ h1.hero-title .g{background:linear-gradient(90deg,var(--teal),var(--pink));-webk
 .mage .badge{background:#f2c94c;} .malaga .badge{background:#2ecc71;color:#062012;}
 
 #demande{scroll-margin-top:74px;}
+#realisations{scroll-margin-top:0;}
 .formbox{background:var(--card);border:1px solid #f0e4c8;border-radius:18px;padding:22px 18px;margin-bottom:20px;}
 .progress{display:flex;gap:6px;margin-bottom:22px;}
 .progress i{flex:1;height:4px;border-radius:3px;background:rgba(255,255,255,.08);}
@@ -619,6 +620,21 @@ document.getElementById('btn-next').addEventListener('click',()=>{
   cur = Math.min(cur+1, steps.length-2); render();
 });
 document.getElementById('btn-prev').addEventListener('click',()=>{ cur=Math.max(cur-1,0); render(); });
+document.querySelectorAll('a[href="index.html#realisations"], a[href="#realisations"]').forEach(function(a){
+  a.addEventListener('click', function(e){
+    var target = document.getElementById('realisations');
+    if(!target) return;
+    if(location.pathname.endsWith('index.html') || location.pathname === '/' || location.pathname.endsWith('/pc-informatique-site/')){
+      e.preventDefault();
+      var rect = target.getBoundingClientRect();
+      var mid = window.innerHeight / 2;
+      var offset = rect.top + window.scrollY - mid + (rect.height / 2);
+      window.scrollTo({ top: offset, behavior: 'smooth' });
+      history.replaceState(null, '', '#realisations');
+    }
+  });
+});
+
 render();
 </script>
 
