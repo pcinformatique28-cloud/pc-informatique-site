@@ -626,9 +626,10 @@ document.querySelectorAll('a[href="index.html#realisations"], a[href="#realisati
     if(!target) return;
     if(location.pathname.endsWith('index.html') || location.pathname === '/' || location.pathname.endsWith('/pc-informatique-site/')){
       e.preventDefault();
+      var navEl = document.querySelector('nav');
+      var headerH = navEl ? navEl.getBoundingClientRect().height : 0;
       var rect = target.getBoundingClientRect();
-      var mid = window.innerHeight / 2;
-      var offset = rect.top + window.scrollY - mid + (rect.height / 2);
+      var offset = rect.top + window.scrollY - headerH - 8;
       window.scrollTo({ top: offset, behavior: 'smooth' });
       history.replaceState(null, '', '#realisations');
     }
