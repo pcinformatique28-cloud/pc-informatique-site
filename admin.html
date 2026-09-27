@@ -21,7 +21,14 @@ nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-f
 .navwrap .headright{display:flex;align-items:center;gap:10px;flex-shrink:0;}
 #count{background:rgba(255,255,255,.06);padding:3px 9px;border-radius:20px;}
 .navwrap b{font-size:.95rem;}
-.bell{position:relative;font-size:1.05rem;color:#fff;cursor:default;display:inline-flex;}
+.bell{position:relative;font-size:1.05rem;color:#fff;cursor:pointer;display:inline-flex;}
+.card-new{animation:cardBlink 1.4s ease-in-out infinite;}
+@keyframes cardBlink{0%,100%{box-shadow:0 2px 10px rgba(0,0,0,.25);}50%{box-shadow:0 2px 18px rgba(242,201,76,.7);}}
+.bell-dropdown{position:absolute;top:30px;right:0;background:var(--card);border:1px solid #f0e4c8;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.35);width:250px;max-height:300px;overflow-y:auto;padding:6px;display:none;z-index:50;text-align:left;}
+.bell-dropdown.on{display:block;}
+.bell-dropdown .bd-item{padding:9px 10px;border-radius:10px;cursor:pointer;font-size:.78rem;color:var(--text);}
+.bell-dropdown .bd-item:active{background:#f5ecd6;}
+.bell-dropdown .bd-empty{padding:10px;color:var(--sub);font-size:.78rem;}
 .bell-badge{position:absolute;top:-6px;right:-10px;background:var(--bad);color:#fff;font-size:.6rem;font-weight:800;border-radius:10px;padding:1px 5px;line-height:1;}
 .tabs{display:flex;gap:8px;margin:16px 0;flex-wrap:wrap;justify-content:center;}
 .tab{font-size:.75rem;padding:7px 12px;border-radius:20px;border:1px solid #f5ecd6;color:var(--sub);cursor:pointer;user-select:none;}
@@ -82,7 +89,7 @@ nav{background:linear-gradient(120deg,#12142b 0%,#1b1e3d 60%,#12142b 100%)!impor
 </head>
 <body>
 
-<nav><div class="navwrap"><b>🔧 PC-INFORMATIQUE — Admin</b><span class="headright"><span id="count" style="font-size:.75rem;color:var(--sub)"></span><span class="bell" id="admin-bell" title="Notifications">&#128276;<span class="bell-badge" id="admin-bell-badge" style="display:none;"></span></span></span></div></nav>
+<nav><div class="navwrap"><b>🔧 PC-INFORMATIQUE — Admin</b><span class="headright"><span id="count" style="font-size:.75rem;color:var(--sub)"></span><span class="bell" id="admin-bell" title="Notifications">&#128276;<span class="bell-badge" id="admin-bell-badge" style="display:none;"></span><div class="bell-dropdown" id="bell-dropdown"></div></span></span></div></nav>
 
 <div id="gate" class="wrap">
   <h3 style="text-align:left">Accès admin</h3>
@@ -107,19 +114,19 @@ nav{background:linear-gradient(120deg,#12142b 0%,#1b1e3d 60%,#12142b 100%)!impor
   </div>
   <div id="sec-demandes">
   <div class="tabs">
-    <div class="tab on" data-f="nouveau">🕓 Nouvelles</div>
+    <div class="tab" data-f="nouveau">🕓 Nouvelles</div>
     <div class="tab" data-f="valide">✅ Validées</div>
     <div class="tab" data-f="refuse">❌ Refusées</div>
-    <div class="tab" data-f="all">Toutes</div>
+    <div class="tab on" data-f="all">Toutes</div>
   </div>
   <div id="list"></div>
   </div>
   <div id="sec-projets" style="display:none">
     <div class="tabs">
-      <div class="tab on" data-fp="en_attente">En attente</div>
+      <div class="tab" data-fp="en_attente">En attente</div>
       <div class="tab" data-fp="valide">Valides</div>
       <div class="tab" data-fp="refuse">Refuses</div>
-      <div class="tab" data-fp="all">Tous</div>
+      <div class="tab on" data-fp="all">Tous</div>
     </div>
     <div id="list-projets"></div>
   </div>
@@ -230,7 +237,7 @@ auth.onAuthStateChanged(user=>{
     document.getElementById('dash').style.display='none';
   }
 });
-let ALL=[]; let filter='nouveau';
+let ALL=[]; let filter='all';
 function loadList(){
   if(!db) return;
   db.collection('demandes').orderBy('createdAt','desc').onSnapshot(snap=>{
@@ -250,7 +257,7 @@ function render(){
   const items = filter==='all' ? ALL : ALL.filter(d=>d.status===filter);
   if(!items.length){ list.innerHTML = '<div class="empty">Aucune demande ici pour le moment.</div>'; return; }
   list.innerHTML = items.map(d=>`
-    <div class="card" onclick="openSheet(${JSON.stringify(d).replace(/"/g,'&quot;')})">
+    <div class="card ${d.status==='nouveau'?'card-new':''}" onclick="openSheet(${JSON.stringify(d).replace(/"/g,'&quot;')})">
       <span class="badge b-${d.status}">${d.status}</span>
       <h4>${d.nom||'Sans nom'} — ${d.structure||''}</h4>
       <p>${d.type||'-'} · ${d.secteur||'-'} · ${d.tel||''}</p>
@@ -326,7 +333,7 @@ function decide(id, status){
   });
 }
 
-let ALLP = []; let filterP = 'en_attente';
+let ALLP = []; let filterP = 'all';
 function loadProjets(){
   if(!db) return;
   db.collection('projets').orderBy('createdAt','desc').onSnapshot(snap=>{
@@ -339,7 +346,7 @@ function renderProjets(){
   const items = filterP==='all' ? ALLP : ALLP.filter(p=>p.statut===filterP);
   if(!items.length){ list.innerHTML = '<div class="empty">Aucun projet ici pour le moment.</div>'; return; }
   list.innerHTML = items.map(p=>`
-    <div class="card">
+    <div class="card ${p.statut==='en_attente'?'card-new':''}" data-id="${p.id}">
       <span class="badge b-${p.statut}">${p.statut}</span>
       <h4>${p.titre||'Sans titre'}</h4>
       <p>${p.type||'-'}</p>
@@ -390,6 +397,46 @@ function updateAdminBell(){
   const total = notifDemandesCount + notifProjetsCount;
   if(total>0){ badge.textContent = total; badge.style.display='inline-block'; }
   else{ badge.style.display='none'; }
+  if(document.getElementById('bell-dropdown').classList.contains('on')) renderBellDropdown();
+}
+function renderBellDropdown(){
+  const dd = document.getElementById('bell-dropdown');
+  const dNouv = ALL.filter(d=>d.status==='nouveau');
+  const pAtt = ALLP.filter(p=>p.statut==='en_attente');
+  if(!dNouv.length && !pAtt.length){ dd.innerHTML = '<div class="bd-empty">Aucune nouvelle notification.</div>'; return; }
+  dd.innerHTML =
+    dNouv.map(d=>`<div class="bd-item" onclick="goToDemande('${d.id}')">🕓 Demande — ${(d.nom||'Sans nom').replace(/'/g,"&#39;")}</div>`).join('') +
+    pAtt.map(p=>`<div class="bd-item" onclick="goToProjet('${p.id}')">🕓 Projet — ${(p.titre||'Sans titre').replace(/'/g,"&#39;")}</div>`).join('');
+}
+document.getElementById('admin-bell').addEventListener('click', e=>{
+  e.stopPropagation();
+  renderBellDropdown();
+  document.getElementById('bell-dropdown').classList.toggle('on');
+});
+document.addEventListener('click', e=>{
+  const dd = document.getElementById('bell-dropdown');
+  if(dd && dd.classList.contains('on') && !document.getElementById('admin-bell').contains(e.target)) dd.classList.remove('on');
+});
+function goToDemande(id){
+  document.getElementById('bell-dropdown').classList.remove('on');
+  document.getElementById('mode-demandes').click();
+  filter='nouveau';
+  document.querySelectorAll('#sec-demandes .tab[data-f]').forEach(x=>x.classList.remove('on'));
+  const t = document.querySelector('#sec-demandes .tab[data-f="nouveau"]'); if(t) t.classList.add('on');
+  render();
+  const d = ALL.find(x=>x.id===id); if(d) openSheet(d);
+}
+function goToProjet(id){
+  document.getElementById('bell-dropdown').classList.remove('on');
+  document.getElementById('mode-projets').click();
+  filterP='en_attente';
+  document.querySelectorAll('#sec-projets .tab[data-fp]').forEach(x=>x.classList.remove('on'));
+  const t = document.querySelector('#sec-projets .tab[data-fp="en_attente"]'); if(t) t.classList.add('on');
+  renderProjets();
+  setTimeout(()=>{
+    const el = document.querySelector('#list-projets [data-id="'+id+'"]');
+    if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
+  }, 60);
 }
 </script>
 
