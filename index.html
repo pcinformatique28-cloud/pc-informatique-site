@@ -261,7 +261,6 @@ nav{padding:2px 0 0 0!important;}
 <body>
 <button type="button" id="install-fab" class="install-fab">
   <span id="install-fab-label">&#128241; Installer l'app</span>
-  <span id="install-fab-close" class="install-fab-close">&times;</span>
 </button>
 
 <nav>
@@ -888,50 +887,39 @@ loadNotifPrefs();
 (function(){
   var deferredPrompt = null;
   var fab = document.getElementById('install-fab');
-  var closeBtn = document.getElementById('install-fab-close');
-  var DISMISS_KEY = 'pcinfo_install_dismissed_at';
-  var DISMISS_DAYS = 3;
+  var DISMISS_KEY = 'pcinfo_install_dismissed_session';
 
-  function isDismissedRecently(){
-    var v = localStorage.getItem(DISMISS_KEY);
-    if(!v) return false;
-    return (Date.now() - parseInt(v,10)) < DISMISS_DAYS*24*60*60*1000;
+  function isDismissedThisSession(){
+    return sessionStorage.getItem(DISMISS_KEY) === '1';
   }
   function isStandalone(){
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+  function dismiss(){
+    if(fab) fab.classList.remove('show');
+    sessionStorage.setItem(DISMISS_KEY, '1');
   }
 
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
     deferredPrompt = e;
-    if(!isStandalone() && !isDismissedRecently() && fab){
+    if(!isStandalone() && !isDismissedThisSession() && fab){
       fab.classList.add('show');
     }
   });
 
   if(fab){
-    fab.addEventListener('click', function(e){
-      if(e.target.closest && e.target.closest('#install-fab-close')) return;
+    fab.addEventListener('click', function(){
       if(deferredPrompt){
         deferredPrompt.prompt();
         deferredPrompt.userChoice.finally(function(){
-          fab.classList.remove('show');
           deferredPrompt = null;
         });
       }
+      dismiss();
     });
   }
-  if(closeBtn){
-    closeBtn.addEventListener('click', function(e){
-      e.stopPropagation();
-      fab.classList.remove('show');
-      localStorage.setItem(DISMISS_KEY, String(Date.now()));
-    });
-  }
-  window.addEventListener('appinstalled', function(){
-    if(fab) fab.classList.remove('show');
-    localStorage.setItem(DISMISS_KEY, String(Date.now()));
-  });
+  window.addEventListener('appinstalled', dismiss);
 })();
 </script>
 
