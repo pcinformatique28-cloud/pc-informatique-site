@@ -1489,5 +1489,26 @@ loadNotifPrefs();
   });
 })();
 </script>
+
+<script>
+(function(){
+  var box = document.createElement('div');
+  box.id = 'debug-console';
+  box.style.cssText = 'position:fixed;bottom:60px;left:0;right:0;max-height:200px;overflow-y:auto;background:rgba(0,0,0,.9);color:#0f0;font-size:11px;font-family:monospace;padding:8px;z-index:99999;white-space:pre-wrap;';
+  document.body.appendChild(box);
+  function log(msg){
+    var line = document.createElement('div');
+    line.textContent = msg;
+    box.appendChild(line);
+    box.scrollTop = box.scrollHeight;
+  }
+  window.addEventListener('error', function(e){
+    log('ERREUR: ' + e.message + ' (' + e.filename + ':' + e.lineno + ')');
+  });
+  window.addEventListener('unhandledrejection', function(e){
+    log('PROMESSE REJETEE: ' + e.reason);
+  });
+})();
+</script>
 </body>
 </html>
