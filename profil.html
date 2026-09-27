@@ -334,6 +334,7 @@ async function loadProjets(){
       ${p.imageURL ? `<img src="${p.imageURL}" alt="" style="cursor:pointer;" data-edit-id="${p.id}">` : ''}
       ${p.lien ? `<a class="lien" href="${escapeHtml(p.lien)}" target="_blank" rel="noopener">${escapeHtml(p.lien)}</a><br>` : ''}
       <button class="btn-danger" data-id="${p.id}">Supprimer</button>
+      ${p.statut === 'en_attente' ? `<button class="btn-edit-projet" data-id="${p.id}" style="background:#2dd4bf;color:#0d0f16;font-weight:700;border:none;border-radius:8px;padding:8px 14px;margin-left:8px;cursor:pointer;">Modifier</button>` : ''}
     </div>
   `).join('');
 
@@ -348,6 +349,20 @@ async function loadProjets(){
   list.querySelectorAll('img[data-edit-id]').forEach(img=>{
     img.addEventListener('click', ()=>{
       const p = projets.find(x => x.id === img.dataset.editId);
+      if(!p) return;
+      editingProjetId = p.id;
+      document.getElementById('p-titre').value = p.titre || '';
+      document.getElementById('p-type').value = p.type || 'personnel';
+      document.getElementById('p-desc').value = p.description || '';
+      document.getElementById('p-lien').value = p.lien || '';
+      document.getElementById('btn-add-projet').textContent = 'Enregistrer les modifications';
+      document.getElementById('p-titre').scrollIntoView({behavior:'smooth', block:'center'});
+    });
+  });
+
+  list.querySelectorAll('.btn-edit-projet').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const p = projets.find(x => x.id === btn.dataset.id);
       if(!p) return;
       editingProjetId = p.id;
       document.getElementById('p-titre').value = p.titre || '';
