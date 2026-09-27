@@ -604,6 +604,7 @@ render();
 (function(){
   if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   var auth = firebase.auth();
+  var db = firebase.firestore();
 
   var drawer = document.getElementById('drawer');
   var overlay = document.getElementById('drawer-overlay');
@@ -642,6 +643,14 @@ render();
       dName.textContent = user.displayName || 'Membre';
       dEmail.textContent = user.email || '';
       dAvatar.src = user.photoURL || 'images/logo-pc-informatique.png';
+      db.collection('membres').doc(user.uid).get().then(function(doc){
+        var d = doc.data() || {};
+        var photoURL = d.photoURL || user.photoURL;
+        if(photoURL){
+          authIcon.innerHTML = '<img src="' + photoURL + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+          dAvatar.src = photoURL;
+        }
+      }).catch(function(){});
       document.getElementById('notif-bell').style.display = 'inline-flex';
       startIndexNotifs(user.uid);
       dProfil.style.display = 'flex';
