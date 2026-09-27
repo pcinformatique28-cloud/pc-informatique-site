@@ -238,6 +238,15 @@ nav{padding:2px 0!important;}
 .bottom-nav a{padding:2px 8px!important;gap:1px!important;}
 .bottom-nav a .ic{font-size:1rem!important;}
 .bn-indicator{position:absolute;bottom:2px;height:3px;background:#FFD500;border-radius:3px;transition:left .25s ease, width .25s ease;}
+
+/* ===== PATCH v20 : vide en-tete, fab centre + croix agrandie, drawer close repositionne ===== */
+nav{padding:2px 0 0 0!important;}
+.navwrap{padding-bottom:0!important;}
+.navlinks{margin-bottom:0!important;}
+.install-fab-wrap{width:100%;display:flex;justify-content:center;}
+#install-fab{margin:6px 0 8px!important;}
+#install-fab-close{width:22px!important;height:22px!important;font-size:1.05rem!important;}
+.drawer .d-close{top:14px!important;right:14px!important;left:auto!important;bottom:auto!important;z-index:5!important;}
 </style>
 </head>
 <body>
@@ -1366,6 +1375,21 @@ loadNotifPrefs();
       });
     }
 
+  });
+})();
+</script>
+
+
+<script>
+(function(){
+  document.addEventListener("DOMContentLoaded", function(){
+    var fab = document.getElementById("install-fab");
+    if(fab && fab.parentNode && !fab.parentNode.classList.contains("install-fab-wrap")){
+      var wrap = document.createElement("div");
+      wrap.className = "install-fab-wrap";
+      fab.parentNode.insertBefore(wrap, fab);
+      wrap.appendChild(fab);
+    }
   });
 })();
 </script>
