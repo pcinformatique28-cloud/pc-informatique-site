@@ -1213,5 +1213,74 @@ loadNotifPrefs();
 })();
 </script>
 
+
+<script>
+(function(){
+  document.addEventListener("DOMContentLoaded", function(){
+
+    // 1) Boutons "Realisations" / "Nouvelle demande" : plus petits, cote a cote
+    var btns = Array.prototype.slice.call(document.querySelectorAll("a,button")).filter(function(el){
+      var t = el.textContent.trim();
+      return t.indexOf("alisations") !== -1 || t.indexOf("Nouvelle demande") !== -1;
+    });
+    var rowParent = null;
+    if(btns.length >= 2){
+      rowParent = btns[0].parentElement;
+      if(rowParent){
+        rowParent.style.display = "flex";
+        rowParent.style.flexWrap = "nowrap";
+        rowParent.style.gap = "8px";
+        rowParent.style.width = "100%";
+        rowParent.style.boxSizing = "border-box";
+      }
+      btns.forEach(function(b){
+        b.style.flex = "1 1 0";
+        b.style.minWidth = "0";
+        b.style.width = "auto";
+        b.style.maxWidth = "none";
+        b.style.padding = "6px 8px";
+        b.style.fontSize = "0.75rem";
+        b.style.whiteSpace = "nowrap";
+        b.style.overflow = "hidden";
+        b.style.textOverflow = "ellipsis";
+        b.style.textAlign = "center";
+        b.style.justifyContent = "center";
+        b.style.boxSizing = "border-box";
+      });
+    }
+
+    // 2) Bouton flottant Installer : place sous l'en-tete, plus de superposition
+    var fab = document.getElementById("install-fab");
+    if(fab && rowParent){
+      fab.style.position = "static";
+      fab.style.left = "auto";
+      fab.style.right = "auto";
+      fab.style.top = "auto";
+      fab.style.bottom = "auto";
+      fab.style.transform = "none";
+      fab.style.display = "inline-flex";
+      fab.style.padding = "4px 10px";
+      fab.style.fontSize = "0.68rem";
+      fab.style.margin = "0";
+
+      var wrapperDiv = document.createElement("div");
+      wrapperDiv.style.width = "100%";
+      wrapperDiv.style.display = "flex";
+      wrapperDiv.style.justifyContent = "center";
+      wrapperDiv.style.margin = "8px 0 0";
+      rowParent.parentNode.insertBefore(wrapperDiv, rowParent.nextSibling);
+      wrapperDiv.appendChild(fab);
+
+      document.addEventListener("click", function(e){
+        if(fab.classList.contains("show") && !fab.contains(e.target)){
+          fab.classList.remove("show");
+        }
+      });
+    }
+
+  });
+})();
+</script>
+
 </body>
 </html>
