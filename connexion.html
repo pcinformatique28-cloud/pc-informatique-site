@@ -93,9 +93,131 @@ body{min-height:100dvh!important;padding:0!important;display:flex!important;alig
 /* ===== PATCH v21 : marges laterales + remontee + scroll page connexion ===== */
 body{padding:16px!important;align-items:flex-start!important;overflow-y:auto!important;}
 .card{margin:40px auto!important;max-width:420px!important;width:100%!important;}
+:root{
+  color-scheme: dark;
+  --bg:#12142b; --card:#1b1e3d; --text:#f2f3fa; --sub:#a9acc4;
+  --teal:#2dd9c4; --pink:#e0266f;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+:root{--logo-navy:#12142b;--logo-navy2:#1b1e3d;--logo-teal:#2dd9c4;--logo-pink:#e0266f;}
+nav{position:sticky;top:0;z-index:20;background:linear-gradient(120deg,#EF9F27 0%,#F0997B 50%,#D4537E 100%);backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,.25);box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 2px 14px rgba(20,24,40,.18);
+.navwrap{max-width:640px;margin:0 auto;width:100%;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;}
+.brand{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;}
+.brand img{width:32px;height:32px;border-radius:50%;flex-shrink:0;}
+.brand b{font-size:.95rem;letter-spacing:.02em;color:#ffffff;}
+.navlinks{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%;}
+.header-row{display:flex;align-items:center;width:100%;gap:8px;padding-top:env(safe-area-inset-top,0px);}
+.header-row #btn-menu{order:1;}
+.header-row .brand{order:2;flex:1 1 auto;min-width:0;justify-content:flex-start;text-align:left;}
+.header-row .brand b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.header-row #notif-bell{order:3;}
+.header-row #auth-icon{order:4;}
+.navlinks a{display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;font-size:.78rem;color:var(--text);padding:7px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);}
+.navlinks a.cta{color:#0d0f16;background:linear-gradient(90deg,var(--teal),var(--pink));border:none;font-weight:700;}
+.navlinks a .ic{font-size:.85rem;line-height:1;}
+.icon-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:var(--text);width:34px;height:34px;border-radius:50%;
+.icon-btn:hover{color:var(--logo-teal);border-color:var(--logo-teal);}
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;opacity:0;pointer-events:none;transition:opacity .25s ease;}
+.drawer-overlay.open{opacity:1;pointer-events:auto;}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:78%;max-width:300px;background:var(--card);border-right:1px solid #f0e4c8;
+.drawer::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--pink));}
+.drawer.open{transform:translateX(0);}
+.drawer .d-user{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #f0e4c8;}
+.drawer .d-user img{width:46px;height:46px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,.08);border:2px solid var(--teal);}
+.drawer .d-user .d-name{font-weight:700;font-size:.92rem;color:var(--text);}
+.drawer .d-user .d-email{color:var(--sub);font-size:.74rem;}
+.drawer nav.d-links{display:flex;flex-direction:column;gap:4px;background:none;backdrop-filter:none;box-shadow:none;border-bottom:none;position:static;}
+.drawer a.d-link{display:flex;align-items:center;gap:12px;padding:11px 10px;border-radius:10px;color:var(--text);text-decoration:none;font-size:.88rem;border-left:3px solid transparent;}
+.drawer a.d-link:hover{background:#fdf1dc;border-left:3px solid var(--teal);}
+.drawer a.d-link .ic{width:30px;height:30px;text-align:center;line-height:30px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.12);margin-right:2px;}
+.drawer a.d-link{background:var(--bg);margin-bottom:4px;border-left:none;border-radius:12px;}
+.drawer a.d-link:hover{background:linear-gradient(90deg,rgba(239,159,39,.15),rgba(212,83,126,.15));}
+.drawer .d-close{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:14px;background:none;border:none;color:var(--sub);font-size:1.3rem;cursor:pointer;}
+.drawer{background:linear-gradient(180deg,var(--logo-navy),var(--logo-navy2));border-right:none;}
+.drawer::before{background:linear-gradient(90deg,var(--logo-teal),var(--logo-pink));}
+.drawer .d-user{border-bottom:1px solid rgba(255,255,255,.12);}
+.drawer .d-user img{border:2px solid var(--logo-teal);}
+.drawer .d-user .d-name{color:#fff;}
+.drawer .d-user .d-email{color:rgba(255,255,255,.65);}
+.drawer a.d-link{background:rgba(255,255,255,.04);color:#f2f3fa;}
+.drawer a.d-link:hover{background:linear-gradient(90deg,rgba(45,217,196,.18),rgba(224,38,111,.18));border-left:3px solid var(--logo-teal);}
+.drawer a.d-link .ic{background:rgba(255,255,255,.9);}
+.drawer .d-close{color:rgba(255,255,255,.75);}
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:linear-gradient(100deg,var(--logo-navy) 0%,var(--logo-navy2) 50%,var(--logo-navy) 100%);backdrop-filter:blur(6px);
+.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;color:rgba(255,255,255,.85);text-decoration:none;font-size:.64rem;padding:4px 8px;}
+.bottom-nav a.active{color:#ffffff;font-weight:700;}
+.bottom-nav a .ic{font-size:1.15rem;}
+.header-row{gap:6px!important;}
+.header-row .brand img{width:28px!important;height:28px!important;}
+.header-row .brand b{font-size:.98rem!important;}
+.navlinks a,.card,.card.pcinfo-self,.formbox,.btn.ghost,.icon-btn,.opt,.upload-box,.thumbs img,.about-tabs button,.about-pane p,.about-btn-wrap button,input[type=text],input[type=email],input[type=tel],input[type=number],textarea,input[type=color]{border-color:var(--logo-teal)!important;border-width:2px!important;}
+.drawer a.d-link .ic{background:#fff!important;filter:none!important;-webkit-filter:none!important;}
+.brand img{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.icon-btn{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.drawer .d-user img{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.drawer a.d-link .ic{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.about-creator .ac-avatar{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.success .tick{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.d-user img{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.d-link .ic{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}
+.navwrap{gap:4px!important;}
+.header-row{padding-top:calc(2px + env(safe-area-inset-top,0px))!important;}
+.navlinks{gap:6px!important;margin-top:2px!important;}
+.navlinks a{padding:5px 10px!important;font-size:.7rem!important;}
+nav{padding:2px 0!important;}
+.bottom-nav{padding:4px 0 calc(4px + env(safe-area-inset-bottom,0px))!important;}
+.bottom-nav a{padding:2px 8px!important;gap:1px!important;}
+.bottom-nav a .ic{font-size:1rem!important;}
+.bn-indicator{position:absolute;bottom:2px;height:3px;background:#FFD500;border-radius:3px;transition:left .25s ease, width .25s ease;}
+nav{padding:2px 0 0 0!important;}
+.navwrap{padding-bottom:0!important;}
+.navlinks{margin-bottom:0!important;}
+.drawer .d-close{top:14px!important;right:14px!important;left:auto!important;bottom:auto!important;z-index:5!important;}
+.drawer .d-close{width:34px!important;height:34px!important;border-radius:10px!important;background:rgba(255,255,255,.14)!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:1.05rem!important;line-height:1!important;}
+body{padding-bottom:76px!important;}
+.card{margin-top:24px!important;}
 </style>
 </head>
 <body>
+<nav>
+  <div class="navwrap">
+  <div class="header-row">
+    <button class="icon-btn" id="btn-menu" aria-label="Menu">&#9776;</button>
+  <a href="connexion.html" class="icon-btn" id="auth-icon" aria-label="Connexion">&#128273;</a>
+  <span class="icon-btn" id="notif-bell" style="display:none;position:relative;cursor:pointer;" title="Notifications">&#128276;<span id="notif-bell-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:#ff4fa3;color:#fff;font-size:.6rem;font-weight:800;border-radius:10px;padding:1px 5px;line-height:1;"></span></span>
+    <div class="brand"><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAAAAAAD/6xaJSlACEQAAAAEAABZ/anVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAAFllqdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3VybjpjMnBhOjAxOTJjNjMxLWZlNzEtNGM2OC1iZjI1LWEwMGJkMmYxOWNjZgAAAAOUanVtYgAAAClqdW1kYzJhcwARABCAAACqADibcQNjMnBhLmFzc2VydGlvbnMAAAAAuWp1bWIAAABEanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5pbmdyZWRpZW50LnYzAAAAABhjMnNogMFMH6z5vrLVYArqr6PJhgAAAG1jYm9yo2lkYzpmb3JtYXRqaW1hZ2UvanBlZ2ppbnN0YW5jZUlEeCx4bXA6aWlkOjg0NGJmNTZkLTQyNTYtNDkzZC04YjVlLTJkNTk3ZjQ0NTA3OGxyZWxhdGlvbnNoaXBocGFyZW50T2YAAAHianVtYgAAAEFqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmFjdGlvbnMudjIAAAAAGGMyc2jNduS8iQkvsluTPpF4FdokAAABmWNib3KiZ2FjdGlvbnOComZhY3Rpb25rYzJwYS5vcGVuZWRqcGFyYW1ldGVyc6FraW5ncmVkaWVudHOBomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCBKbsm6xkdcbs9ln0vVe/yQG+D6rWImJH78QeqgY4oHXaRmYWN0aW9ueB1jb20uYW50aHJvcGljLmNsYXVkZS5wcm92aWRlZGpwYXJhbWV0ZXJzoXgfY29tLmFudGhyb3BpYy5vcmlnaW4tY29uZmlkZW5jZWd1bmtub3dua2Rlc2NyaXB0aW9ueGZDbGF1ZGUgcHJvdmlkZWQgdGhpcyBmaWxlIGF0IHRoZSByZXF1ZXN0IG9mIGEgdXNlciBhbmQgbWF5IGhhdmUgY3JlYXRlZCBvciBtb2RpZmllZCB0aGUgZmlsZSBjb250ZW50cy5tc29mdHdhcmVBZ2VudKFkbmFtZWZDbGF1ZGVyYWxsQWN0aW9uc0luY2x1ZGVk9QAAAMhqdW1iAAAAQGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaGFzaC5kYXRhAAAAABhjMnNoyN75/TSHEx8H0cyuAEF1MAAAAIBjYm9ypWNhbGdmc2hhMjU2Y3BhZE4AAAAAAAAAAAAAAAAAAGRoYXNoWCDmelFsSG5W9yuVKLKCxZg+SnWasQ7gSA02147BtMavlGRuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBRmbGVuZ3RoGRaLAAACPmp1bWIAAAAnanVtZGMyY2wAEQAQgAAAqgA4m3EDYzJwYS5jbGFpbS52MgAAAAIPY2JvcqVjYWxnZnNoYTI1NmlzaWduYXR1cmV4TXNlbGYjanVtYmY9L2MycGEvdXJuOmMycGE6MDE5MmM2MzEtZmU3MS00YzY4LWJmMjUtYTAwYmQyZjE5Y2NmL2MycGEuc2lnbmF0dXJlamluc3RhbmNlSUR4LHhtcDppaWQ6YzU2NDk1YjYtOTZlZS00YzkzLWIzYjUtZjJmOTgzMmQwYmVicmNyZWF0ZWRfYXNzZXJ0aW9uc4OiY3VybHgtc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5pbmdyZWRpZW50LnYzZGhhc2hYIEpuybrGR1xuz2WfS9V7/JAb4PqtYiYkfvxB6qBjigddomN1cmx4KnNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuYWN0aW9ucy52MmRoYXNoWCBprfe+12eAvQ7xqs47q3fT13PCyRpSFfc25t1eVuZIqqJjdXJseClzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmhhc2guZGF0YWRoYXNoWCDg5x9ZSLAdEruLPd1cCBM0mfOq2kFYPxZC57RJ6qrRKXRjbGFpbV9nZW5lcmF0b3JfaW5mb6NkbmFtZW9BbnRocm9waWMgRmlsZXNndmVyc2lvbmUxLjAuMGtzcGVjVmVyc2lvbmUyLjQuMAAAEDhqdW1iAAAAKGp1bWRjMmNzABEAEIAAAKoAOJtxA2MycGEuc2lnbmF0dXJlAAAAEAhjYm9y0oRZAhKiASYYIVkCCjCCAgYwggGNoAMCAQICFEDloAruwjnQvriD+gZCBT1nVRMAMAoGCCqGSM49BAMDMEkxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMS4wLAYDVQQDEyVBbnRocm9waWMgQ29udGVudCBDcmVkZW50aWFscyBSb290IENBMB4XDTI2MDgwNzE4NDM1NloXDTI4MDgwNjE5NDM1NlowRDEXMBUGA1UEChMOQW50aHJvcGljLCBQQkMxKTAnBgNVBAMTIEFudGhyb3BpYyBDbGF1ZGUgQ29udGVudCBTaWduaW5nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEmHoKa8tQGAUU1TS9QqU5W0Tp2N3XsvlK7BfQt6YWKwEzd2R3/dzKPEUDdCjlLjp9fT+KFjRVnuZ9v0oXvTe3k6NYMFYwDgYDVR0PAQH/BAQDAgeAMBUGA1UdJQQOMAwGCisGAQQBg+heAgEwDAYDVR0TAQH/BAIwADAfBgNVHSMEGDAWgBTOUeIEgU5kWyP448TPmj6cwddcwjAKBggqhkjOPQQDAwNnADBkAjAxcx0UngF60stVjs5G4T2eiptsBk5mf9oCtfJPAUBl8qs/PEXa8+gk1/X5QJ2DVcYCMHBfXN31YapiSqYvlIWrDVDJKOvXMl+kkz37Wt0PBI8sw486Mq6JeOhT+lRR4b1HCaFjcGFkWQ2eAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA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" alt="PC-INFORMATIQUE"><b>PC-INFORMATIQUE</b></div>
+  </div>
+    <div class="navlinks">
+      <a href="#realisations"><span class="ic">📁</span>Réalisations</a>
+      <a href="#demande" class="cta"><span class="ic">➕</span>Nouvelle demande</a>
+    </div>
+  </div>
+</nav>
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<aside class="drawer" id="drawer">
+  <button class="d-close" id="drawer-close" aria-label="Fermer">&times;</button>
+  <div class="d-user" id="drawer-user" style="display:none;">
+    <img id="drawer-avatar" src="" alt="">
+    <div>
+      <div class="d-name" id="drawer-name">&mdash;</div>
+      <div class="d-email" id="drawer-email">&mdash;</div>
+    </div>
+  </div>
+  <nav class="d-links">
+    <a href="index.html" class="d-link"><span class="ic">&#127968;</span>Accueil</a>
+    <a href="index.html#realisations" class="d-link"><span class="ic">&#128193;</span>Realisations</a>
+    <a href="index.html#demande" class="d-link"><span class="ic">&#10133;</span>Nouvelle demande</a>
+    <a href="profil.html" class="d-link" id="drawer-profil" style="display:none;"><span class="ic">&#128100;</span>Mon profil</a>
+    <a href="admin.html" class="d-link" id="drawer-admin" style="display:none;"><span class="ic">&#9881;</span>Tableau de bord</a>
+    <a href="#" class="d-link" onclick="openSheet('about-sheet');return false;"><span class="ic" style="color:#12142b;font-weight:800;">i</span>A propos</a>
+    <a href="#" class="d-link" onclick="openSheet('notif-sheet');return false;"><span class="ic">&#128276;</span>Parametres notifications</a>
+    <a href="connexion.html" class="d-link" id="drawer-login"><span class="ic">&#128273;</span>Connexion</a>
+    <a href="#" class="d-link" id="drawer-logout" style="display:none;color:#ff6b6b;"><span class="ic">&#128682;</span>Deconnexion</a>
+  </nav>
+</aside>
+
+<div class="bottom-nav">
+  <a href="index.html"><span class="ic">&#127968;</span><span class="lbl">Accueil</span></a>
+  <a href="index.html#realisations"><span class="ic">&#128193;</span><span class="lbl">Projets</span></a>
+  <a href="index.html#demande"><span class="ic">&#10133;</span><span class="lbl">Demande</span></a>
+  <a href="connexion.html" id="bottom-auth" class="active"><span class="ic">&#128273;</span><span class="lbl">Connexion</span></a>
+</div>
+
+
+
   <div class="card">
     <h1>Connexion</h1>
     <p class="sub">Accède à ton espace membre PC-INFORMATIQUE.</p>
@@ -164,4 +286,57 @@ auth.onAuthStateChanged(user=>{
 });
 </script>
 </body>
+
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    var drawer = document.getElementById('drawer');
+    var overlay = document.getElementById('drawer-overlay');
+    var btnMenu = document.getElementById('btn-menu');
+    var drawerClose = document.getElementById('drawer-close');
+    function openDrawer(){ drawer.classList.add('open'); overlay.classList.add('open'); }
+    function closeDrawer(){ drawer.classList.remove('open'); overlay.classList.remove('open'); }
+    if(btnMenu) btnMenu.addEventListener('click', openDrawer);
+    if(drawerClose) drawerClose.addEventListener('click', closeDrawer);
+    if(overlay) overlay.addEventListener('click', closeDrawer);
+
+    var dLogout = document.getElementById('drawer-logout');
+    if(dLogout){
+      dLogout.addEventListener('click', function(e){
+        e.preventDefault();
+        auth.signOut().then(function(){ closeDrawer(); location.href='index.html'; });
+      });
+    }
+
+    var bottomNav = document.querySelector('.bottom-nav');
+    if(bottomNav){
+      var indicator = document.createElement('span');
+      indicator.className = 'bn-indicator';
+      bottomNav.appendChild(indicator);
+      var active = bottomNav.querySelector('a.active');
+      if(active){
+        var rect = active.getBoundingClientRect();
+        var parentRect = bottomNav.getBoundingClientRect();
+        indicator.style.left = (rect.left - parentRect.left) + 'px';
+        indicator.style.width = rect.width + 'px';
+      }
+    }
+
+    auth.onAuthStateChanged(function(user){
+      if(user){
+        var du = document.getElementById('drawer-user');
+        if(du) du.style.display = 'flex';
+        var dn = document.getElementById('drawer-name'); if(dn) dn.textContent = user.displayName || 'Membre';
+        var de = document.getElementById('drawer-email'); if(de) de.textContent = user.email || '';
+        var dp = document.getElementById('drawer-profil'); if(dp) dp.style.display = 'flex';
+        var dl = document.getElementById('drawer-login'); if(dl) dl.style.display = 'none';
+        if(dLogout) dLogout.style.display = 'flex';
+        var authIcon = document.getElementById('auth-icon');
+        if(authIcon){ authIcon.href = 'profil.html'; authIcon.innerHTML = '&#128100;'; }
+      }
+    });
+  });
+})();
+</script>
+
 </html>
