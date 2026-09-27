@@ -1420,5 +1420,37 @@ loadNotifPrefs();
 })();
 </script>
 
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    var oldClose = document.getElementById('install-fab-close');
+    var fab = document.getElementById('install-fab');
+    if(oldClose && oldClose.parentNode){
+      var newClose = oldClose.cloneNode(true);
+      oldClose.parentNode.replaceChild(newClose, oldClose);
+      newClose.id = 'install-fab-close';
+      newClose.style.setProperty('width','34px','important');
+      newClose.style.setProperty('height','34px','important');
+      newClose.style.setProperty('font-size','1.2rem','important');
+      newClose.style.setProperty('display','inline-flex','important');
+      newClose.style.setProperty('align-items','center','important');
+      newClose.style.setProperty('justify-content','center','important');
+      newClose.style.setProperty('pointer-events','auto','important');
+      newClose.style.setProperty('position','relative','important');
+      newClose.style.setProperty('z-index','10','important');
+      function closeFab(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if(typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+        if(fab) fab.classList.remove('show');
+        try{ localStorage.setItem('pcinfo_install_dismissed_at', String(Date.now())); }catch(err){}
+      }
+      newClose.addEventListener('click', closeFab, true);
+      newClose.addEventListener('touchend', closeFab, true);
+      newClose.addEventListener('pointerup', closeFab, true);
+    }
+  });
+})();
+</script>
 </body>
 </html>
