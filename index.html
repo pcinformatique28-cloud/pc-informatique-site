@@ -636,6 +636,22 @@ document.querySelectorAll('a[href="index.html#realisations"], a[href="#realisati
   });
 });
 
+document.querySelectorAll('a[href="index.html#demande"], a[href="#demande"]').forEach(function(a){
+  a.addEventListener('click', function(e){
+    var target = document.getElementById('demande');
+    if(!target) return;
+    if(location.pathname.endsWith('index.html') || location.pathname === '/' || location.pathname.endsWith('/pc-informatique-site/')){
+      e.preventDefault();
+      var navEl = document.querySelector('nav');
+      var headerH = navEl ? navEl.getBoundingClientRect().height : 0;
+      var rect = target.getBoundingClientRect();
+      var offset = rect.top + window.scrollY - headerH - 8;
+      window.scrollTo({ top: offset, behavior: 'smooth' });
+      history.replaceState(null, '', '#demande');
+    }
+  });
+});
+
 render();
 </script>
 
