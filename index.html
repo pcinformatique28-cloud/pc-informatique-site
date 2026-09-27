@@ -954,7 +954,7 @@ loadNotifPrefs();
       var dragging = false, startX, startY, origX, origY, moved = false;
 
       fab.addEventListener("touchstart", function(e){
-        if(closeBtn && e.target === closeBtn) return;
+        if(e.target.closest && e.target.closest('#install-fab-close')) return;
         dragging = true;
         moved = false;
         var t = e.touches[0];
@@ -1073,7 +1073,7 @@ loadNotifPrefs();
       var dragging = false, startX, startY, origX, origY, moved = false;
 
       fab.addEventListener("touchstart", function(e){
-        if(closeBtn && e.target === closeBtn) return;
+        if(e.target.closest && e.target.closest('#install-fab-close')) return;
         dragging = true;
         moved = false;
         var t = e.touches[0];
