@@ -226,6 +226,18 @@ nav:not(.d-links){position:sticky!important;top:0!important;z-index:25!important
   flex-shrink:0;aspect-ratio:1/1;
 }
 @keyframes fabIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:none;}}
+
+/* ===== PATCH v19 : en-tete compact, fab hors en-tete, correctif tiroir, curseur bottom-nav ===== */
+.navwrap{gap:4px!important;}
+.header-row{padding-top:calc(2px + env(safe-area-inset-top,0px))!important;}
+.navlinks{gap:6px!important;margin-top:2px!important;}
+.navlinks a{padding:5px 10px!important;font-size:.7rem!important;}
+nav{padding:2px 0!important;}
+#install-fab{position:static!important;display:inline-flex!important;margin:6px auto 8px!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;transform:none!important;z-index:1!important;padding:4px 10px!important;font-size:.66rem!important;}
+.bottom-nav{padding:4px 0 calc(4px + env(safe-area-inset-bottom,0px))!important;}
+.bottom-nav a{padding:2px 8px!important;gap:1px!important;}
+.bottom-nav a .ic{font-size:1rem!important;}
+.bn-indicator{position:absolute;bottom:2px;height:3px;background:#FFD500;border-radius:3px;transition:left .25s ease, width .25s ease;}
 </style>
 </head>
 <body>
@@ -1284,6 +1296,73 @@ loadNotifPrefs();
         if(fab.classList.contains("show") && !fab.contains(e.target)){
           fab.classList.remove("show");
         }
+      });
+    }
+
+  });
+})();
+</script>
+
+
+<script>
+(function(){
+  document.addEventListener("DOMContentLoaded", function(){
+
+    // 1) Fab hors de l'en-tete, place juste sous le nav
+    var fab = document.getElementById("install-fab");
+    var navEl = document.querySelector("nav");
+    if(fab && navEl && navEl.parentNode){
+      navEl.parentNode.insertBefore(fab, navEl.nextSibling);
+    }
+
+    // 2) Corriger les liens du tiroir deformes par d'anciens patches
+    document.querySelectorAll(".drawer a.d-link").forEach(function(a){
+      ["padding","font-size","flex","width","max-width","min-width","white-space","overflow","text-overflow","text-align","justify-content","box-sizing"].forEach(function(p){
+        a.style.removeProperty(p);
+      });
+    });
+
+    // 3) Curseur jaune anime sous l'onglet actif de la bottom-nav
+    var bottomNav = document.querySelector(".bottom-nav");
+    if(bottomNav){
+      var indicator = document.createElement("span");
+      indicator.className = "bn-indicator";
+      bottomNav.appendChild(indicator);
+      var links = Array.prototype.slice.call(bottomNav.querySelectorAll("a"));
+
+      function moveIndicator(link){
+        if(!link) return;
+        var rect = link.getBoundingClientRect();
+        var parentRect = bottomNav.getBoundingClientRect();
+        indicator.style.left = (rect.left - parentRect.left) + "px";
+        indicator.style.width = rect.width + "px";
+      }
+
+      function setActive(link){
+        links.forEach(function(l){ l.classList.remove("active"); });
+        link.classList.add("active");
+        moveIndicator(link);
+      }
+
+      var hash = window.location.hash;
+      var current = null;
+      links.forEach(function(l){
+        var href = l.getAttribute("href") || "";
+        if(!current && hash && href.indexOf(hash) !== -1) current = l;
+      });
+      if(!current){
+        links.forEach(function(l){ if(!current && l.classList.contains("active")) current = l; });
+      }
+      if(!current) current = links[0];
+      setActive(current);
+
+      links.forEach(function(l){
+        l.addEventListener("click", function(){ setActive(l); });
+      });
+
+      window.addEventListener("resize", function(){
+        var act = bottomNav.querySelector("a.active");
+        moveIndicator(act);
       });
     }
 
