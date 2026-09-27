@@ -1089,5 +1089,129 @@ loadNotifPrefs();
 })();
 </script>
 
+
+<script>
+(function(){
+  document.addEventListener("DOMContentLoaded", function(){
+
+    // 1) Boutons "Realisations" / "Nouvelle demande" : meme taille, centres
+    var btns = Array.prototype.slice.call(document.querySelectorAll("a,button")).filter(function(el){
+      var t = el.textContent.trim();
+      return t.indexOf("alisations") !== -1 || t.indexOf("Nouvelle demande") !== -1;
+    });
+    if(btns.length >= 2){
+      var parent = btns[0].parentElement;
+      if(parent){
+        parent.style.display = "flex";
+        parent.style.justifyContent = "center";
+        parent.style.alignItems = "center";
+        parent.style.gap = "10px";
+        parent.style.flexWrap = "wrap";
+      }
+      btns.forEach(function(b){
+        b.style.padding = "8px 16px";
+        b.style.fontSize = "0.85rem";
+        b.style.textAlign = "center";
+        b.style.justifyContent = "center";
+        b.style.boxSizing = "border-box";
+      });
+      setTimeout(function(){
+        var maxW = 0;
+        btns.forEach(function(b){ maxW = Math.max(maxW, b.offsetWidth); });
+        btns.forEach(function(b){ b.style.width = maxW + "px"; });
+      }, 50);
+    }
+
+    // 2) Bouton flottant Installer : centre par defaut sous l'en-tete, se ferme au clic ailleurs
+    var fab = document.getElementById("install-fab");
+    if(fab){
+      fab.style.position = "fixed";
+      fab.style.left = "50%";
+      fab.style.right = "auto";
+      fab.style.top = "calc(112px + env(safe-area-inset-top,0px))";
+      fab.style.transform = "translateX(-50%)";
+
+      document.addEventListener("click", function(e){
+        if(fab.classList.contains("show") && !fab.contains(e.target)){
+          fab.classList.remove("show");
+        }
+      });
+    }
+
+    // 3) Icone oeil afficher/masquer sur les champs mot de passe
+    document.querySelectorAll('input[type="password"]').forEach(function(input){
+      if(input.dataset.eyeAdded) return;
+      input.dataset.eyeAdded = "1";
+      var wrapper = document.createElement("div");
+      wrapper.style.position = "relative";
+      wrapper.style.display = "block";
+      wrapper.style.width = "100%";
+      input.parentNode.insertBefore(wrapper, input);
+      wrapper.appendChild(input);
+      input.style.paddingRight = "42px";
+      input.style.boxSizing = "border-box";
+      input.style.width = "100%";
+
+      var eye = document.createElement("span");
+      eye.textContent = "\u{1F441}\uFE0F";
+      eye.style.position = "absolute";
+      eye.style.right = "12px";
+      eye.style.top = "50%";
+      eye.style.transform = "translateY(-50%)";
+      eye.style.cursor = "pointer";
+      eye.style.fontSize = "1.1rem";
+      eye.style.userSelect = "none";
+      eye.style.opacity = "0.85";
+      wrapper.appendChild(eye);
+
+      eye.addEventListener("click", function(){
+        if(input.type === "password"){
+          input.type = "text";
+          eye.textContent = "\u{1F648}";
+        } else {
+          input.type = "password";
+          eye.textContent = "\u{1F441}\uFE0F";
+        }
+      });
+    });
+
+    // 4) Inversion des couleurs (fond de page / cadre) sur profil et connexion
+    function luminance(rgb){
+      var m = rgb.match(/\d+/g);
+      if(!m) return 1;
+      var r = m[0]/255, g = m[1]/255, b = m[2]/255;
+      return 0.299*r + 0.587*g + 0.114*b;
+    }
+    function invertPageCard(matches){
+      var card = null;
+      document.querySelectorAll("div,section,form").forEach(function(el){
+        if(card || el.children.length === 0) return;
+        var heading = el.querySelector("h1,h2,h3");
+        if(heading && matches.some(function(t){ return heading.textContent.indexOf(t) !== -1; })){
+          card = el;
+        }
+      });
+      if(!card) return;
+      var bodyBg = getComputedStyle(document.body).backgroundColor;
+      var cardBg = getComputedStyle(card).backgroundColor;
+      document.body.style.backgroundColor = cardBg;
+      document.documentElement.style.backgroundColor = cardBg;
+      card.style.backgroundColor = bodyBg;
+      var newCardLum = luminance(bodyBg);
+      var textColor = newCardLum > 0.6 ? "#1a1a2e" : "#f5f5fa";
+      card.querySelectorAll("*").forEach(function(el){
+        var st = getComputedStyle(el);
+        var elLum = luminance(st.color);
+        if(newCardLum > 0.6 && elLum > 0.6){ el.style.color = textColor; }
+        else if(newCardLum <= 0.6 && elLum <= 0.4){ el.style.color = textColor; }
+      });
+    }
+    invertPageCard(["Mon profil"]);
+    invertPageCard(["Connexion"]);
+
+  });
+})();
+</script>
+
 </body>
 </html>
