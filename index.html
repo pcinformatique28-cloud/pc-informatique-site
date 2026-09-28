@@ -1711,5 +1711,88 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 })();
 </script>
+
+<style>/*PATCH-PARTNERS-3*/
+.pc-partners.pcp-run{display:block;overflow:hidden;white-space:nowrap}
+.pcp-track{display:flex;width:max-content;align-items:center;will-change:transform}
+.pcp-half{display:flex;align-items:center;flex:none}
+.pcp-i{display:flex;align-items:center;gap:8px;flex:none}
+.pcp-main{padding:4px 12px;border:1px solid #facc15;border-radius:12px;box-shadow:0 0 12px #facc1566}
+.pcp-star{color:#facc15}
+.pcp-s{margin:0 26px;flex:none;color:#facc15;font-size:1.05rem;opacity:.9}
+.pcp-t{font-weight:800;flex:none;white-space:nowrap;color:#facc15}
+</style>
+<script>/*PATCH-PARTNERS-3*/
+(function(){
+  var DEF="\u25C6", PAUSEMS=4000, SPEED=50;
+  function getMeta(cb){
+    try{
+      firebase.firestore().collection("partenaires").orderBy("ts").get().then(function(sn){
+        var a=[]; sn.forEach(function(d){var x=d.data();a.push({sep:String(x.sep||"").slice(0,3),main:x.principal===true});}); cb(a);
+      }).catch(function(){cb([]);});
+    }catch(e){cb([]);}
+  }
+  function build(box,orig,meta){
+    if(box.classList.contains("pcp-run"))return;
+    var set=[];
+    orig.forEach(function(el,i){
+      var main=!!(meta[i]&&meta[i].main);
+      var it=document.createElement("div"); it.className="pcp-i"+(main?" pcp-main":"");
+      var nm=(el.tagName==="IMG")?(el.alt||el.title||""):el.textContent;
+      if(el.tagName==="IMG"){var im=document.createElement("img"); im.src=el.src; im.alt=nm; it.appendChild(im);}
+      if(nm){var sp=document.createElement("span"); sp.className="pn"; sp.textContent=nm; it.appendChild(sp);}
+      if(main){var st=document.createElement("span"); st.className="pcp-star"; st.textContent="\u2605"; it.appendChild(st);}
+      set.push(it);
+    });
+    function mk(t){var x=document.createElement("span"); x.className="pcp-s"; x.textContent=t||DEF; return x;}
+    function unit(){
+      var f=document.createDocumentFragment();
+      var t=document.createElement("span"); t.className="pcp-t"; t.textContent="Nos partenaires & nos Sponsors officiels"; f.appendChild(t);
+      set.forEach(function(it,i){f.appendChild(mk(meta[i]&&meta[i].sep)); f.appendChild(it.cloneNode(true));});
+      f.appendChild(mk(meta[0]&&meta[0].sep));
+      return f;
+    }
+    var track=document.createElement("div"); track.className="pcp-track";
+    var half=document.createElement("div"); half.className="pcp-half";
+    box.textContent=""; box.classList.add("pcp-run");
+    track.appendChild(half); box.appendChild(track);
+    var k=0; do{ half.appendChild(unit()); k++; }while(half.offsetWidth<box.clientWidth&&k<8);
+    track.appendChild(half.cloneNode(true));
+    var W=1, targets=[], x=0, last=0, paused=false;
+    function measure(){
+      W=half.offsetWidth||1; var C=box.clientWidth/2; targets=[];
+      Array.prototype.forEach.call(half.querySelectorAll(".pcp-main"),function(el){
+        targets.push((((C-(el.offsetLeft+el.offsetWidth/2))%W)+W)%W-W);
+      });
+    }
+    measure(); x=-W;
+    if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches){box.style.overflowX="auto";return;}
+    function tick(ts){
+      if(!last)last=ts;
+      var dt=Math.min(ts-last,100); last=ts;
+      if(!paused){
+        var nx=x+SPEED*dt/1000, hit=-1, j;
+        for(j=0;j<targets.length;j++){ if(x<targets[j]&&nx>=targets[j]){hit=j;break;} }
+        if(hit>=0){ nx=targets[hit]; paused=true; setTimeout(function(){paused=false;last=0;},PAUSEMS); }
+        if(nx>=0){ measure(); nx-=W; }
+        x=nx; track.style.transform="translateX("+x+"px)";
+      }
+      requestAnimationFrame(tick);
+    }
+    track.style.transform="translateX("+x+"px)";
+    requestAnimationFrame(tick);
+  }
+  var n=0, timer=setInterval(function(){
+    if(++n>40){clearInterval(timer);return;}
+    var box=document.getElementById("pc-partners");
+    if(!box||!box.children.length||box.classList.contains("pcp-run"))return;
+    clearInterval(timer);
+    var orig=Array.prototype.slice.call(box.children);
+    var imgs=orig.filter(function(e){return e.tagName==="IMG"&&e.decode;}).map(function(e){return e.decode().catch(function(){});});
+    var wait=Promise.race([Promise.all(imgs),new Promise(function(r){setTimeout(r,2000);})]);
+    getMeta(function(meta){wait.then(function(){build(box,orig,meta);});});
+  },400);
+})();
+</script>
 </body>
 </html>

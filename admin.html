@@ -533,7 +533,7 @@ function goToProjet(id){
   $("pt-add").addEventListener("click", function () {
     var nom = $("pt-nom").value.trim(), b = this;
     if (!nom) { msg("Écris le nom de l'entreprise.", true); return; }
-    var d = { nom: nom, ts: Date.now() };
+    var d = { nom: nom, ts: Date.now(), sep: (document.getElementById("pt-sep")||{}).value || "", principal: !!(document.getElementById("pt-princ")||{}).checked };
     if (thumb) d.logo = thumb;
     b.disabled = true; msg("Enregistrement...");
     DB.collection("partenaires").add(d).then(function () {
@@ -812,5 +812,61 @@ body{padding-bottom:96px}
   });
   bar.style.display="none";
   setOn("dem");
+})();
+</script>
+
+<script>/*PATCH-PARTADM-1*/
+(function(){
+  var DB=(typeof db!=="undefined")?db:firebase.firestore();
+  var docs=[];
+  var n=0, t=setInterval(function(){
+    if(++n>80){clearInterval(t);return;}
+    var nom=document.getElementById("pt-nom");
+    if(!nom||document.getElementById("pt-sep"))return;
+    clearInterval(t);
+    var w=document.createElement("div"); w.style.cssText="margin:8px 0";
+    var l=document.createElement("label"); l.textContent="Signe de s\u00E9paration (avant ce partenaire)";
+    l.style.cssText="display:block;font-size:13px;opacity:.8;margin-bottom:4px";
+    var sel=document.createElement("select"); sel.id="pt-sep";
+    sel.style.cssText="padding:10px;border-radius:10px;width:100%;font:inherit";
+    [["\u25C6","\u25C6  Losange"],["\u2726","\u2726  \u00C9toile"],["\u25CF","\u25CF  Point"],["|","|  Barre"],["\u2605","\u2605  \u00C9toile pleine"],["\u25AA","\u25AA  Carr\u00E9"],["\u2015","\u2015  Tiret"]].forEach(function(o){
+      var op=document.createElement("option"); op.value=o[0]; op.textContent=o[1]; sel.appendChild(op);
+    });
+    w.appendChild(l); w.appendChild(sel); nom.insertAdjacentElement("afterend",w);
+    var w2=document.createElement("label"); w2.style.cssText="display:flex;gap:8px;align-items:center;margin:8px 0";
+    var c=document.createElement("input"); c.type="checkbox"; c.id="pt-princ"; c.style.cssText="width:20px;height:20px";
+    w2.appendChild(c); w2.appendChild(document.createTextNode("\u2B50 Partenaire / sponsor principal (le d\u00E9filement s'arr\u00EAte dessus)"));
+    w.insertAdjacentElement("afterend",w2);
+    var add=document.getElementById("pt-add");
+    if(add)add.addEventListener("click",function(){setTimeout(function(){if(!nom.value)c.checked=false;},1500);});
+  },300);
+  function apply(){
+    var rows=document.querySelectorAll("#pt-list .pt-item");
+    if(!rows.length||rows.length!==docs.length)return;
+    Array.prototype.forEach.call(rows,function(r,i){
+      var d=docs[i], b=r.querySelector(".pi-star");
+      if(!b){
+        b=document.createElement("button"); b.type="button"; b.className="pi-star";
+        b.style.cssText="margin-left:auto;margin-right:8px;padding:6px 10px;border-radius:10px;border:1px solid #facc15;background:transparent;color:#facc15;font:inherit;font-size:13px";
+        var del=r.querySelector(".pt-del"); if(del)r.insertBefore(b,del); else r.appendChild(b);
+        b.addEventListener("click",function(){
+          var cur=b.getAttribute("data-on")==="1";
+          DB.collection("partenaires").doc(b.getAttribute("data-id")).update({principal:!cur}).catch(function(){
+            alert("Refus\u00E9 par les r\u00E8gles Firestore. Supprime ce partenaire et ajoute-le \u00E0 nouveau avec la case coch\u00E9e.");
+          });
+        });
+      }
+      b.setAttribute("data-id",d.id);
+      var on=d.data().principal===true;
+      b.setAttribute("data-on",on?"1":"0");
+      b.textContent=(on?"\u2605":"\u2606")+" Principal";
+    });
+  }
+  DB.collection("partenaires").orderBy("ts").onSnapshot(function(sn){
+    docs=[]; sn.forEach(function(d){docs.push(d);});
+    setTimeout(apply,300);
+  });
+  var lst=document.getElementById("pt-list");
+  if(lst){var tm=null; new MutationObserver(function(){clearTimeout(tm);tm=setTimeout(apply,150);}).observe(lst,{childList:true});}
 })();
 </script>
