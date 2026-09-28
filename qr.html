@@ -147,7 +147,7 @@ else if(typeof firebase==="undefined"){ deny("Connexion indisponible."); }
 else {
 try{
 if(!firebase.apps.length)firebase.initializeApp(CFG);
-firebase.auth().onAuthStateChanged(function(u){ if(u)show(); else deny("Page r\u00e9serv\u00e9e aux membres inscrits et \u00e0 l\u2019admin. Connecte-toi d\u2019abord sur le site."); });
+firebase.auth().onAuthStateChanged(function(u){ if(u&&!u.isAnonymous)show(); else deny("Page r\u00e9serv\u00e9e aux membres inscrits et \u00e0 l\u2019admin. Connecte-toi d\u2019abord sur le site."); });
 }catch(e){ deny("Connexion indisponible."); }
 }
 })();
