@@ -1,6 +1,6 @@
 (function(){
 if(document.getElementById("qrw"))return;
-var SVG="qr-pc-informatique.svg";
+var SVG="qr-pc-informatique.png";
 var st=document.createElement("style");
 st.textContent="#qrw{max-width:520px;margin:24px auto 110px;padding:16px;text-align:center;color:#fff}#qrw h3{margin:0 0 10px;font-size:16px}#qrw .box{display:inline-block;background:#fff;padding:8px;border-radius:12px}#qrw img{display:block}#qrw .m{cursor:pointer}#qrw p{font-size:14px;opacity:.9;margin:10px 0}#qrw a.b{display:inline-block;margin:4px;padding:10px 14px;border-radius:12px;background:linear-gradient(135deg,#2dd4bf,#ec4899);color:#000;font-weight:700;text-decoration:none}";
 document.head.appendChild(st);
