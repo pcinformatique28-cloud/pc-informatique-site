@@ -1684,5 +1684,32 @@ document.addEventListener("DOMContentLoaded", function () {
   } catch (e) {}
 });
 </script>
+
+<script>/*PATCH-GPS-1*/
+(function(){
+  var pos=null;
+  if(typeof collect==="function"){
+    var c0=collect;
+    collect=function(){var d=c0.apply(this,arguments);
+      if(pos){d.lat=pos.lat;d.lng=pos.lng;d.precision=pos.acc;} return d;};
+  } else { console.warn("collect() introuvable"); }
+  var v=document.getElementById("f-ville")||document.querySelector('input[id*="ville"]');
+  if(!v){console.warn("champ ville introuvable");return;}
+  var b=document.createElement("button");
+  b.type="button"; b.textContent="\uD83D\uDCCD Ma position";
+  b.style.cssText="margin-top:6px;padding:8px 12px;border-radius:8px;border:1px solid #8886;background:transparent;color:inherit";
+  var s=document.createElement("div"); s.style.cssText="font-size:12px;margin-top:4px";
+  v.insertAdjacentElement("afterend",s); v.insertAdjacentElement("afterend",b);
+  b.addEventListener("click",function(){
+    if(!navigator.geolocation){s.textContent="GPS indisponible";return;}
+    s.textContent="Localisation...";
+    navigator.geolocation.getCurrentPosition(function(r){
+      pos={lat:+r.coords.latitude.toFixed(6),lng:+r.coords.longitude.toFixed(6),acc:Math.round(r.coords.accuracy)};
+      s.textContent="Position enregistree (\u00B1"+pos.acc+" m), envoyee avec votre demande.";
+    },function(){s.textContent="Position refusee ou indisponible.";},
+    {enableHighAccuracy:true,timeout:15000,maximumAge:0});
+  });
+})();
+</script>
 </body>
 </html>

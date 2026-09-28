@@ -657,3 +657,83 @@ function goToProjet(id){
   $("vs-today").addEventListener("click", function () { $("vs-day").value = today(); draw(); });
 })();
 </script>
+
+<script>/*PATCH-STATS-1*/
+(function(){
+  function $(i){return document.getElementById(i);}
+  var DB=(typeof db!=="undefined")?db:firebase.firestore();
+  var mp=$("mode-projets"), secD=$("sec-demandes");
+  if(!mp||!secD){return;}
+  var bar=mp.parentNode;
+  var tab=document.createElement("div"); tab.className="tab"; tab.id="mode-stats"; tab.textContent="Stats";
+  bar.appendChild(tab);
+  var sec=document.createElement("div"); sec.id="sec-stats"; sec.style.cssText="display:none;padding:12px";
+  sec.innerHTML='<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px"><b>Mois</b><input type="month" id="st-mois"><button type="button" id="st-all">Tous</button></div><div id="st-kpi"></div><h3>Types par mois</h3><div id="st-table" style="overflow-x:auto"></div><h3>Graphique (6 derniers mois)</h3><div id="st-chart"></div><h3>Classement des types</h3><div id="st-rank"></div><h3>Fonctionnalites les plus demandees</h3><div id="st-feat"></div>';
+  secD.parentNode.insertBefore(sec,secD.nextSibling);
+  var data=[],map={},started=false,month=new Date().toISOString().slice(0,7);
+  function ok(d){return d.status==="valide"||d.statut==="valide";}
+  function inM(d){return !month||String(d.createdAt||"").slice(0,7)===month;}
+  function esc(x){return String(x).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
+  function count(list,kf){var m={};list.forEach(function(d){kf(d).forEach(function(k){m[k]=m[k]||{a:0,v:0};m[k].a++;if(ok(d))m[k].v++;});});return m;}
+  function sorted(m){return Object.keys(m).sort(function(a,b){return m[b].a-m[a].a;});}
+  function bars(m,ks,color){
+    return ks.map(function(k,i){return '<div style="margin:6px 0"><div>'+(["\uD83E\uDD47","\uD83E\uDD48","\uD83E\uDD49"][i]||(i+1)+".")+' '+esc(k)+' \u2014 <b>'+m[k].a+'</b></div><div style="height:8px;border-radius:4px;background:'+color+';width:'+Math.round(100*m[k].a/m[ks[0]].a)+'%"></div></div>';}).join("")||"<i>Aucune donnee</i>";
+  }
+  function draw(){
+    var L=data.filter(inM), m=count(L,function(d){return [d.type||"\u2014"];}), ks=sorted(m), tv=L.filter(ok).length;
+    $("st-kpi").innerHTML='<b>'+L.length+'</b> demandes \u00B7 <b>'+tv+'</b> creees'+(L.length?' ('+Math.round(100*tv/L.length)+'%)':'');
+    $("st-table").innerHTML=ks.length?'<table style="border-collapse:collapse;width:100%"><tr><th align="left">Type</th><th>Demandees</th><th>Creees</th></tr>'+ks.map(function(k){return '<tr><td style="padding:4px 6px;border-top:1px solid #8884">'+esc(k)+'</td><td align="center">'+m[k].a+'</td><td align="center">'+m[k].v+'</td></tr>';}).join("")+'</table>':"<i>Aucune donnee</i>";
+    var now=new Date(),ms=[];
+    for(var i=5;i>=0;i--){var x=new Date(now.getFullYear(),now.getMonth()-i,1);ms.push(x.getFullYear()+"-"+("0"+(x.getMonth()+1)).slice(-2));}
+    var a=ms.map(function(k){return data.filter(function(d){return String(d.createdAt||"").slice(0,7)===k;});});
+    var mx=1; a.forEach(function(l){mx=Math.max(mx,l.length);});
+    var svg='<svg viewBox="0 0 360 190" width="100%" style="max-width:520px" font-size="10" fill="currentColor">';
+    a.forEach(function(l,j){var v=l.filter(ok).length,X=10+j*58,h1=Math.round(130*l.length/mx),h2=Math.round(130*v/mx);
+      svg+='<rect x="'+X+'" y="'+(150-h1)+'" width="22" height="'+h1+'" fill="#2563eb"/><rect x="'+(X+24)+'" y="'+(150-h2)+'" width="22" height="'+h2+'" fill="#16a34a"/>'
+      +'<text x="'+(X+11)+'" y="'+(146-h1)+'" text-anchor="middle">'+l.length+'</text><text x="'+(X+35)+'" y="'+(146-h2)+'" text-anchor="middle">'+v+'</text>'
+      +'<text x="'+(X+23)+'" y="166" text-anchor="middle">'+ms[j].slice(5)+'/'+ms[j].slice(2,4)+'</text>';});
+    svg+='<rect x="10" y="176" width="10" height="10" fill="#2563eb"/><text x="24" y="185">Demandees</text><rect x="100" y="176" width="10" height="10" fill="#16a34a"/><text x="114" y="185">Creees</text></svg>';
+    $("st-chart").innerHTML=svg;
+    $("st-rank").innerHTML=bars(m,ks,"#2563eb");
+    var fm=count(L,function(d){return Array.isArray(d.features)?d.features:[];});
+    $("st-feat").innerHTML=bars(fm,sorted(fm).slice(0,8),"#16a34a");
+  }
+  function actions(){
+    Object.keys(map).forEach(function(id){
+      var el=secD.querySelector('[onclick*="'+id+'"]')||secD.querySelector('[data-id="'+id+'"]');
+      if(!el||el.querySelector(".pi-act"))return;
+      var d=map[id],w=document.createElement("div"),h="";
+      w.className="pi-act"; w.style.cssText="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap";
+      var st="padding:6px 10px;border-radius:8px;color:#fff;text-decoration:none;font-size:13px;";
+      var tel=(typeof cleanTel==="function")?cleanTel(d.tel):String(d.tel||"").replace(/\D/g,"");
+      if(tel) h+='<a target="_blank" rel="noopener" style="'+st+'background:#25D366" href="https://wa.me/'+tel+'">\uD83D\uDCAC WhatsApp</a>';
+      if(d.lat&&d.lng) h+='<a target="_blank" rel="noopener" style="'+st+'background:#2563eb" href="https://www.google.com/maps?q='+d.lat+','+d.lng+'">\uD83D\uDCCD GPS</a>';
+      else if(d.ville) h+='<a target="_blank" rel="noopener" style="'+st+'background:#64748b" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(d.ville+" Gabon")+'">\uD83D\uDCCD Ville</a>';
+      if(!h)return;
+      w.innerHTML=h; w.addEventListener("click",function(e){e.stopPropagation();}); el.appendChild(w);
+    });
+  }
+  var tm=null;
+  new MutationObserver(function(){clearTimeout(tm);tm=setTimeout(actions,60);}).observe(secD,{childList:true,subtree:true});
+  function start(){
+    if(started)return; started=true;
+    DB.collection("demandes").orderBy("createdAt","desc").limit(3000).onSnapshot(function(snap){
+      data=[];map={}; snap.forEach(function(x){var d=x.data();d.id=x.id;data.push(d);map[x.id]=d;});
+      draw(); actions();
+    },function(e){started=false;$("st-kpi").textContent="Erreur : "+(e&&e.message||e);});
+  }
+  try{ if(firebase.auth) firebase.auth().onAuthStateChanged(function(u){if(u)start();}); }catch(e){}
+  $("st-mois").value=month;
+  $("st-mois").addEventListener("change",function(){month=this.value;draw();});
+  $("st-all").addEventListener("click",function(){month="";$("st-mois").value="";draw();});
+  function hideMine(){tab.classList.remove("on");sec.style.display="none";}
+  bar.addEventListener("click",function(e){if(!tab.contains(e.target))hideMine();});
+  tab.addEventListener("click",function(){
+    Array.prototype.forEach.call(bar.children,function(t){t.classList.remove("on");});
+    tab.classList.add("on");
+    ["sec-demandes","sec-projets"].forEach(function(i){var e=$(i);if(e)e.style.display="none";});
+    var k=$("vs-kpi"); while(k&&k.parentNode!==secD.parentNode)k=k.parentNode; if(k)k.style.display="none";
+    sec.style.display="block"; start(); draw();
+  });
+})();
+</script>
