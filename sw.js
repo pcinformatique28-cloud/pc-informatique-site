@@ -1,4 +1,4 @@
-const CACHE_NAME = "pc-informatique-v1790598646";
+const CACHE_NAME = "pc-informatique-v1790604185";
 const CORE_ASSETS = [
   "./index.html",
   "./images/icon-192.png",

@@ -68,6 +68,24 @@ function laptopSVG(){
 var lap=box(lx,ly,lw,lh,"");
 lap.innerHTML=laptopSVG();
 root.appendChild(lap);
+/* ---------- dactylographie sur l'ecran ---------- */
+(function(){
+  var TXT="PC-INFORMATIQUE", k=lw/420, sw=316*k, sh=184*k;
+  var fs=Math.min(sw*0.9/(TXT.length*0.62),sh*0.5);
+  var scr=document.createElement("div");
+  scr.style.cssText="position:absolute;left:"+(52*k)+"px;top:"+(20*k)+"px;width:"+sw+"px;height:"+sh+"px;display:flex;align-items:center;justify-content:center;pointer-events:none;overflow:hidden;white-space:nowrap;font:700 "+fs.toFixed(1)+"px 'Courier New',ui-monospace,monospace;color:#bfe9ff;text-shadow:0 0 10px rgba(95,182,255,.9),0 0 22px rgba(45,212,191,.5)";
+  var tx=document.createElement("span"), cu=document.createElement("span");
+  cu.textContent="\u258C"; cu.style.cssText="margin-left:2px;color:#2dd4bf";
+  scr.appendChild(tx); scr.appendChild(cu); lap.appendChild(scr);
+  try{ cu.animate([{opacity:1},{opacity:1,offset:.5},{opacity:0,offset:.5},{opacity:0}],{duration:800,iterations:Infinity}); }catch(e){}
+  var n=0;
+  function typeNext(){
+    if(ended||!root.parentNode)return;
+    n++; tx.textContent=TXT.slice(0,n);
+    if(n<TXT.length)setTimeout(typeNext,70);
+  }
+  setTimeout(typeNext,500);
+})();
 
 /* faisceau lumineux a la sortie de l'ecran */
 var bs=ld*1.5;
