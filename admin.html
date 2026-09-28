@@ -737,3 +737,80 @@ function goToProjet(id){
   });
 })();
 </script>
+
+<style>/*PATCH-NAV-1*/
+#pi-nav{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;gap:2px;overflow-x:auto;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));background:#0d1024f2;border-top:1px solid #ffffff22}
+.pi-n{flex:1 0 58px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:2px;border:0;background:none;color:#aab;font:inherit;font-size:10px;cursor:pointer}
+.pi-n i{font-style:normal;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;background:#ffffff14}
+.pi-n.on{color:#fff;font-weight:700}
+.pi-n.on i{background:linear-gradient(135deg,#2dd4bf,#ec4899)}
+body{padding-bottom:96px}
+.pi-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:12px}
+.pi-tile{border:1px solid #ffffff2a;border-radius:16px;padding:16px 12px;background:#ffffff0d;color:inherit;text-align:left;font:inherit;cursor:pointer}
+.pi-tile i{font-style:normal;display:flex;width:48px;height:48px;border-radius:50%;align-items:center;justify-content:center;font-size:24px;background:linear-gradient(135deg,#2dd4bf,#ec4899);margin-bottom:8px}
+.pi-tile b{display:block;font-size:16px}
+.pi-tile span{font-size:12px;opacity:.7}
+@media(min-width:900px){.pi-tiles{grid-template-columns:repeat(4,1fr)}}
+</style>
+<script>/*PATCH-NAV-1*/
+(function(){
+  function $(i){return document.getElementById(i);}
+  var mp=$("mode-projets"), secD=$("sec-demandes");
+  if(!mp||!secD){console.warn("nav: structure introuvable");return;}
+  var bar=mp.parentNode, box=secD.parentNode;
+  function byText(t){var a=document.querySelectorAll(".tab"),i;for(i=0;i<a.length;i++){if(a[i].textContent.trim()===t&&!a[i].closest("#pi-nav"))return a[i];}return null;}
+  function up(el){while(el&&el.parentNode!==box)el=el.parentNode;return(el&&!el.contains(bar))?el:null;}
+  var dash=document.createElement("div"); dash.id="pi-dash"; dash.style.display="none";
+  box.insertBefore(dash,secD);
+  var items=[
+    {k:"acc",ic:"\uD83C\uDFE0",l:"Accueil",d:""},
+    {k:"dem",ic:"\uD83D\uDCCB",l:"Demandes",d:"Valider, refuser, contacter",el:function(){return $("mode-demandes");}},
+    {k:"pro",ic:"\uD83D\uDCC1",l:"Projets",d:"Projets des membres",el:function(){return $("mode-projets");}},
+    {k:"par",ic:"\uD83E\uDD1D",l:"Partenaires",d:"Logos et sponsors",el:function(){return byText("Partenaires");}},
+    {k:"vis",ic:"\uD83D\uDC41\uFE0F",l:"Visites",d:"Qui visite le site",el:function(){return byText("Visites");}},
+    {k:"sta",ic:"\uD83D\uDCCA",l:"Stats",d:"Types, mois, classement",el:function(){return $("mode-stats");}},
+    {k:"mem",ic:"\uD83D\uDC65",l:"Membres",d:"Gerer les membres",href:"admin-membres.html"},
+    {k:"sit",ic:"\uD83C\uDF10",l:"Site",d:"Voir le site public",href:"index.html"}
+  ];
+  function sec(k){
+    if(k==="dem")return secD;
+    if(k==="pro")return $("sec-projets");
+    if(k==="sta")return $("sec-stats");
+    if(k==="vis")return up($("vs-kpi"));
+    if(k==="par")return up(document.querySelector('input[placeholder*="entreprise"]'));
+    if(k==="acc")return dash;
+    return null;
+  }
+  function show(k){
+    var t=sec(k);
+    ["dem","pro","sta","vis","par","acc"].forEach(function(x){var e=sec(x);if(e&&e!==t)e.style.display="none";});
+    if(t)t.style.display="block";
+  }
+  var nav=document.createElement("div"); nav.id="pi-nav";
+  function setOn(k){Array.prototype.forEach.call(nav.children,function(b){b.classList.toggle("on",b.getAttribute("data-k")===k);});}
+  function go(it){
+    if(it.href){location.href=it.href;return;}
+    if(it.k!=="acc"){var e=it.el();if(e)e.click();}
+    setTimeout(function(){show(it.k);setOn(it.k);window.scrollTo(0,0);},0);
+  }
+  items.forEach(function(it){
+    var b=document.createElement("button"); b.type="button"; b.className="pi-n"; b.setAttribute("data-k",it.k);
+    b.innerHTML="<i>"+it.ic+"</i>"+it.l;
+    b.addEventListener("click",function(){go(it);});
+    nav.appendChild(b);
+  });
+  document.body.appendChild(nav);
+  var h='<h2 style="margin:14px 12px 0">Tableau de bord</h2><div class="pi-tiles">';
+  items.forEach(function(it,i){if(it.k==="acc")return;h+='<button type="button" class="pi-tile" data-i="'+i+'"><i>'+it.ic+'</i><b>'+it.l+'</b><span>'+it.d+'</span></button>';});
+  dash.innerHTML=h+"</div>";
+  dash.addEventListener("click",function(ev){var b=ev.target.closest(".pi-tile");if(b)go(items[+b.getAttribute("data-i")]);});
+  bar.addEventListener("click",function(ev){
+    var t=ev.target.closest?ev.target.closest(".tab"):null; if(!t)return;
+    items.forEach(function(it){
+      if(it.el&&it.el()===t)setTimeout(function(){show(it.k);setOn(it.k);},0);
+    });
+  });
+  bar.style.display="none";
+  setOn("dem");
+})();
+</script>
