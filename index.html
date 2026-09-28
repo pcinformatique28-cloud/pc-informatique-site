@@ -418,8 +418,8 @@ function toggleCard(id){
       <div class="step" data-step="2">
         <h3 data-i18n="step2Title">Votre activité</h3>
         <p class="hint" data-i18n="step2Hint">Un peu de contexte sur votre structure.</p>
-        <label>Nom de l'entreprise / structure</label><input type="text" id="f-structure">
-        <label>Secteur d'activité *</label>
+        <label data-i18n="labelStructure">Nom de l'entreprise / structure</label><input type="text" id="f-structure">
+        <label data-i18n="labelSecteur">Secteur d'activité *</label>
         <select id="f-secteur" required>
           <option value="">— Choisir —</option>
           <option>Commerce &amp; vente</option><option>Restauration &amp; bars</option>
@@ -427,28 +427,28 @@ function toggleCard(id){
           <option>Éducation</option><option>Transport &amp; logistique</option>
           <option>Services &amp; conseil</option><option>Sport &amp; loisirs</option><option>Autre</option>
         </select>
-        <label>Ville</label><input type="text" id="f-ville" placeholder="Libreville...">
+        <label data-i18n="labelVille">Ville</label><input type="text" id="f-ville" placeholder="Libreville...">
       </div>
 
       <div class="step" data-step="3">
-        <h3>Type de produit</h3>
-        <p class="hint">Que souhaitez-vous faire créer ?</p>
+        <h3 data-i18n="step3Title">Type de produit</h3>
+        <p class="hint" data-i18n="step3Hint">Que souhaitez-vous faire créer ?</p>
         <div class="opt-grid" id="f-type"></div>
       </div>
 
       <div class="step" data-step="4">
-        <h3>Fonctionnalités &amp; détails</h3>
-        <p class="hint">Cochez ce qui vous intéresse.</p>
+        <h3 data-i18n="step4Title">Fonctionnalités &amp; détails</h3>
+        <p class="hint" data-i18n="step4Hint">Cochez ce qui vous intéresse.</p>
         <div class="opt-grid" id="f-features"></div>
-        <label>Description libre du projet</label>
+        <label data-i18n="labelDesc">Description libre du projet</label>
         <textarea id="f-desc" placeholder="Expliquez votre idée en quelques phrases..."></textarea>
-        <label>Budget approximatif</label>
+        <label data-i18n="labelBudget">Budget approximatif</label>
         <select id="f-budget">
           <option value="">— Choisir —</option>
           <option>Moins de 150 000 FCFA</option><option>150 000 – 400 000 FCFA</option>
           <option>400 000 – 1 000 000 FCFA</option><option>Plus de 1 000 000 FCFA</option><option>À discuter</option>
         </select>
-        <label>Délai souhaité</label>
+        <label data-i18n="labelDelai">Délai souhaité</label>
         <select id="f-delai">
           <option value="">— Choisir —</option>
           <option>Express (24h)</option><option>2 à 3 jours</option><option>1 semaine</option><option>Flexible</option>
@@ -456,48 +456,48 @@ function toggleCard(id){
       </div>
 
       <div class="step" data-step="5">
-        <h3>Identité visuelle</h3>
-        <p class="hint">Tout ce que vous avez déjà (facultatif) — sinon on vous propose une charte.</p>
-        <label>Nom commercial souhaité</label><input type="text" id="f-nomcommercial" placeholder="Si différent du nom de la structure">
-        <label>Slogan</label><input type="text" id="f-slogan">
-        <label>Devise à afficher</label>
+        <h3 data-i18n="step5Title">Identité visuelle</h3>
+        <p class="hint" data-i18n="step5Hint">Tout ce que vous avez déjà (facultatif) — sinon on vous propose une charte.</p>
+        <label data-i18n="labelNomCommercial">Nom commercial souhaité</label><input type="text" id="f-nomcommercial" placeholder="Si différent du nom de la structure">
+        <label data-i18n="labelSlogan">Slogan</label><input type="text" id="f-slogan">
+        <label data-i18n="labelDevise">Devise à afficher</label>
         <select id="f-devise"><option>FCFA</option><option>EUR</option><option>USD</option><option>Autre</option></select>
-        <label>Couleurs de la marque (si connues)</label>
+        <label data-i18n="labelCouleurs">Couleurs de la marque (si connues)</label>
         <div class="color-row">
-          <div><input type="color" id="f-c1" value="#33d9c4"><div class="hint" style="margin:4px 0 0">Principale</div></div>
-          <div><input type="color" id="f-c2" value="#ff4fa3"><div class="hint" style="margin:4px 0 0">Secondaire</div></div>
+          <div><input type="color" id="f-c1" value="#33d9c4"><div class="hint" data-i18n="colorPrincipale" style="margin:4px 0 0">Principale</div></div>
+          <div><input type="color" id="f-c2" value="#ff4fa3"><div class="hint" data-i18n="colorSecondaire" style="margin:4px 0 0">Secondaire</div></div>
         </div>
-        <label>Logo / photos (facultatif)</label>
-        <div class="upload-box" id="upload-box">📎 Toucher pour choisir des images</div>
+        <label data-i18n="labelLogo">Logo / photos (facultatif)</label>
+        <div class="upload-box" id="upload-box"><span data-i18n="uploadBoxText">📎 Toucher pour choisir des images</span></div>
         <input type="file" id="f-images" accept="image/*" multiple style="display:none">
         <div class="thumbs" id="thumbs"></div>
-        <label>Textes / contenus déjà prêts (facultatif)</label>
+        <label data-i18n="labelTextes">Textes / contenus déjà prêts (facultatif)</label>
         <textarea id="f-textes" placeholder="Ex : texte d'accueil, présentation, à propos, horaires, mentions légales..."></textarea>
       </div>
 
       <div class="step" data-step="6">
-        <h3>Récapitulatif</h3>
-        <p class="hint">Vérifiez avant l'envoi.</p>
+        <h3 data-i18n="step6Title">Récapitulatif</h3>
+        <p class="hint" data-i18n="step6Hint">Vérifiez avant l'envoi.</p>
         <div class="recap" id="f-recap"></div>
       </div>
 
       <div class="step" data-step="ok">
         <div class="success">
           <div class="tick">✓</div>
-          <h3>Demande envoyée !</h3>
-          <p class="hint">Nous revenons vers vous très vite sur le numéro/email fourni.</p>
+          <h3 data-i18n="successTitle">Demande envoyée !</h3>
+          <p class="hint" data-i18n="successHint">Nous revenons vers vous très vite sur le numéro/email fourni.</p>
         </div>
       </div>
 
       <div class="nav-btns" id="nav-btns">
-        <button type="button" class="btn ghost" id="btn-prev">Précédent</button>
+        <button type="button" class="btn ghost" id="btn-prev"><span data-i18n="btnPrev">Précédent</span></button>
         <button type="button" class="btn primary" id="btn-next">Suivant</button>
       </div>
     </form>
   </div>
 
-<div class="about-btn-wrap" style="text-align:center;margin:34px 0 18px;"><button onclick="openSheet('about-sheet')">&#8505;&nbsp; A propos de PC-INFORMATIQUE</button></div>
-  <footer>PC-INFORMATIQUE — Services informatiques &amp; création d'applications web/mobile</footer>
+<div class="about-btn-wrap" style="text-align:center;margin:34px 0 18px;"><button onclick="openSheet('about-sheet')"><span data-i18n="aboutBtn">&#8505;&nbsp; A propos de PC-INFORMATIQUE</span></button></div>
+  <footer><span data-i18n="footerText">PC-INFORMATIQUE — Services informatiques &amp; création d'applications web/mobile</span></footer>
 </div>
 
 <script>
@@ -547,9 +547,10 @@ function render(){
   progress.querySelectorAll('i').forEach((b,i)=>b.classList.toggle('on', i < (steps[cur]==='ok'?6:steps[cur])));
   document.getElementById('nav-btns').style.display = steps[cur]==='ok' ? 'none' : 'flex';
   document.getElementById('btn-prev').style.visibility = cur===0 ? 'hidden' : 'visible';
-  document.getElementById('btn-next').textContent = steps[cur]===6 ? 'Envoyer ma demande' : 'Suivant';
+  document.getElementById('btn-next').textContent = (window.__i18nDict && window.__getLang) ? (steps[cur]===6 ? (window.__i18nDict[window.__getLang()].btnEnvoyer||'Envoyer ma demande') : (window.__i18nDict[window.__getLang()].btnSuivant||'Suivant')) : (steps[cur]===6 ? 'Envoyer ma demande' : 'Suivant');
   if(steps[cur]===6) buildRecap();
 }
+window.__wizardRender = render;
 function valid(){
   const s=steps[cur];
   if(s===1) return document.getElementById('f-nom').value.trim() && document.getElementById('f-tel').value.trim();
@@ -716,11 +717,13 @@ render();
     };
 
     var I18N={
-      fr:{accueil:"Accueil",realisations:"Realisations",nouvelleDemande:"Nouvelle demande",monProfil:"Mon profil",tableauBord:"Tableau de bord",connexion:"Connexion",kicker:"Studio de developpement - Gabon",heroTitle:"Votre <span class='g'>site, application ou PWA</span> livre en <span class='g'>une journee</span>",lede:"Conseil, programmation &amp; applications sur mesure. Remplissez le formulaire de demande ci-dessous : il sert de cahier des charges et nous permet de lancer votre projet immediatement.",realisationsTitle:"Nos realisations",realisationsCount:"5 applications",demandeTitle:"Nouvelle demande de projet",demandeSteps:"6 etapes",badgeSport:"Sport",badgeSorties:"Sorties",badgeGestion:"Gestion",badgeImmobilier:"Immobilier",bodyGsc:"Gestion des structures et acteurs sportifs : clubs, federations, arbitres, entraineurs et athletes.",bodyAmbi:"Annuaire social des etablissements (bars, snacks, restos, boites de nuit), forum et services taxi.",bodyMage:"Gestion de caisse et d'inventaire pour bars, snacks et clubs : facturation et suivi des benefices en temps reel.",bodyMalaga:"Maison a louer au Gabon - plateforme de mise en relation pour la location a Libreville entre particuliers, agences et societes.",voirApp:"Voir l'application",navAccueil:"Accueil",navProjets:"Projets",navDemande:"Demande",navConnexion:"Connexion",step1Title:"Vos informations",step1Hint:"Pour vous recontacter rapidement.",labelNom:"Nom complet *",labelEmail:"Email",labelTel:"Telephone / WhatsApp *",step2Title:"Votre activite",step2Hint:"Un peu de contexte sur votre structure."},
-      en:{accueil:"Home",realisations:"Portfolio",nouvelleDemande:"New request",monProfil:"My profile",tableauBord:"Dashboard",connexion:"Login",kicker:"Development studio - Gabon",heroTitle:"Your <span class='g'>website, app or PWA</span> delivered in <span class='g'>one day</span>",lede:"Consulting, development &amp; custom applications. Fill out the request form below: it works as a project brief and lets us start your project right away.",realisationsTitle:"Our work",realisationsCount:"5 apps",demandeTitle:"New project request",demandeSteps:"6 steps",badgeSport:"Sport",badgeSorties:"Nightlife",badgeGestion:"Management",badgeImmobilier:"Real Estate",bodyGsc:"Management of sports structures and stakeholders: clubs, federations, referees, coaches and athletes.",bodyAmbi:"Social directory of venues (bars, snack bars, restaurants, nightclubs), forum and taxi services.",bodyMage:"Cash register and inventory management for bars, snack bars and clubs: billing and real-time profit tracking.",bodyMalaga:"House for rent in Gabon - a matchmaking platform for rentals in Libreville between individuals, agencies and companies.",voirApp:"View the app",navAccueil:"Home",navProjets:"Projects",navDemande:"Request",navConnexion:"Login",step1Title:"Your information",step1Hint:"So we can contact you quickly.",labelNom:"Full name *",labelEmail:"Email",labelTel:"Phone / WhatsApp *",step2Title:"Your business",step2Hint:"A bit of context about your organization."},
-      es:{accueil:"Inicio",realisations:"Portafolio",nouvelleDemande:"Nueva solicitud",monProfil:"Mi perfil",tableauBord:"Panel",connexion:"Iniciar sesion",kicker:"Estudio de desarrollo - Gabon",heroTitle:"Tu <span class='g'>sitio, aplicacion o PWA</span> entregado en <span class='g'>un dia</span>",lede:"Consultoria, programacion &amp; aplicaciones a medida. Complete el formulario de solicitud a continuacion: sirve como pliego de condiciones y nos permite iniciar su proyecto de inmediato.",realisationsTitle:"Nuestros proyectos",realisationsCount:"5 aplicaciones",demandeTitle:"Nueva solicitud de proyecto",demandeSteps:"6 pasos",badgeSport:"Deporte",badgeSorties:"Ocio",badgeGestion:"Gestion",badgeImmobilier:"Inmobiliario",bodyGsc:"Gestion de estructuras y actores deportivos: clubes, federaciones, arbitros, entrenadores y atletas.",bodyAmbi:"Directorio social de establecimientos (bares, snacks, restaurantes, discotecas), foro y servicios de taxi.",bodyMage:"Gestion de caja e inventario para bares, snacks y clubes: facturacion y seguimiento de beneficios en tiempo real.",bodyMalaga:"Casa en alquiler en Gabon - plataforma de contacto para el alquiler en Libreville entre particulares, agencias y empresas.",voirApp:"Ver la aplicacion",navAccueil:"Inicio",navProjets:"Proyectos",navDemande:"Solicitud",navConnexion:"Acceso",step1Title:"Su informacion",step1Hint:"Para poder contactarle rapidamente.",labelNom:"Nombre completo *",labelEmail:"Correo electronico",labelTel:"Telefono / WhatsApp *",step2Title:"Su actividad",step2Hint:"Un poco de contexto sobre su estructura."},
-      zh:{accueil:"\u9996\u9875",realisations:"\u4f5c\u54c1\u96c6",nouvelleDemande:"\u65b0\u8bf7\u6c42",monProfil:"\u6211\u7684\u8d44\u6599",tableauBord:"\u63a7\u5236\u53f0",connexion:"\u767b\u5f55",kicker:"开发工作室 - 加蓬",heroTitle:"您的<span class='g'>网站、应用或PWA</span>可在<span class='g'>一天内</span>交付",lede:"咨询、开发与定制应用程序。请填写下方的需求表单：它将作为项目说明书，帮助我们立即启动您的项目。",realisationsTitle:"我们的作品",realisationsCount:"5个应用",demandeTitle:"新项目申请",demandeSteps:"6个步骤",badgeSport:"体育",badgeSorties:"娱乐",badgeGestion:"管理",badgeImmobilier:"房地产",bodyGsc:"体育机构和相关人员管理：俱乐部、联合会、裁判、教练和运动员。",bodyAmbi:"场所社交名录（酒吧、小吃店、餐厅、夜店）、论坛及出租车服务。",bodyMage:"为酒吧、小吃店和俱乐部提供收银和库存管理：开票及实时利润跟踪。",bodyMalaga:"加蓬出租房屋 - 一个连接自然人、中介和公司在利伯维尔进行租赁的平台。",voirApp:"查看应用",navAccueil:"首页",navProjets:"项目",navDemande:"申请",navConnexion:"登录",step1Title:"您的信息",step1Hint:"以便我们尽快与您联系。",labelNom:"姓名 *",labelEmail:"电子邮箱",labelTel:"电话/WhatsApp *",step2Title:"您的业务",step2Hint:"简单介绍一下您的机构背景。"}
+      fr:{accueil:"Accueil",realisations:"Realisations",nouvelleDemande:"Nouvelle demande",monProfil:"Mon profil",tableauBord:"Tableau de bord",connexion:"Connexion",kicker:"Studio de developpement - Gabon",heroTitle:"Votre <span class='g'>site, application ou PWA</span> livre en <span class='g'>une journee</span>",lede:"Conseil, programmation &amp; applications sur mesure. Remplissez le formulaire de demande ci-dessous : il sert de cahier des charges et nous permet de lancer votre projet immediatement.",realisationsTitle:"Nos realisations",realisationsCount:"5 applications",demandeTitle:"Nouvelle demande de projet",demandeSteps:"6 etapes",badgeSport:"Sport",badgeSorties:"Sorties",badgeGestion:"Gestion",badgeImmobilier:"Immobilier",bodyGsc:"Gestion des structures et acteurs sportifs : clubs, federations, arbitres, entraineurs et athletes.",bodyAmbi:"Annuaire social des etablissements (bars, snacks, restos, boites de nuit), forum et services taxi.",bodyMage:"Gestion de caisse et d'inventaire pour bars, snacks et clubs : facturation et suivi des benefices en temps reel.",bodyMalaga:"Maison a louer au Gabon - plateforme de mise en relation pour la location a Libreville entre particuliers, agences et societes.",voirApp:"Voir l'application",navAccueil:"Accueil",navProjets:"Projets",navDemande:"Demande",navConnexion:"Connexion",step1Title:"Vos informations",step1Hint:"Pour vous recontacter rapidement.",labelNom:"Nom complet *",labelEmail:"Email",labelTel:"Telephone / WhatsApp *",step2Title:"Votre activite",step2Hint:"Un peu de contexte sur votre structure.",labelStructure:"Nom de l'entreprise / structure",labelSecteur:"Secteur d'activite *",labelVille:"Ville",step3Title:"Type de produit",step3Hint:"Que souhaitez-vous faire creer ?",step4Title:"Fonctionnalites &amp; details",step4Hint:"Cochez ce qui vous interesse.",labelDesc:"Description libre du projet",labelBudget:"Budget approximatif",labelDelai:"Delai souhaite",step5Title:"Identite visuelle",step5Hint:"Tout ce que vous avez deja (facultatif) — sinon on vous propose une charte.",labelNomCommercial:"Nom commercial souhaite",labelSlogan:"Slogan",labelDevise:"Devise a afficher",labelCouleurs:"Couleurs de la marque (si connues)",colorPrincipale:"Principale",colorSecondaire:"Secondaire",labelLogo:"Logo / photos (facultatif)",uploadBoxText:"📎 Toucher pour choisir des images",labelTextes:"Textes / contenus deja prets (facultatif)",step6Title:"Recapitulatif",step6Hint:"Verifiez avant l'envoi.",successTitle:"Demande envoyee !",successHint:"Nous revenons vers vous tres vite sur le numero/email fourni.",btnPrev:"Precedent",btnSuivant:"Suivant",btnEnvoyer:"Envoyer ma demande",aboutBtn:"ℹ️&nbsp; A propos de PC-INFORMATIQUE",footerText:"PC-INFORMATIQUE — Services informatiques &amp; creation d'applications web/mobile"},
+      en:{accueil:"Home",realisations:"Portfolio",nouvelleDemande:"New request",monProfil:"My profile",tableauBord:"Dashboard",connexion:"Login",kicker:"Development studio - Gabon",heroTitle:"Your <span class='g'>website, app or PWA</span> delivered in <span class='g'>one day</span>",lede:"Consulting, development &amp; custom applications. Fill out the request form below: it works as a project brief and lets us start your project right away.",realisationsTitle:"Our work",realisationsCount:"5 apps",demandeTitle:"New project request",demandeSteps:"6 steps",badgeSport:"Sport",badgeSorties:"Nightlife",badgeGestion:"Management",badgeImmobilier:"Real Estate",bodyGsc:"Management of sports structures and stakeholders: clubs, federations, referees, coaches and athletes.",bodyAmbi:"Social directory of venues (bars, snack bars, restaurants, nightclubs), forum and taxi services.",bodyMage:"Cash register and inventory management for bars, snack bars and clubs: billing and real-time profit tracking.",bodyMalaga:"House for rent in Gabon - a matchmaking platform for rentals in Libreville between individuals, agencies and companies.",voirApp:"View the app",navAccueil:"Home",navProjets:"Projects",navDemande:"Request",navConnexion:"Login",step1Title:"Your information",step1Hint:"So we can contact you quickly.",labelNom:"Full name *",labelEmail:"Email",labelTel:"Phone / WhatsApp *",step2Title:"Your business",step2Hint:"A bit of context about your organization.",labelStructure:"Company / organization name",labelSecteur:"Industry *",labelVille:"City",step3Title:"Product type",step3Hint:"What would you like us to build?",step4Title:"Features &amp; details",step4Hint:"Check what interests you.",labelDesc:"Free-form project description",labelBudget:"Approximate budget",labelDelai:"Desired timeline",step5Title:"Visual identity",step5Hint:"Anything you already have (optional) — otherwise we'll suggest a style.",labelNomCommercial:"Desired brand name",labelSlogan:"Slogan",labelDevise:"Currency to display",labelCouleurs:"Brand colors (if known)",colorPrincipale:"Primary",colorSecondaire:"Secondary",labelLogo:"Logo / photos (optional)",uploadBoxText:"📎 Tap to choose images",labelTextes:"Ready-made texts / content (optional)",step6Title:"Summary",step6Hint:"Review before sending.",successTitle:"Request sent!",successHint:"We'll get back to you shortly at the number/email provided.",btnPrev:"Previous",btnSuivant:"Next",btnEnvoyer:"Send my request",aboutBtn:"ℹ️&nbsp; About PC-INFORMATIQUE",footerText:"PC-INFORMATIQUE — IT services &amp; web/mobile app development"},
+      es:{accueil:"Inicio",realisations:"Portafolio",nouvelleDemande:"Nueva solicitud",monProfil:"Mi perfil",tableauBord:"Panel",connexion:"Iniciar sesion",kicker:"Estudio de desarrollo - Gabon",heroTitle:"Tu <span class='g'>sitio, aplicacion o PWA</span> entregado en <span class='g'>un dia</span>",lede:"Consultoria, programacion &amp; aplicaciones a medida. Complete el formulario de solicitud a continuacion: sirve como pliego de condiciones y nos permite iniciar su proyecto de inmediato.",realisationsTitle:"Nuestros proyectos",realisationsCount:"5 aplicaciones",demandeTitle:"Nueva solicitud de proyecto",demandeSteps:"6 pasos",badgeSport:"Deporte",badgeSorties:"Ocio",badgeGestion:"Gestion",badgeImmobilier:"Inmobiliario",bodyGsc:"Gestion de estructuras y actores deportivos: clubes, federaciones, arbitros, entrenadores y atletas.",bodyAmbi:"Directorio social de establecimientos (bares, snacks, restaurantes, discotecas), foro y servicios de taxi.",bodyMage:"Gestion de caja e inventario para bares, snacks y clubes: facturacion y seguimiento de beneficios en tiempo real.",bodyMalaga:"Casa en alquiler en Gabon - plataforma de contacto para el alquiler en Libreville entre particulares, agencias y empresas.",voirApp:"Ver la aplicacion",navAccueil:"Inicio",navProjets:"Proyectos",navDemande:"Solicitud",navConnexion:"Acceso",step1Title:"Su informacion",step1Hint:"Para poder contactarle rapidamente.",labelNom:"Nombre completo *",labelEmail:"Correo electronico",labelTel:"Telefono / WhatsApp *",step2Title:"Su actividad",step2Hint:"Un poco de contexto sobre su estructura.",labelStructure:"Nombre de la empresa / estructura",labelSecteur:"Sector de actividad *",labelVille:"Ciudad",step3Title:"Tipo de producto",step3Hint:"¿Que desea que creemos?",step4Title:"Funcionalidades &amp; detalles",step4Hint:"Marque lo que le interese.",labelDesc:"Descripcion libre del proyecto",labelBudget:"Presupuesto aproximado",labelDelai:"Plazo deseado",step5Title:"Identidad visual",step5Hint:"Todo lo que ya tenga (opcional) — si no, le proponemos una guia de estilo.",labelNomCommercial:"Nombre comercial deseado",labelSlogan:"Eslogan",labelDevise:"Moneda a mostrar",labelCouleurs:"Colores de la marca (si los conoce)",colorPrincipale:"Principal",colorSecondaire:"Secundario",labelLogo:"Logo / fotos (opcional)",uploadBoxText:"📎 Toque para elegir imagenes",labelTextes:"Textos / contenidos ya listos (opcional)",step6Title:"Resumen",step6Hint:"Revise antes de enviar.",successTitle:"¡Solicitud enviada!",successHint:"Nos pondremos en contacto muy pronto al numero/correo indicado.",btnPrev:"Anterior",btnSuivant:"Siguiente",btnEnvoyer:"Enviar mi solicitud",aboutBtn:"ℹ️&nbsp; Acerca de PC-INFORMATIQUE",footerText:"PC-INFORMATIQUE — Servicios informaticos &amp; creacion de aplicaciones web/movil"},
+      zh:{accueil:"\u9996\u9875",realisations:"\u4f5c\u54c1\u96c6",nouvelleDemande:"\u65b0\u8bf7\u6c42",monProfil:"\u6211\u7684\u8d44\u6599",tableauBord:"\u63a7\u5236\u53f0",connexion:"\u767b\u5f55",kicker:"开发工作室 - 加蓬",heroTitle:"您的<span class='g'>网站、应用或PWA</span>可在<span class='g'>一天内</span>交付",lede:"咨询、开发与定制应用程序。请填写下方的需求表单：它将作为项目说明书，帮助我们立即启动您的项目。",realisationsTitle:"我们的作品",realisationsCount:"5个应用",demandeTitle:"新项目申请",demandeSteps:"6个步骤",badgeSport:"体育",badgeSorties:"娱乐",badgeGestion:"管理",badgeImmobilier:"房地产",bodyGsc:"体育机构和相关人员管理：俱乐部、联合会、裁判、教练和运动员。",bodyAmbi:"场所社交名录（酒吧、小吃店、餐厅、夜店）、论坛及出租车服务。",bodyMage:"为酒吧、小吃店和俱乐部提供收银和库存管理：开票及实时利润跟踪。",bodyMalaga:"加蓬出租房屋 - 一个连接自然人、中介和公司在利伯维尔进行租赁的平台。",voirApp:"查看应用",navAccueil:"首页",navProjets:"项目",navDemande:"申请",navConnexion:"登录",step1Title:"您的信息",step1Hint:"以便我们尽快与您联系。",labelNom:"姓名 *",labelEmail:"电子邮箱",labelTel:"电话/WhatsApp *",step2Title:"您的业务",step2Hint:"简单介绍一下您的机构背景。",labelStructure:"公司/机构名称",labelSecteur:"行业领域 *",labelVille:"城市",step3Title:"产品类型",step3Hint:"您希望我们制作什么？",step4Title:"功能与细节",step4Hint:"勾选您感兴趣的内容。",labelDesc:"项目自由描述",labelBudget:"大致预算",labelDelai:"期望交付时间",step5Title:"视觉形象",step5Hint:"您已有的任何素材（可选）——否则我们将为您建议一套视觉方案。",labelNomCommercial:"期望的商业名称",labelSlogan:"口号",labelDevise:"显示货币",labelCouleurs:"品牌颜色（如已确定）",colorPrincipale:"主色",colorSecondaire:"辅色",labelLogo:"标志/图片（可选）",uploadBoxText:"📎 点击选择图片",labelTextes:"已准备好的文字/内容（可选）",step6Title:"摘要",step6Hint:"发送前请核对。",successTitle:"申请已发送！",successHint:"我们会尽快通过您提供的电话/邮箱与您联系。",btnPrev:"上一步",btnSuivant:"下一步",btnEnvoyer:"发送我的申请",aboutBtn:"ℹ️&nbsp; 关于 PC-INFORMATIQUE",footerText:"PC-INFORMATIQUE — 加蓬IT服务与网站/移动应用开发"}
     };
+    window.__i18nDict=I18N;
+    window.__getLang=function(){return localStorage.getItem('pcinfo-lang')||'fr';};
     var LANG_MAP={
       accueil:'a[href="index.html"].d-link',
       realisations:'a[href="index.html#realisations"].d-link',
@@ -744,6 +747,7 @@ render();
         var k=el.getAttribute('data-i18n');
         if(dict[k]!==undefined){ el.innerHTML=dict[k]; }
       });
+      if(typeof window.__wizardRender==='function'){ window.__wizardRender(); }
       applyTheme(root.getAttribute('data-theme')==='light'?'light':'dark');
     }
     window.setLang=function(lang){
