@@ -68,23 +68,37 @@ function laptopSVG(){
 var lap=box(lx,ly,lw,lh,"");
 lap.innerHTML=laptopSVG();
 root.appendChild(lap);
-/* ---------- dactylographie sur l'ecran ---------- */
+/* ---------- dactylographie sur l'ecran (titre) ---------- */
 (function(){
-  var TXT="PC-INFORMATIQUE", k=lw/420, sw=316*k, sh=184*k;
-  var fs=Math.min(sw*0.9/(TXT.length*0.62),sh*0.5);
+  var L1="PC", L2="INFORMATIQUE", k=lw/420, sw=316*k, sh=184*k;
+  var f2=Math.min(sw*0.92/(L2.length*1.05),sh*0.16), f1=f2*2.6;
+  var lk=document.createElement("link");lk.rel="stylesheet";lk.href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap";document.head.appendChild(lk);
   var scr=document.createElement("div");
-  scr.style.cssText="position:absolute;left:"+(52*k)+"px;top:"+(20*k)+"px;width:"+sw+"px;height:"+sh+"px;display:flex;align-items:center;justify-content:center;pointer-events:none;overflow:hidden;white-space:nowrap;font:700 "+fs.toFixed(1)+"px 'Courier New',ui-monospace,monospace;color:#bfe9ff;text-shadow:0 0 10px rgba(95,182,255,.9),0 0 22px rgba(45,212,191,.5)";
-  var tx=document.createElement("span"), cu=document.createElement("span");
-  cu.textContent="\u258C"; cu.style.cssText="margin-left:2px;color:#2dd4bf";
-  scr.appendChild(tx); scr.appendChild(cu); lap.appendChild(scr);
+  scr.style.cssText="position:absolute;left:"+(52*k)+"px;top:"+(20*k)+"px;width:"+sw+"px;height:"+sh+"px;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;overflow:hidden;white-space:nowrap;font-family:Orbitron,'Courier New',monospace;font-weight:900;text-align:center";
+  var r1=document.createElement("div"), r2=document.createElement("div"), bar=document.createElement("div");
+  var t1=document.createElement("span"), t2=document.createElement("span"), cu=document.createElement("span");
+  r1.style.cssText="display:inline-block;min-height:1.05em;font-size:"+f1.toFixed(1)+"px;line-height:1.05;letter-spacing:.12em;padding-left:.12em;color:transparent;background:linear-gradient(90deg,#2dd4bf,#bfe9ff 50%,#ff4fa3);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 0 8px rgba(95,182,255,.7))";
+  r2.style.cssText="min-height:1.2em;margin-top:.5em;font-size:"+f2.toFixed(1)+"px;letter-spacing:.16em;padding-left:.16em;color:#bfe9ff;text-shadow:0 0 8px rgba(95,182,255,.9),0 0 18px rgba(45,212,191,.5)";
+  bar.style.cssText="height:2px;width:0;margin-top:10px;border-radius:2px;background:linear-gradient(90deg,transparent,#2dd4bf,#ff4fa3,transparent);box-shadow:0 0 8px rgba(45,212,191,.8);transition:width .7s ease-out";
+  cu.textContent="\u258C"; cu.style.cssText="color:#2dd4bf;-webkit-text-fill-color:#2dd4bf";
+  r1.appendChild(t1); r2.appendChild(t2); r1.appendChild(cu);
+  scr.appendChild(r1); scr.appendChild(r2); scr.appendChild(bar); lap.appendChild(scr);
   try{ cu.animate([{opacity:1},{opacity:1,offset:.5},{opacity:0,offset:.5},{opacity:0}],{duration:800,iterations:Infinity}); }catch(e){}
-  var n=0;
+  var n=0, total=L1.length+L2.length, go=false;
+  function render(){
+    t1.textContent=L1.slice(0,Math.min(n,L1.length));
+    t2.textContent=L2.slice(0,Math.max(0,n-L1.length));
+    (n<=L1.length?r1:r2).appendChild(cu);
+  }
   function typeNext(){
     if(ended||!root.parentNode)return;
-    n++; tx.textContent=TXT.slice(0,n);
-    if(n<TXT.length)setTimeout(typeNext,70);
+    n++; render();
+    if(n<total)setTimeout(typeNext,80);
+    else bar.style.width=(sw*0.6).toFixed(0)+"px";
   }
-  setTimeout(typeNext,500);
+  function start(){ if(go)return; go=true; typeNext(); }
+  setTimeout(start,1500);
+  try{ document.fonts.load("900 20px Orbitron").then(function(){ setTimeout(start,300); }); }catch(e){}
 })();
 
 /* faisceau lumineux a la sortie de l'ecran */
