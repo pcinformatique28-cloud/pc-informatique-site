@@ -1611,5 +1611,78 @@ document.addEventListener('DOMContentLoaded', function () {
   } catch (e) {}
 });
 </script>
+
+<!-- PATCH-VISITES-1 -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  function vid() {
+    var k = "pcinfo-vid", v = null;
+    try { v = localStorage.getItem(k); } catch (e) {}
+    if (!v) {
+      v = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Math.random().toString(36).slice(2) + Date.now().toString(36));
+      try { localStorage.setItem(k, v); } catch (e) {}
+    }
+    return String(v).slice(0, 40);
+  }
+  function geo() {
+    return new Promise(function (res) {
+      var t = setTimeout(function () { res({}); }, 4000);
+      fetch("https://ipwho.is/?fields=success,city,country")
+        .then(function (r) { return r.json(); })
+        .then(function (j) { clearTimeout(t); res(j && j.success ? { ville: j.city, pays: j.country } : {}); })
+        .catch(function () { clearTimeout(t); res({}); });
+    });
+  }
+  function send(FS, nom, g) {
+    var now = Date.now(), l = new Date(now + 3600000).toISOString();
+    var d = { vid: vid(), ts: now, jour: l.slice(0, 10), heure: l.slice(11, 16),
+      page: (location.pathname.split("/").pop() || "index.html").slice(0, 60),
+      lang: String(navigator.language || "").slice(0, 10),
+      appareil: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "mobile" : "ordinateur" };
+    if (nom) d.nom = nom;
+    if (g && g.ville) d.ville = String(g.ville).slice(0, 60);
+    if (g && g.pays) d.pays = String(g.pays).slice(0, 60);
+    try { var h = document.referrer && new URL(document.referrer).hostname; if (h && h !== location.hostname) d.ref = h.slice(0, 60); } catch (e) {}
+    FS.collection("visites").add(d).catch(function () {});
+  }
+  try {
+    if (!window.firebase) return;
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    var FS = firebase.firestore(), AU = firebase.auth();
+    if (!localStorage.getItem("pcinfo-notice")) {
+      var T = {
+        fr: "Ce site enregistre des statistiques de visite (ville, appareil ; nom si vous êtes connecté).",
+        en: "This site records visit statistics (city, device; name if you are logged in).",
+        es: "Este sitio registra estadísticas de visita (ciudad, dispositivo; nombre si has iniciado sesión).",
+        zh: "本网站记录访问统计（城市、设备；登录后含姓名）。"
+      };
+      var lg = String(navigator.language || "fr").slice(0, 2);
+      var bn = document.createElement("div");
+      bn.style.cssText = "position:fixed;left:8px;right:8px;bottom:70px;z-index:9998;display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:#1b1e3d;color:#f2f3fa;font-size:.78rem;box-shadow:0 4px 16px rgba(0,0,0,.35)";
+      var tx = document.createElement("span"); tx.style.flex = "1"; tx.textContent = T[lg] || T.fr;
+      var ok = document.createElement("button"); ok.textContent = "OK";
+      ok.style.cssText = "border:0;border-radius:8px;padding:6px 12px;font-weight:700;background:#ffd21f;color:#000";
+      ok.onclick = function () { try { localStorage.setItem("pcinfo-notice", "1"); } catch (e) {} bn.remove(); };
+      bn.appendChild(tx); bn.appendChild(ok); document.body.appendChild(bn);
+    }
+    if (sessionStorage.getItem("pcinfo-vs")) return;
+    var done = false;
+    AU.onAuthStateChanged(function (u) {
+      if (done) return; done = true;
+      sessionStorage.setItem("pcinfo-vs", "1");
+      var chk = u ? FS.collection("admins").doc(u.uid).get().then(function (a) { return a.exists; }).catch(function () { return false; }) : Promise.resolve(false);
+      chk.then(function (isAdm) {
+        if (isAdm) return;
+        var nm = u ? FS.collection("membres").doc(u.uid).get().then(function (m) {
+            var x = m.exists ? m.data() : {};
+            return String(x.nom || x.name || u.displayName || "Membre").slice(0, 60);
+          }).catch(function () { return String(u.displayName || "Membre").slice(0, 60); })
+          : Promise.resolve(null);
+        return Promise.all([nm, geo()]).then(function (r) { send(FS, r[0], r[1]); });
+      });
+    });
+  } catch (e) {}
+});
+</script>
 </body>
 </html>

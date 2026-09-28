@@ -122,6 +122,7 @@ nav{background:linear-gradient(120deg,#12142b 0%,#1b1e3d 60%,#12142b 100%)!impor
     <div class="tab on" id="mode-demandes">Demandes</div>
     <div class="tab" id="mode-projets">Projets membres</div>
     <div class="tab" id="mode-partenaires">Partenaires</div>
+    <div class="tab" id="mode-visites">Visites</div>
   </div>
   <div id="sec-partenaires" style="display:none">
   <div class="pt-card">
@@ -133,6 +134,15 @@ nav{background:linear-gradient(120deg,#12142b 0%,#1b1e3d 60%,#12142b 100%)!impor
     <div class="pt-msg" id="pt-msg"></div>
   </div>
   <div id="pt-list"></div>
+</div>
+<div id="sec-visites" style="display:none">
+  <div class="vs-card">
+    <h3>Visites</h3>
+    <div class="vs-row"><input type="date" id="vs-day"><button type="button" class="vs-btn" id="vs-today">Aujourd'hui</button></div>
+    <div class="vs-kpi" id="vs-kpi"></div>
+    <div class="vs-chart" id="vs-chart"></div>
+  </div>
+  <div class="vs-wrap"><table class="vs-table"><thead><tr><th>#</th><th>Heure</th><th>Visiteur</th><th>Lieu</th><th>Appareil</th></tr></thead><tbody id="vs-body"></tbody></table></div>
 </div>
 <div id="sec-demandes">
   <div class="tabs">
@@ -553,5 +563,97 @@ function goToProjet(id){
       row.appendChild(del); list.appendChild(row);
     });
   }, function () { list.textContent = "Lecture impossible : publie d'abord les règles Firestore (partenaires)."; });
+})();
+</script>
+
+<!-- PATCH-ADMIN-VISITES -->
+<style>
+.vs-card{border:1px solid rgba(127,127,127,.35);border-radius:14px;padding:14px;margin:0 0 14px;background:var(--card,transparent)}
+.vs-card h3{margin:0 0 10px;font-size:1rem}
+.vs-row{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.vs-row input[type=date]{padding:9px 10px;border-radius:10px;border:1px solid rgba(127,127,127,.45);background:rgba(127,127,127,.12);color:inherit;font:inherit}
+.vs-btn{padding:9px 14px;border:0;border-radius:10px;font:inherit;font-weight:700;cursor:pointer;color:#000;background:linear-gradient(90deg,#33d9c4,#ff4fa3)}
+.vs-kpi{font-size:.85rem;margin:6px 0 12px}
+.vs-chart{display:flex;align-items:flex-end;gap:3px;height:128px;overflow-x:auto;padding-top:4px}
+.vs-col{flex:1;min-width:20px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;cursor:pointer;border-radius:6px;padding:2px 0}
+.vs-col.sel{background:rgba(127,127,127,.18)}
+.vs-bar{width:70%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#33d9c4,#ff4fa3)}
+.vs-num{font-size:.65rem;min-height:.8rem}
+.vs-lab{font-size:.6rem;opacity:.75;margin-top:3px}
+.vs-wrap{overflow-x:auto}
+.vs-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.vs-table th,.vs-table td{text-align:left;padding:8px 6px;border-bottom:1px solid rgba(127,127,127,.25);white-space:nowrap}
+</style>
+<script>
+(function () {
+  function $(id) { return document.getElementById(id); }
+  var tab = $("mode-visites"), sec = $("sec-visites");
+  if (!tab || !sec) return;
+  var others = ["mode-demandes", "mode-projets", "mode-partenaires"];
+  var osecs = ["sec-demandes", "sec-projets", "sec-partenaires"];
+  var started = false, data = [];
+  function today() { return new Date(Date.now() + 3600000).toISOString().slice(0, 10); }
+  function cell(tr, txt) { var td = document.createElement("td"); td.textContent = txt; tr.appendChild(td); }
+  function draw() {
+    var day = $("vs-day").value || today(), per = {};
+    data.forEach(function (v) { per[v.jour] = (per[v.jour] || 0) + 1; });
+    var days = [], i, max = 1;
+    for (i = 13; i >= 0; i--) days.push(new Date(Date.now() + 3600000 - i * 86400000).toISOString().slice(0, 10));
+    days.forEach(function (d) { if ((per[d] || 0) > max) max = per[d]; });
+    var ch = $("vs-chart"); ch.textContent = "";
+    days.forEach(function (d) {
+      var n = per[d] || 0, col = document.createElement("div");
+      col.className = "vs-col" + (d === day ? " sel" : "");
+      var num = document.createElement("span"); num.className = "vs-num"; num.textContent = n || "";
+      var bar = document.createElement("div"); bar.className = "vs-bar"; bar.style.height = Math.max(n ? 3 : 0, Math.round(n / max * 80)) + "px";
+      var lab = document.createElement("span"); lab.className = "vs-lab"; lab.textContent = d.slice(8) + "/" + d.slice(5, 7);
+      col.onclick = function () { $("vs-day").value = d; draw(); };
+      col.appendChild(num); col.appendChild(bar); col.appendChild(lab); ch.appendChild(col);
+    });
+    var rows = data.filter(function (v) { return v.jour === day; }).sort(function (a, b) { return a.ts - b.ts; });
+    var named = {}, anon = {}, na = 0, uniq = {};
+    rows.forEach(function (v) { uniq[v.vid] = 1; if (v.nom) named[v.vid] = v.nom; });
+    rows.forEach(function (v) { if (!named[v.vid] && !anon[v.vid]) anon[v.vid] = ++na; });
+    $("vs-kpi").textContent = rows.length + " visite(s) · " + Object.keys(uniq).length + " visiteur(s) · " + Object.keys(named).length + " membre(s) · " + na + " anonyme(s)";
+    var tb = $("vs-body"); tb.textContent = "";
+    rows.slice().reverse().forEach(function (v, k) {
+      var tr = document.createElement("tr");
+      cell(tr, String(rows.length - k));
+      cell(tr, v.heure || "");
+      cell(tr, named[v.vid] || ("Anonyme " + anon[v.vid]));
+      cell(tr, [v.ville, v.pays].filter(Boolean).join(", ") || "—");
+      cell(tr, v.appareil || "");
+      tb.appendChild(tr);
+    });
+    if (!rows.length) {
+      var t0 = document.createElement("tr"), c0 = document.createElement("td");
+      c0.colSpan = 5; c0.textContent = "Aucune visite ce jour-là."; t0.appendChild(c0); tb.appendChild(t0);
+    }
+  }
+  function start() {
+    if (started) return; started = true;
+    var DB = (typeof db !== "undefined") ? db : firebase.firestore();
+    DB.collection("visites").where("ts", ">=", Date.now() - 14 * 86400000).orderBy("ts", "desc").limit(3000)
+      .onSnapshot(function (snap) {
+        data = []; snap.forEach(function (d) { data.push(d.data()); }); draw();
+      }, function (e) {
+        started = false;
+        $("vs-kpi").textContent = (e && e.code === "permission-denied")
+          ? "Accès refusé : publie les règles Firestore (visites) ou connecte-toi avec le compte admin."
+          : "Erreur : " + (e && e.message || e);
+      });
+  }
+  tab.addEventListener("click", function () {
+    others.forEach(function (id) { var e = $(id); if (e) e.classList.remove("on"); });
+    osecs.forEach(function (id) { var e = $(id); if (e) e.style.display = "none"; });
+    tab.classList.add("on"); sec.style.display = "block"; start(); draw();
+  });
+  others.forEach(function (id) {
+    var e = $(id);
+    if (e) e.addEventListener("click", function () { tab.classList.remove("on"); sec.style.display = "none"; });
+  });
+  $("vs-day").value = today();
+  $("vs-day").addEventListener("change", draw);
+  $("vs-today").addEventListener("click", function () { $("vs-day").value = today(); draw(); });
 })();
 </script>

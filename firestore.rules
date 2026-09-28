@@ -106,5 +106,23 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Visites (tracking) : creation publique strictement bornee, lecture admin
+    match /visites/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['vid','nom','ts','jour','heure','ville','pays','page','lang','appareil','ref'])
+        && request.resource.data.vid is string && request.resource.data.vid.size() <= 40
+        && request.resource.data.ts is number
+        && request.resource.data.jour is string && request.resource.data.jour.size() == 10
+        && request.resource.data.heure is string && request.resource.data.heure.size() <= 5
+        && request.resource.data.page is string && request.resource.data.page.size() <= 60
+        && request.resource.data.lang is string && request.resource.data.lang.size() <= 10
+        && request.resource.data.appareil is string && request.resource.data.appareil.size() <= 12
+        && (!('nom' in request.resource.data) || (request.resource.data.nom is string && request.resource.data.nom.size() <= 60))
+        && (!('ville' in request.resource.data) || (request.resource.data.ville is string && request.resource.data.ville.size() <= 60))
+        && (!('pays' in request.resource.data) || (request.resource.data.pays is string && request.resource.data.pays.size() <= 60))
+        && (!('ref' in request.resource.data) || (request.resource.data.ref is string && request.resource.data.ref.size() <= 60));
+      allow read, delete: if isAdmin();
+      allow update: if false;
+    }
+
   }
 }
