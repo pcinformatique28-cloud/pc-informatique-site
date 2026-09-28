@@ -1,0 +1,153 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR Code - PC-INFORMATIQUE</title>
+
+<style id="pg"></style>
+<style>
+html,body{margin:0}
+body{font-family:system-ui,Arial,sans-serif;background:#0f1226;color:#fff}
+#gate{padding:40px 20px;text-align:center}
+#app{display:none;max-width:720px;margin:0 auto;padding:14px}
+h1{font-size:20px;margin:6px 0 12px}
+label{display:block;font-size:13px;opacity:.8;margin:10px 0 4px}
+select{width:100%;padding:12px;border-radius:10px;font:inherit}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+button,a.b{padding:12px 14px;border-radius:12px;border:0;background:linear-gradient(135deg,#2dd4bf,#ec4899);color:#000;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}
+button.g,a.b.g{background:#ffffff1f;color:#fff}
+#info{font-size:13px;opacity:.85;margin:8px 0}
+#prev{background:#fff;padding:8px;border-radius:12px;text-align:center}
+#cv{max-width:100%;max-height:70vh;height:auto}
+.tips{font-size:13px;opacity:.8;line-height:1.55;margin-top:14px}
+#pa{display:none}
+@media print{
+body{background:#fff}
+#gate,#app{display:none!important}
+#pa{display:block}
+#pa img{display:block}
+}
+</style></head><body>
+<div id="gate">V&eacute;rification de la connexion...</div>
+<div id="app">
+<h1>QR Code &middot; formats &amp; impression</h1>
+<label for="fmt">Format</label><select id="fmt"></select>
+<div id="info"></div>
+<div id="prev"><canvas id="cv"></canvas></div>
+<div class="row">
+<button type="button" id="bdl">T&eacute;l&eacute;charger PNG</button>
+<a class="b g" href="qr-pc-informatique.svg" download="qr-pc-informatique.svg">SVG vectoriel</a>
+<button type="button" class="g" id="bpr">Imprimer / PDF</button>
+<button type="button" class="g" id="bsh">Partager</button>
+<a class="b g" href="admin.html">Admin</a>
+</div>
+<div class="tips">&bull; Taille minimale du QR imprim&eacute; : 2 cm (id&eacute;al 3 cm ou plus).<br>&bull; Garde le fond blanc et la marge blanche, n'inverse pas les couleurs.<br>&bull; Pour un imprimeur : envoie le SVG (vectoriel) ou le PDF.<br>&bull; Impression : choisis &laquo; Enregistrer au format PDF &raquo;, papier = format choisi, &eacute;chelle 100 %.<br>&bull; Teste toujours le scan sur 2 t&eacute;l&eacute;phones avant une s&eacute;rie.</div>
+</div>
+<div id="pa"><img id="pimg" alt=""></div>
+<script>
+(function(){
+var TITRE="PC-INFORMATIQUE", DESC="Applications, sites web et solutions num\u00e9riques sur mesure.", URL0="https://pcinformatique28-cloud.github.io/pc-informatique-site/", MAIL="pcinformatique28@gmail.com", TEL="+241 60 14 19 24", LOGO="", CFG=null;
+var FF="system-ui,Arial,sans-serif";
+var F=[
+{id:"a4",n:"Affiche A4 (210\u00d7297 mm)",w:210,h:297,px:[2480,3508],l:"portrait"},
+{id:"a3",n:"Affiche A3 (297\u00d7420 mm)",w:297,h:420,px:[2480,3508],l:"portrait"},
+{id:"a5",n:"Flyer A5 (148\u00d7210 mm)",w:148,h:210,px:[1748,2480],l:"portrait"},
+{id:"a6",n:"Flyer A6 (105\u00d7148 mm)",w:105,h:148,px:[1240,1748],l:"portrait"},
+{id:"carte",n:"Carte de visite (85\u00d755 mm)",w:85,h:55,px:[1004,650],l:"card"},
+{id:"auto100",n:"Autocollant carr\u00e9 (100\u00d7100 mm)",w:100,h:100,px:[1181,1181],l:"qr"},
+{id:"auto50",n:"Petit autocollant (50\u00d750 mm)",w:50,h:50,px:[591,591],l:"qr"},
+{id:"carre",n:"R\u00e9seaux sociaux carr\u00e9 (1080\u00d71080 px)",px:[1080,1080],l:"square"},
+{id:"story",n:"Story / Statut WhatsApp (1080\u00d71920 px)",px:[1080,1920],l:"portrait"},
+{id:"banniere",n:"Banni\u00e8re / aper\u00e7u (1200\u00d7630 px)",px:[1200,630],l:"banner"},
+{id:"qr1024",n:"QR seul 1024 px (fond blanc)",px:[1024,1024],l:"qr"},
+{id:"qr2048",n:"QR seul 2048 px (haute d\u00e9finition)",px:[2048,2048],l:"qr"}
+];
+var cv=document.getElementById("cv"), X=cv.getContext("2d"), sel=document.getElementById("fmt"), info=document.getElementById("info");
+var qi=new Image(), lg=null, cur=F[0], okQ=false, ready=0, shown=false, inited=false;
+function $(i){return document.getElementById(i);}
+function T(s,px,y,size,wt,maxw,al){
+var sz=size; X.textAlign=al||"center"; X.textBaseline="top"; X.fillStyle="#111";
+do{ X.font=wt+" "+sz+"px "+FF; if(X.measureText(s).width<=maxw)break; sz*=0.94; }while(sz>8);
+X.fillText(s,px,y); return sz;
+}
+function WR(s,size,wt,maxw){
+X.font=wt+" "+size+"px "+FF;
+var w=s.split(" "), l=[], c="";
+w.forEach(function(t){ var n=c?c+" "+t:t; if(X.measureText(n).width>maxw&&c){l.push(c);c=t;}else c=n; });
+if(c)l.push(c); return l;
+}
+function stack(it,gap,W,H){
+var tot=gap*(it.length-1); it.forEach(function(i){tot+=i.h;});
+var y=Math.max(H*0.03,(H-tot)/2);
+it.forEach(function(i){ i.d(y); y+=i.h+gap; });
+}
+function portrait(W,H,o){
+var it=[];
+if(lg&&o.logo){ var lh=Math.min(H*0.09,W*o.logo), lw=lg.width*lh/lg.height; if(lw>W*0.5){lw=W*0.5;lh=lg.height*lw/lg.width;} it.push({h:lh,d:function(y){X.drawImage(lg,(W-lw)/2,y,lw,lh);}}); }
+var ts=W*o.title; it.push({h:ts*1.15,d:function(y){T(TITRE,W/2,y,ts,"800",W*0.9);}});
+if(o.desc){ var ds=W*0.038, dl=WR(DESC,ds,"400",W*0.82); it.push({h:dl.length*ds*1.35,d:function(y){dl.forEach(function(s,i){T(s,W/2,y+i*ds*1.35,ds,"400",W*0.9);});}}); }
+var q=Math.min(W*o.qw,H*o.qh); it.push({h:q,d:function(y){X.drawImage(qi,(W-q)/2,y,q,q);}});
+var ss=W*0.05; it.push({h:ss*1.2,d:function(y){T("Scannez pour ouvrir le site",W/2,y,ss,"700",W*0.9);}});
+if(o.url){ var us=W*0.026; it.push({h:us*1.2,d:function(y){T(URL0,W/2,y,us,"400",W*0.92);}}); }
+var cs=W*o.cs; it.push({h:cs*2.7,d:function(y){T("Email : "+MAIL,W/2,y,cs,"400",W*0.9);T("T\u00e9l : "+TEL,W/2,y+cs*1.35,cs,"400",W*0.9);}});
+stack(it,W*o.gap,W,H);
+}
+function land(W,H,o){
+var q=H*o.q, m=(H-q)/2, tx=m+q+m, tw=W-tx-m, it=[];
+if(lg){ var lh=H*o.lg, lw=lg.width*lh/lg.height; if(lw>tw){lw=tw;lh=lg.height*lw/lg.width;} it.push({h:lh,d:function(y){X.drawImage(lg,tx,y,lw,lh);}}); }
+var ts=H*o.t; it.push({h:ts*1.15,d:function(y){T(TITRE,tx,y,ts,"800",tw,"left");}});
+var ds=H*o.d, dl=WR(DESC,ds,"400",tw); it.push({h:dl.length*ds*1.3,d:function(y){dl.forEach(function(s,i){T(s,tx,y+i*ds*1.3,ds,"400",tw,"left");});}});
+var cs=H*o.c; it.push({h:cs*2.6,d:function(y){T("Email : "+MAIL,tx,y,cs,"400",tw,"left");T("T\u00e9l : "+TEL,tx,y+cs*1.3,cs,"400",tw,"left");}});
+X.drawImage(qi,m,m,q,q);
+stack(it,H*0.035,W,H);
+}
+function render(){
+if(!okQ)return;
+var f=cur, W=f.px[0], H=f.px[1];
+cv.width=W; cv.height=H; X.fillStyle="#fff"; X.fillRect(0,0,W,H);
+X.imageSmoothingQuality="high";
+if(f.l==="qr"){ var q=Math.min(W,H); X.drawImage(qi,(W-q)/2,(H-q)/2,q,q); }
+else if(f.l==="card") land(W,H,{q:0.72,t:0.1,d:0.055,c:0.05,lg:0.14});
+else if(f.l==="banner") land(W,H,{q:0.8,t:0.11,d:0.06,c:0.055,lg:0.16});
+else if(f.l==="square") portrait(W,H,{logo:0.1,title:0.07,desc:false,url:false,qw:0.5,qh:0.5,cs:0.038,gap:0.03});
+else portrait(W,H,{logo:0.22,title:0.08,desc:true,url:true,qw:0.8,qh:0.4,cs:0.042,gap:0.035});
+info.textContent=f.w?(f.w+"\u00d7"+f.h+" mm \u00b7 "+W+"\u00d7"+H+" px ("+Math.round(W/(f.w/25.4))+" dpi)"):(W+"\u00d7"+H+" px \u00b7 usage num\u00e9rique");
+}
+function go(){ if(++ready<2)return; okQ=true; render(); }
+function init(){
+if(inited)return; inited=true;
+F.forEach(function(f,i){ var o=document.createElement("option"); o.value=i; o.textContent=f.n; sel.appendChild(o); });
+sel.addEventListener("change",function(){ cur=F[+sel.value]; render(); });
+$("bdl").addEventListener("click",function(){
+cv.toBlob(function(b){ var a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="qr-pc-informatique-"+cur.id+".png"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(a.href);},2000); },"image/png");
+});
+$("bpr").addEventListener("click",function(){
+if(!cur.w){ alert("Format num\u00e9rique : utilise T\u00e9l\u00e9charger PNG ou Partager."); return; }
+$("pg").textContent="@page{size:"+cur.w+"mm "+cur.h+"mm;margin:0}";
+var im=$("pimg"); im.style.width=cur.w+"mm"; im.style.height=cur.h+"mm";
+im.onload=function(){ window.print(); };
+im.src=cv.toDataURL("image/png")+"#"+Date.now();
+});
+$("bsh").addEventListener("click",function(){
+cv.toBlob(function(b){
+var fl=new File([b],"qr-pc-informatique-"+cur.id+".png",{type:"image/png"});
+if(navigator.canShare&&navigator.canShare({files:[fl]})) navigator.share({files:[fl],title:TITRE}).catch(function(){});
+else alert("Partage indisponible sur cet appareil : utilise T\u00e9l\u00e9charger PNG.");
+},"image/png");
+});
+fetch("qr-pc-informatique.svg").then(function(r){return r.text();}).then(function(t){
+t=t.replace("<svg ",'<svg width="2048" height="2048" ');
+qi.onload=go; qi.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(t);
+});
+if(LOGO){ lg=new Image(); lg.onload=go; lg.onerror=function(){lg=null;go();}; lg.src=LOGO; } else go();
+}
+function show(){ if(shown)return; shown=true; $("gate").style.display="none"; $("app").style.display="block"; init(); }
+function deny(m){ $("gate").innerHTML=m+'<br><br><a class="b" href="index.html">Retour au site</a>'; }
+if(!CFG){ show(); }
+else if(typeof firebase==="undefined"){ deny("Connexion indisponible."); }
+else {
+try{
+if(!firebase.apps.length)firebase.initializeApp(CFG);
+firebase.auth().onAuthStateChanged(function(u){ if(u)show(); else deny("Page r\u00e9serv\u00e9e aux membres inscrits et \u00e0 l\u2019admin. Connecte-toi d\u2019abord sur le site."); });
+}catch(e){ deny("Connexion indisponible."); }
+}
+})();
+</script></body></html>
