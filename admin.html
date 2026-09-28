@@ -98,10 +98,11 @@ nav{background:linear-gradient(120deg,#12142b 0%,#1b1e3d 60%,#12142b 100%)!impor
 </style>
 </head>
 <body>
+<div id="pcp-wait" style="text-align:center;padding:48px 16px;color:#9aa0b4;font-family:system-ui,sans-serif">Chargement...</div>
 
 <nav><div class="navwrap"><b>🔧 PC-INFORMATIQUE — Admin</b><span class="headright"><span id="count" style="font-size:.75rem;color:var(--sub)"></span><span class="bell" id="admin-bell" title="Notifications">&#128276;<span class="bell-badge" id="admin-bell-badge" style="display:none;"></span><div class="bell-dropdown" id="bell-dropdown"></div></span></span></div></nav>
 
-<div id="gate" class="wrap">
+<div id="gate" class="wrap" style="display:none">
   <h3 style="text-align:left">Accès admin</h3>
   <p style="color:var(--sub);font-size:.82rem;text-align:left">Connectez-vous avec votre compte admin.</p>
   <label>E-mail</label>
@@ -872,3 +873,19 @@ body{padding-bottom:96px}
 </script>
 <script src="qr-widget.js"></script>
 <script src="pwd-eye.js"></script>
+<script>
+(function(){
+var w=document.getElementById('pcp-wait');
+function vis(e){return e&&getComputedStyle(e).display!=='none';}
+var t=setInterval(function(){
+  var g=document.getElementById('gate'), d=document.getElementById('dash');
+  if(!g||!d){clearInterval(t);return;}
+  if(vis(g)||vis(d)){ if(w)w.style.display='none'; clearInterval(t); }
+},100);
+setTimeout(function(){
+  var g=document.getElementById('gate'), d=document.getElementById('dash');
+  if(g&&d&&!vis(g)&&!vis(d)){ g.style.display='block'; }
+  if(w)w.style.display='none';
+},4000);
+})();
+</script>

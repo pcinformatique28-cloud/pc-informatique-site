@@ -6,7 +6,7 @@ var st=document.createElement("style");
 st.textContent=".pe-wrap{position:relative;display:block;width:100%}.pe-wrap>input{width:100%;box-sizing:border-box;padding-right:48px!important}.pe-btn{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:38px;height:38px;border:0;background:transparent;color:#475569;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;border-radius:10px}.pe-btn:active{background:rgba(0,0,0,.08)}";
 document.head.appendChild(st);
 function add(inp){
-if(inp.getAttribute("data-pe"))return;
+if(inp.getAttribute("data-pe")||(inp.closest&&inp.closest(".pwrap")))return;
 inp.setAttribute("data-pe","1");
 var cs=getComputedStyle(inp);
 var wrap=document.createElement("span");
