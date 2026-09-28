@@ -42,6 +42,16 @@ service cloud.firestore {
     // Collection "membres" — un document par compte inscrit.
     // Champs attendus : nom, email, bio, photoURL, createdAt, actif
     // ------------------------------------------------------------------
+    match /membres_prive/{uid} {
+      // E-mails des membres : visibles seulement par le membre et l'admin
+      allow read: if isSignedIn() && (request.auth.uid == uid || isAdmin());
+      allow create: if isAdmin() || (isSignedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email'])
+        && request.resource.data.email is string
+        && request.resource.data.email.size() < 200);
+      allow update, delete: if isAdmin();
+    }
+
     match /membres/{uid} {
       // Profils publics (annuaire des membres sur le site)
       allow read: if true;
@@ -50,7 +60,7 @@ service cloud.firestore {
       allow create: if isSignedIn() && request.auth.uid == uid
         && request.resource.data.keys().hasOnly(['nom','email','bio','photoURL','createdAt','actif','cguAcceptees','cguDate'])
         && request.resource.data.nom is string && request.resource.data.nom.size() > 0 && request.resource.data.nom.size() < 100
-        && request.resource.data.email is string
+        && (!('email' in request.resource.data) || request.resource.data.email is string)
         && request.resource.data.actif == true;
 
       // Un membre modifie son propre profil, mais ne peut pas se désactiver
