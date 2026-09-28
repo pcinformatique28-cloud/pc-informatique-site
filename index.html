@@ -1650,7 +1650,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!window.firebase) return;
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     var FS = firebase.firestore(), AU = firebase.auth();
-    if (!localStorage.getItem("pcinfo-notice")) {
+    if (false) {
       var T = {
         fr: "Ce site enregistre des statistiques de visite (ville, appareil ; nom si vous êtes connecté).",
         en: "This site records visit statistics (city, device; name if you are logged in).",
@@ -1675,11 +1675,11 @@ document.addEventListener("DOMContentLoaded", function () {
       chk.then(function (isAdm) {
         if (isAdm) return;
         var nm = u ? FS.collection("membres").doc(u.uid).get().then(function (m) {
-            var x = m.exists ? m.data() : {};
+            var x = m.exists ? m.data() : {}; if (x.cguAcceptees !== true) return null;
             return String(x.nom || x.name || u.displayName || "Membre").slice(0, 60);
-          }).catch(function () { return String(u.displayName || "Membre").slice(0, 60); })
+          }).catch(function () { return null; })
           : Promise.resolve(null);
-        return Promise.all([nm, geo()]).then(function (r) { send(FS, r[0], r[1]); });
+        return nm.then(function (n) { if (n === null) return; return geo().then(function (g) { send(FS, n, g); }); });
       });
     });
   } catch (e) {}
