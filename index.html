@@ -1566,5 +1566,50 @@ loadNotifPrefs();
   });
 })();
 </script>
+
+<!-- PATCH-ACCUEIL-2 -->
+<style>
+:root{--kicker-pull:-26px}
+.kicker{margin-top:var(--kicker-pull)!important}
+:root[data-theme="light"] .kicker{color:#000!important;-webkit-text-fill-color:#000!important}
+.pc-partners{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;
+ margin:16px auto;padding:10px 12px;width:88%;max-width:520px;min-height:58px;box-sizing:border-box;
+ border:2px solid #ffd21f;border-radius:14px;
+ box-shadow:0 0 8px rgba(255,210,31,.85),0 0 20px rgba(255,190,0,.45),inset 0 0 8px rgba(255,210,31,.15);
+ animation:pcGlow 3s ease-in-out infinite}
+@keyframes pcGlow{50%{box-shadow:0 0 12px rgba(255,210,31,1),0 0 28px rgba(255,190,0,.6),inset 0 0 10px rgba(255,210,31,.25)}}
+@media (prefers-reduced-motion:reduce){.pc-partners{animation:none}}
+.pc-partners img{height:40px;max-width:110px;width:auto;object-fit:contain;border-radius:8px}
+.pc-partners .pn{font-size:.8rem;font-weight:700;opacity:.9}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var k = document.querySelector('.kicker');
+  if (k && getComputedStyle(k).display === 'inline') k.style.display = 'inline-block';
+  if (document.getElementById('pc-partners')) return;
+  var box = document.createElement('div');
+  box.id = 'pc-partners'; box.className = 'pc-partners';
+  var t = document.getElementById('realisations');
+  if (t && /^(A|BUTTON)$/.test(t.tagName)) t = null;
+  if (t && t.parentNode) t.parentNode.insertBefore(box, t);
+  else {
+    var host = k && (k.closest('section') || k.parentElement);
+    if (!host || !host.parentNode) return;
+    host.parentNode.insertBefore(box, host.nextSibling);
+  }
+  try {
+    if (!window.firebase) return;
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    firebase.firestore().collection('partenaires').orderBy('ts').get().then(function (snap) {
+      snap.forEach(function (doc) {
+        var d = doc.data(), el;
+        if (d.logo) { el = document.createElement('img'); el.src = d.logo; el.alt = d.nom || ""; el.title = d.nom || ""; }
+        else { el = document.createElement('span'); el.className = 'pn'; el.textContent = d.nom || ""; }
+        box.appendChild(el);
+      });
+    }).catch(function () {});
+  } catch (e) {}
+});
+</script>
 </body>
 </html>
