@@ -20,6 +20,16 @@
   --teal:#2dd9c4; --pink:#e0266f;
   box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
+:root[data-theme="light"]{
+  color-scheme: light;
+  --bg:#f4f5fb; --card:#ffffff; --text:#12142b; --sub:#4b4f6b;
+}
+:root[data-theme="light"] .navlinks a{border-color:rgba(18,20,43,.18);background:rgba(18,20,43,.05);}
+:root[data-theme="light"] .icon-btn{border-color:rgba(18,20,43,.18);}
+:root[data-theme="light"] .notif-row{border-color:rgba(18,20,43,.12);}
+:root[data-theme="light"] .about-pane p{border-color:rgba(18,20,43,.12);}
+:root[data-theme="light"] html,
+:root[data-theme="light"] body{background:var(--bg);color:var(--text);}
 *{box-sizing:border-box;}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:18px;}
 a{color:inherit;}
@@ -278,6 +288,17 @@ nav{padding:2px 0 0 0!important;}
   </div>
 </nav>
 <div class="drawer-overlay" id="drawer-overlay"></div>
+<div class="sheet-overlay" id="lang-sheet-overlay" onclick="closeSheet('lang-sheet')"></div>
+<div class="sheet" id="lang-sheet">
+  <button class="sheet-close" onclick="closeSheet('lang-sheet')">&times;</button>
+  <h3>Choisir la langue</h3>
+  <div class="about-apps">
+    <a href="#" onclick="setLang('fr');return false;">Francais</a>
+    <a href="#" onclick="setLang('en');return false;">English</a>
+    <a href="#" onclick="setLang('es');return false;">Espanol</a>
+    <a href="#" onclick="setLang('zh');return false;">Zhongwen</a>
+  </div>
+</div>
 <aside class="drawer" id="drawer">
   <button class="d-close" id="drawer-close" aria-label="Fermer">&times;</button>
   <div class="d-user" id="drawer-user" style="display:none;">
@@ -288,6 +309,8 @@ nav{padding:2px 0 0 0!important;}
     </div>
   </div>
   <nav class="d-links">
+    <a href="#" class="d-link" id="theme-toggle-btn" onclick="toggleTheme();return false;"><span class="ic" id="theme-toggle-icon">&#127769;</span><span id="theme-toggle-label">Mode clair</span></a>
+    <a href="#" class="d-link" onclick="openSheet('lang-sheet');return false;"><span class="ic">&#127760;</span>Langue / Language</a>
     <a href="index.html" class="d-link"><span class="ic">&#127968;</span>Accueil</a>
     <a href="index.html#realisations" class="d-link"><span class="ic">&#128193;</span>Realisations</a>
     <a href="index.html#demande" class="d-link"><span class="ic">&#10133;</span>Nouvelle demande</a>
@@ -672,6 +695,60 @@ render();
   function openDrawer(){ drawer.classList.add('open'); overlay.classList.add('open'); }
   function closeDrawer(){ drawer.classList.remove('open'); overlay.classList.remove('open'); }
   document.getElementById('btn-menu').addEventListener('click', openDrawer);
+  (function(){
+    var root=document.documentElement;
+    function applyTheme(t){
+      if(t==='light'){root.setAttribute('data-theme','light');}else{root.removeAttribute('data-theme');}
+      var icon=document.getElementById('theme-toggle-icon');
+      var label=document.getElementById('theme-toggle-label');
+      var lang=localStorage.getItem('pcinfo-lang')||'fr';
+      var lightLabels={fr:'Mode sombre',en:'Dark mode',es:'Modo oscuro',zh:'\u6df1\u8272\u6a21\u5f0f'};
+      var darkLabels={fr:'Mode clair',en:'Light mode',es:'Modo claro',zh:'\u6d45\u8272\u6a21\u5f0f'};
+      if(icon) icon.innerHTML = t==='light' ? '&#9728;' : '&#127769;';
+      if(label) label.textContent = t==='light' ? lightLabels[lang] : darkLabels[lang];
+    }
+    applyTheme(localStorage.getItem('pcinfo-theme')||'dark');
+    window.toggleTheme=function(){
+      var cur=root.getAttribute('data-theme')==='light'?'light':'dark';
+      var next=cur==='light'?'dark':'light';
+      localStorage.setItem('pcinfo-theme',next);
+      applyTheme(next);
+    };
+
+    var I18N={
+      fr:{accueil:"Accueil",realisations:"Realisations",nouvelleDemande:"Nouvelle demande",monProfil:"Mon profil",tableauBord:"Tableau de bord",connexion:"Connexion"},
+      en:{accueil:"Home",realisations:"Portfolio",nouvelleDemande:"New request",monProfil:"My profile",tableauBord:"Dashboard",connexion:"Login"},
+      es:{accueil:"Inicio",realisations:"Portafolio",nouvelleDemande:"Nueva solicitud",monProfil:"Mi perfil",tableauBord:"Panel",connexion:"Iniciar sesion"},
+      zh:{accueil:"\u9996\u9875",realisations:"\u4f5c\u54c1\u96c6",nouvelleDemande:"\u65b0\u8bf7\u6c42",monProfil:"\u6211\u7684\u8d44\u6599",tableauBord:"\u63a7\u5236\u53f0",connexion:"\u767b\u5f55"}
+    };
+    var LANG_MAP={
+      accueil:'a[href="index.html"].d-link',
+      realisations:'a[href="index.html#realisations"].d-link',
+      nouvelleDemande:'a[href="index.html#demande"].d-link',
+      monProfil:'#drawer-profil',
+      tableauBord:'#drawer-admin',
+      connexion:'a[href="connexion.html"].d-link'
+    };
+    function applyLang(lang){
+      var dict=I18N[lang]||I18N.fr;
+      Object.keys(LANG_MAP).forEach(function(key){
+        var el=document.querySelector(LANG_MAP[key]);
+        if(el){
+          var icon=el.querySelector('.ic');
+          el.textContent='';
+          if(icon) el.appendChild(icon);
+          el.appendChild(document.createTextNode(dict[key]));
+        }
+      });
+      applyTheme(root.getAttribute('data-theme')==='light'?'light':'dark');
+    }
+    window.setLang=function(lang){
+      localStorage.setItem('pcinfo-lang',lang);
+      applyLang(lang);
+      if(typeof closeSheet==='function') closeSheet('lang-sheet');
+    };
+    applyLang(localStorage.getItem('pcinfo-lang')||'fr');
+  })();
   document.getElementById('drawer-close').addEventListener('click', closeDrawer);
   overlay.addEventListener('click', closeDrawer);
 
