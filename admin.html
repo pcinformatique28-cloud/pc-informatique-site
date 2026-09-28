@@ -111,8 +111,20 @@ nav{background:linear-gradient(120deg,#12142b 0%,#1b1e3d 60%,#12142b 100%)!impor
   <div class="modebar" style="display:flex;gap:8px;margin:14px 0;justify-content:center;">
     <div class="tab on" id="mode-demandes">Demandes</div>
     <div class="tab" id="mode-projets">Projets membres</div>
+    <div class="tab" id="mode-partenaires">Partenaires</div>
   </div>
-  <div id="sec-demandes">
+  <div id="sec-partenaires" style="display:none">
+  <div class="pt-card">
+    <h3>Partenaires &amp; sponsors</h3>
+    <input type="text" id="pt-nom" maxlength="60" placeholder="Nom de l'entreprise">
+    <input type="file" id="pt-file" accept="image/*">
+    <img id="pt-prev" class="pt-prev" alt="">
+    <button type="button" class="pt-btn" id="pt-add">Ajouter</button>
+    <div class="pt-msg" id="pt-msg"></div>
+  </div>
+  <div id="pt-list"></div>
+</div>
+<div id="sec-demandes">
   <div class="tabs">
     <div class="tab" data-f="nouveau">🕓 Nouvelles</div>
     <div class="tab" data-f="valide">✅ Validées</div>
@@ -440,3 +452,96 @@ function goToProjet(id){
 </script>
 
 </html>
+
+<!-- PATCH-ADMIN-PARTENAIRES -->
+<style>
+.modebar{flex-wrap:wrap}
+.pt-card{border:1px solid rgba(127,127,127,.35);border-radius:14px;padding:14px;margin:0 0 14px;background:var(--card,transparent)}
+.pt-card h3{margin:0 0 10px;font-size:1rem}
+.pt-card input[type=text]{width:100%;box-sizing:border-box;padding:11px 12px;border-radius:10px;border:1px solid rgba(127,127,127,.45);background:rgba(127,127,127,.12);color:inherit;font:inherit;margin-bottom:10px}
+.pt-card input[type=file]{width:100%;margin-bottom:10px;font:inherit;color:inherit}
+.pt-prev{height:48px;max-width:140px;object-fit:contain;border-radius:8px;display:none;margin:0 0 10px}
+.pt-btn{padding:11px 18px;border:0;border-radius:12px;font:inherit;font-weight:700;cursor:pointer;color:#000;background:linear-gradient(90deg,#33d9c4,#ff4fa3)}
+.pt-btn[disabled]{opacity:.5}
+.pt-msg{margin-top:8px;font-size:.85rem;min-height:1.1em}
+.pt-item{display:flex;align-items:center;gap:12px;border:1px solid rgba(127,127,127,.35);border-radius:12px;padding:8px 12px;margin-bottom:8px;background:var(--card,transparent)}
+.pt-item img{height:40px;max-width:90px;object-fit:contain;border-radius:6px}
+.pt-item .pt-n{flex:1;font-weight:700;overflow:hidden;text-overflow:ellipsis}
+.pt-del{border:1px solid rgba(255,92,92,.7);color:#ff5c5c;background:transparent;border-radius:10px;padding:6px 10px;font:inherit;cursor:pointer}
+</style>
+<script>
+(function () {
+  function $(id) { return document.getElementById(id); }
+  var DB = (typeof db !== "undefined") ? db : firebase.firestore();
+  var tabP = $("mode-partenaires"), secP = $("sec-partenaires");
+  if (!tabP || !secP) return;
+  var others = ["mode-demandes", "mode-projets"], secs = ["sec-demandes", "sec-projets"];
+  tabP.addEventListener("click", function () {
+    others.forEach(function (id) { $(id).classList.remove("on"); });
+    secs.forEach(function (id) { $(id).style.display = "none"; });
+    tabP.classList.add("on"); secP.style.display = "block";
+  });
+  others.forEach(function (id) {
+    $(id).addEventListener("click", function () { tabP.classList.remove("on"); secP.style.display = "none"; });
+  });
+
+  var thumb = null;
+  function msg(t, bad) { var m = $("pt-msg"); m.textContent = t; m.style.color = bad ? "#ff5c5c" : "#2fbf71"; }
+  function resize(file, max) {
+    return new Promise(function (res, rej) {
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function () {
+        var r = Math.min(max / img.width, max / img.height, 1), c = document.createElement("canvas");
+        c.width = Math.max(1, Math.round(img.width * r));
+        c.height = Math.max(1, Math.round(img.height * r));
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        res(c.toDataURL("image/webp", 0.85));
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); rej(new Error("image")); };
+      img.src = url;
+    });
+  }
+  $("pt-file").addEventListener("change", function () {
+    var f = this.files && this.files[0], p = $("pt-prev");
+    thumb = null; p.style.display = "none";
+    if (!f) return;
+    if (!/^image\//.test(f.type)) { msg("Fichier non valide (image attendue).", true); this.value = ""; return; }
+    resize(f, 160).then(function (d) { thumb = d; p.src = d; p.style.display = "block"; msg(""); })
+      .catch(function () { msg("Image illisible.", true); });
+  });
+  $("pt-add").addEventListener("click", function () {
+    var nom = $("pt-nom").value.trim(), b = this;
+    if (!nom) { msg("Écris le nom de l'entreprise.", true); return; }
+    var d = { nom: nom, ts: Date.now() };
+    if (thumb) d.logo = thumb;
+    b.disabled = true; msg("Enregistrement...");
+    DB.collection("partenaires").add(d).then(function () {
+      $("pt-nom").value = ""; $("pt-file").value = ""; $("pt-prev").style.display = "none"; thumb = null;
+      msg("Partenaire ajouté.");
+    }).catch(function (e) {
+      msg(e && e.code === "permission-denied" ? "Refusé : compte non admin ou règles Firestore non publiées." : "Erreur : " + (e && e.message || e), true);
+    }).then(function () { b.disabled = false; });
+  });
+
+  var list = $("pt-list");
+  DB.collection("partenaires").orderBy("ts").onSnapshot(function (snap) {
+    list.textContent = "";
+    if (snap.empty) {
+      var e = document.createElement("div"); e.className = "pt-msg";
+      e.textContent = "Aucun partenaire pour l'instant."; list.appendChild(e); return;
+    }
+    snap.forEach(function (d) {
+      var x = d.data(), row = document.createElement("div"); row.className = "pt-item";
+      if (x.logo) { var im = document.createElement("img"); im.src = x.logo; im.alt = ""; row.appendChild(im); }
+      var n = document.createElement("span"); n.className = "pt-n"; n.textContent = x.nom || ""; row.appendChild(n);
+      var del = document.createElement("button"); del.type = "button"; del.className = "pt-del"; del.textContent = "Supprimer";
+      del.onclick = function () {
+        if (confirm("Supprimer " + (x.nom || "ce partenaire") + " ?"))
+          DB.collection("partenaires").doc(d.id).delete().catch(function () { msg("Suppression refusée.", true); });
+      };
+      row.appendChild(del); list.appendChild(row);
+    });
+  }, function () { list.textContent = "Lecture impossible : publie d'abord les règles Firestore (partenaires)."; });
+})();
+</script>
