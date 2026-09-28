@@ -8,7 +8,7 @@ try{
 }catch(e){}
 try{ if(!force&&window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return; }catch(e){}
 
-var MIN=3000, FADE=600, MAXW=5000;
+var MIN=10000, FADE=600, MAXW=10500;
 var vw=window.innerWidth||360, vh=window.innerHeight||640;
 function rnd(a,b){return a+Math.random()*(b-a);}
 function clamp(v,a,b){return v<a?a:(v>b?b:v);}
