@@ -58,9 +58,8 @@ service cloud.firestore {
 
       // Un membre crée uniquement son propre document, à l'inscription
       allow create: if isSignedIn() && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['nom','email','bio','photoURL','createdAt','actif','cguAcceptees','cguDate'])
+        && request.resource.data.keys().hasOnly(['nom','bio','photoURL','createdAt','actif','cguAcceptees','cguDate'])
         && request.resource.data.nom is string && request.resource.data.nom.size() > 0 && request.resource.data.nom.size() < 100
-        && (!('email' in request.resource.data) || request.resource.data.email is string)
         && request.resource.data.actif == true;
 
       // Un membre modifie son propre profil, mais ne peut pas se désactiver
