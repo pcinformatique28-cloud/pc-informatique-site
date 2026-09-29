@@ -122,10 +122,11 @@ document.getElementById('btn-submit').addEventListener('click', async ()=>{
     const cred = await auth.createUserWithEmailAndPassword(email, pass);
     await db.collection('membres').doc(cred.user.uid).set({
       cguAcceptees: true, cguDate: new Date().toISOString(),
-      nom, email, bio:"", photoURL:"",
+      nom, bio:"", photoURL:"",
       actif:true,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
+    await db.collection('membres_prive').doc(cred.user.uid).set({ email });
     showMsg("Compte créé ! Redirection…", true);
     setTimeout(()=> location.href = 'profil.html', 800);
   }catch(err){

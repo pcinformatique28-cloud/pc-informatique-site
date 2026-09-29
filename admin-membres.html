@@ -269,6 +269,11 @@ async function loadMembres(){
     return;
   }
 
+  const privSnap = await db.collection('membres_prive').get();
+  const emailMap = {};
+  privSnap.forEach(d => { emailMap[d.id] = d.data().email || ''; });
+  membres.forEach(m => { m.email = emailMap[m.id] || m.email || ''; });
+
   list.innerHTML = membres.map(m => `
     <div class="row">
       <img class="avatar" src="${m.photoURL || DEFAULT_AVATAR}" alt="">
