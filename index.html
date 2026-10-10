@@ -856,25 +856,103 @@ render();
 
 <script>
 (function(){
+  var NB = window.__nbState = window.__nbState || {offs:[],panel:null,render:null,bound:false,unlocked:false,ctx:null,tok:0};
+  var RKEY = 'pcinfo_alerts_read';
+  function nbPrefs(){ try{ return JSON.parse(localStorage.getItem('notif_prefs')||'{}'); }catch(e){ return {}; } }
+  function nbOn(k){ return nbPrefs()[k] !== false; }
+  function nbLoad(){ try{ return JSON.parse(localStorage.getItem(RKEY)||'[]'); }catch(e){ return []; } }
+  function nbSave(l){ try{ localStorage.setItem(RKEY, JSON.stringify(l.slice(-300))); }catch(e){} }
+  function nbRing(type){
+    if(!nbOn(type)) return;
+    if(NB.unlocked){ try{
+      NB.ctx = NB.ctx || new (window.AudioContext||window.webkitAudioContext)();
+      [880,1175].forEach(function(f,i){ var o=NB.ctx.createOscillator(), g=NB.ctx.createGain(); o.frequency.value=f; o.connect(g); g.connect(NB.ctx.destination); var t=NB.ctx.currentTime+i*0.18; g.gain.setValueAtTime(0.2,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.17); o.start(t); o.stop(t+0.18); });
+    }catch(e){} }
+    if(navigator.vibrate) navigator.vibrate([200,100,200]);
+  }
+  function nbTs(d){ var v=d.createdAt||d.ts||d.date; try{ if(v&&v.toMillis) return v.toMillis(); if(typeof v==='number') return v; }catch(e){} return 0; }
+  function nbPanel(){
+    if(NB.panel) return NB.panel;
+    var p=document.createElement('div');
+    p.style.cssText='position:fixed;top:100px;right:8px;z-index:9999;width:300px;max-width:94vw;max-height:65vh;overflow-y:auto;background:var(--card,#12142b);color:var(--text,#fff);border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:8px;display:none;font-size:14px;box-shadow:0 8px 28px rgba(0,0,0,.35)';
+    document.body.appendChild(p); NB.panel=p; return p;
+  }
+  function stopIndexNotifs(){
+    NB.tok++;
+    NB.offs.forEach(function(o){ try{o()}catch(e){} }); NB.offs=[]; NB.render=null;
+    var b=document.getElementById('notif-bell-badge'); if(b) b.style.display='none';
+    if(NB.panel) NB.panel.style.display='none';
+  }
   function startIndexNotifs(uid){
     var db = firebase.firestore();
     var badge = document.getElementById('notif-bell-badge');
     if(!badge) return;
-    badge.style.display='none';
-    (window.__nbOffs||[]).forEach(function(o){try{o()}catch(e){}});
-    window.__nbOffs=[];
-    db.collection('admins').doc(uid).get().then(function(a){
-      if(!a.exists) return;
-      var c=[0,0];
-      function upd(){var n=c[0]+c[1];if(n>0){badge.textContent=n>99?'99+':n;badge.style.display='inline-block';}else{badge.style.display='none';}}
-      window.__nbOffs.push(db.collection('demandes').where('status','==','nouveau').onSnapshot(function(sn){c[0]=sn.size;upd();},function(){}));
-      window.__nbOffs.push(db.collection('projets').where('statut','==','en_attente').onSnapshot(function(sn){c[1]=sn.size;upd();},function(){}));
-    }).catch(function(){});
+    stopIndexNotifs();
+    var tok = NB.tok;
+    var read = nbLoad(), per = {}, seen = {}, known = null, items = [], total = 0;
+    function visible(){ return items.filter(function(a){ return nbOn(a.type); }); }
+    function unread(){ return visible().filter(function(a){ return read.indexOf(a.id) < 0; }); }
+    function render(){
+      var un = unread();
+      if(un.length>0){ badge.textContent = un.length>99?'99+':un.length; badge.style.display='inline-block'; } else { badge.style.display='none'; }
+      var p = nbPanel(); p.textContent='';
+      var h=document.createElement('div'); h.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:4px 6px 8px';
+      var t=document.createElement('b'); t.textContent='Notifications'; h.appendChild(t);
+      if(un.length){ var m=document.createElement('a'); m.href='#'; m.textContent='Tout marquer comme lu'; m.style.cssText='font-size:12px;color:#33d9c4';
+        m.onclick=function(e){ e.preventDefault(); visible().forEach(function(a){ if(read.indexOf(a.id)<0) read.push(a.id); }); nbSave(read); render(); }; h.appendChild(m); }
+      p.appendChild(h);
+      var vis = visible();
+      if(!vis.length){ var e0=document.createElement('p'); e0.style.cssText='opacity:.7;padding:6px'; e0.textContent='Rien de nouveau.'; p.appendChild(e0); }
+      vis.forEach(function(a){
+        var isU = read.indexOf(a.id) < 0, r=document.createElement('div');
+        r.style.cssText='padding:8px;border-radius:8px;margin-bottom:4px;cursor:pointer;'+(isU?'background:rgba(255,255,255,.1);font-weight:700':'opacity:.6');
+        var l1=document.createElement('div'); l1.textContent=a.title;
+        var l2=document.createElement('div'); l2.style.cssText='font-size:12px;font-weight:400;opacity:.8'; l2.textContent=a.body;
+        r.appendChild(l1); r.appendChild(l2);
+        r.onclick=function(){ if(read.indexOf(a.id)<0){ read.push(a.id); nbSave(read); } p.style.display='none'; render(); location.href=a.link; };
+        p.appendChild(r);
+      });
+    }
+    NB.render = render;
+    function feed(i, docs){
+      per[i]=docs; seen[i]=1;
+      items=[].concat.apply([], Object.keys(per).map(function(k){ return per[k]; })).sort(function(a,b){ return b.at-a.at; });
+      if(Object.keys(seen).length < total){ render(); return; }
+      if(known===null){ known={}; items.forEach(function(a){ known[a.id]=1; }); render(); return; }
+      items.forEach(function(a){ if(!known[a.id]){ known[a.id]=1; if(read.indexOf(a.id)<0) nbRing(a.type); } });
+      render();
+    }
+    function sub(q, i, mk){ NB.offs.push(q.onSnapshot(function(sn){ feed(i, sn.docs.map(function(d){ return mk(d.id, d.data()); })); }, function(){})); }
+    function go(admin){
+      if(tok !== NB.tok) return;
+      if(admin){
+        total = 2;
+        sub(db.collection('demandes').where('status','==','nouveau').limit(50), 0, function(id,d){ return {id:'dem-'+id, type:'demandes', title:'Nouvelle demande de projet', body:d.nom||'', link:'admin.html', at:nbTs(d)}; });
+        sub(db.collection('projets').where('statut','==','en_attente').limit(50), 1, function(id,d){ return {id:'proj-'+id, type:'projets', title:'Projet \u00e0 valider', body:d.titre||'', link:'admin.html', at:nbTs(d)}; });
+      } else {
+        total = 1;
+        sub(db.collection('projets').where('membreId','==',uid).where('vu','==',false).limit(50), 0, function(id,d){ return {id:'mp-'+id, type:'projets', title:'Mise \u00e0 jour de votre projet', body:(d.titre||'')+(d.statut?' \u00b7 '+d.statut:''), link:'profil.html', at:nbTs(d)}; });
+      }
+    }
+    db.collection('admins').doc(uid).get().then(function(a){ go(a.exists); }).catch(function(){ go(false); });
   }
   window.startIndexNotifs = startIndexNotifs;
-  document.getElementById('notif-bell').addEventListener('click', function(){
-    location.href = 'profil.html';
-  });
+  if(!NB.bound){
+    NB.bound = true;
+    document.addEventListener('pointerdown', function(){ NB.unlocked = true; }, {once:true});
+    document.getElementById('notif-bell').addEventListener('click', function(e){
+      e.stopPropagation();
+      var p = nbPanel(); if(NB.render) NB.render();
+      p.style.display = p.style.display==='block' ? 'none' : 'block';
+    });
+    document.addEventListener('click', function(e){
+      if(NB.panel && NB.panel.style.display==='block' && !NB.panel.contains(e.target)) NB.panel.style.display='none';
+    });
+    document.addEventListener('change', function(e){
+      if(e.target && /^notif-/.test(e.target.id||'') && NB.render) NB.render();
+    });
+    try{ firebase.auth().onAuthStateChanged(function(u){ if(!u) stopIndexNotifs(); }); }catch(e){}
+  }
 })();
 </script>
 
