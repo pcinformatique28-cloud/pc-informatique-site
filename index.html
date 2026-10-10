@@ -858,13 +858,18 @@ render();
 (function(){
   function startIndexNotifs(uid){
     var db = firebase.firestore();
-    db.collection('projets').where('membreId','==',uid).where('vu','==', false)
-      .onSnapshot(function(snap){
-        var badge = document.getElementById('notif-bell-badge');
-        if(!badge) return;
-        if(snap.size>0){ badge.textContent = snap.size; badge.style.display='inline-block'; }
-        else{ badge.style.display='none'; }
-      });
+    var badge = document.getElementById('notif-bell-badge');
+    if(!badge) return;
+    badge.style.display='none';
+    (window.__nbOffs||[]).forEach(function(o){try{o()}catch(e){}});
+    window.__nbOffs=[];
+    db.collection('admins').doc(uid).get().then(function(a){
+      if(!a.exists) return;
+      var c=[0,0];
+      function upd(){var n=c[0]+c[1];if(n>0){badge.textContent=n>99?'99+':n;badge.style.display='inline-block';}else{badge.style.display='none';}}
+      window.__nbOffs.push(db.collection('demandes').where('status','==','nouveau').onSnapshot(function(sn){c[0]=sn.size;upd();},function(){}));
+      window.__nbOffs.push(db.collection('projets').where('statut','==','en_attente').onSnapshot(function(sn){c[1]=sn.size;upd();},function(){}));
+    }).catch(function(){});
   }
   window.startIndexNotifs = startIndexNotifs;
   document.getElementById('notif-bell').addEventListener('click', function(){
