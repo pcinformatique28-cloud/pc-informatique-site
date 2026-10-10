@@ -436,5 +436,49 @@ document.getElementById('profil-bell').addEventListener('click', async ()=>{
   document.getElementById('projets-list').scrollIntoView({behavior:'smooth', block:'start'});
 });
 </script>
+<script>/*PATCH-MENU-PROFIL*/
+(function(){
+function light(){return document.documentElement.getAttribute('data-theme')==='light'}
+var css=document.createElement('style');
+css.textContent='#pm-btn{position:fixed;top:10px;left:10px;z-index:9000;width:40px;height:40px;border-radius:50%;border:2px solid #33d9c4;background:#12142b;color:#fff;font-size:20px;cursor:pointer;line-height:1}'
++'#pm-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9001;display:none}'
++'#pm-dr{position:fixed;top:0;left:0;bottom:0;width:280px;max-width:84vw;z-index:9002;background:#12142b;color:#f2f3fa;padding:14px 12px;overflow-y:auto;transform:translateX(-105%);transition:transform .25s;box-shadow:4px 0 24px rgba(0,0,0,.4)}'
++'#pm-dr.open{transform:none}#pm-ov.open{display:block}'
++'#pm-dr a{display:flex;align-items:center;gap:12px;padding:11px 10px;margin-bottom:6px;border-radius:12px;background:rgba(255,255,255,.06);color:inherit;text-decoration:none;font-size:.9rem}'
++'#pm-dr a span{width:30px;height:30px;line-height:30px;text-align:center;border-radius:50%;background:rgba(255,255,255,.9);color:#12142b}'
++'#pm-x{float:right;background:none;border:0;color:inherit;font-size:26px;cursor:pointer}'
++':root[data-theme="light"] #pm-dr{background:#fff;color:#12142b}:root[data-theme="light"] #pm-dr a{background:#f5f1e6}:root[data-theme="light"] #pm-dr a span{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}';
+document.head.appendChild(css);
+var btn=document.createElement('button');btn.id='pm-btn';btn.type='button';btn.setAttribute('aria-label','Menu');btn.textContent='\u2630';
+var ov=document.createElement('div');ov.id='pm-ov';
+var dr=document.createElement('aside');dr.id='pm-dr';
+var x=document.createElement('button');x.id='pm-x';x.type='button';x.textContent='\u00d7';dr.appendChild(x);
+var nav=document.createElement('nav');nav.style.clear='both';dr.appendChild(nav);
+function add(href,ic,label,id,hidden){var a=document.createElement('a');a.href=href;if(id)a.id=id;if(hidden)a.style.display='none';
+ var i=document.createElement('span');i.textContent=ic;a.appendChild(i);a.appendChild(document.createTextNode(label));nav.appendChild(a);return a}
+add('index.html','\uD83C\uDFE0','Accueil');
+add('profil.html','\uD83D\uDC64','Mon profil');
+var adm=add('admin.html','\u2699','Tableau de bord','pm-admin',true);
+add('index.html#realisations','\uD83D\uDCC1','R\u00e9alisations');
+add('index.html#demande','\u2795','Nouvelle demande');
+add('index.html','\uD83D\uDD14','Param\u00e8tres notifications (accueil)');
+add('index.html','\uD83C\uDF10','Langue / Language (accueil)');
+var out=add('#','\uD83D\uDEAA','D\u00e9connexion','pm-out',true);out.style.color='#ff6b6b';
+var th=add('#','\uD83C\uDF19','Mode clair','pm-theme');
+function lab(){th.lastChild.nodeValue=light()?'Mode sombre':'Mode clair';th.firstChild.textContent=light()?'\u2600':'\uD83C\uDF19'}
+th.onclick=function(e){e.preventDefault();var l=!light();if(l)document.documentElement.setAttribute('data-theme','light');else document.documentElement.removeAttribute('data-theme');try{localStorage.setItem('pcinfo-theme',l?'light':'dark')}catch(er){}lab()};
+lab();
+function openM(){dr.classList.add('open');ov.classList.add('open')}
+function closeM(){dr.classList.remove('open');ov.classList.remove('open')}
+btn.onclick=openM;ov.onclick=closeM;x.onclick=closeM;
+function mount(){document.body.appendChild(btn);document.body.appendChild(ov);document.body.appendChild(dr)}
+if(document.body)mount();else document.addEventListener('DOMContentLoaded',mount);
+function wire(){try{firebase.auth().onAuthStateChanged(function(u){
+ out.style.display=u?'flex':'none';
+ if(u){try{firebase.firestore().collection('admins').doc(u.uid).get().then(function(d){adm.style.display=d.exists?'flex':'none'}).catch(function(){})}catch(e){}}
+ else adm.style.display='none'})}catch(e){}}
+out.onclick=function(e){e.preventDefault();try{firebase.auth().signOut().then(function(){location.href='index.html'})}catch(er){location.href='index.html'}};
+if(window.firebase&&firebase.auth)wire();else window.addEventListener('load',function(){if(window.firebase)wire()});
+})();</script>
 </body>
 </html>
