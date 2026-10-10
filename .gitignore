@@ -20,3 +20,5 @@ fix_*.py
 dedupe_*.py
 theme_*.py
 apply_*.sh
+patch-*.mjs
+notif-admin.html
