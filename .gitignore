@@ -10,3 +10,13 @@ images/icon-preview.png
 *.bak4
 __pycache__/
 *.pyc
+
+__pycache__/
+*.bak
+*.bak[0-9]
+*.bak-*
+patch_*.py
+fix_*.py
+dedupe_*.py
+theme_*.py
+apply_*.sh
