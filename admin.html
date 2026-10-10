@@ -871,6 +871,75 @@ body{padding-bottom:96px}
   if(lst){var tm=null; new MutationObserver(function(){clearTimeout(tm);tm=setTimeout(apply,150);}).observe(lst,{childList:true});}
 })();
 </script>
+<script>/*PATCH-NOTIF-1*/
+(function(){
+var KEY='pcinfo_alerts_read';
+function lr(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return []}}
+function sr(l){try{localStorage.setItem(KEY,JSON.stringify(l.slice(-300)))}catch(e){}}
+var read=lr(),per={},seen={},known=null,offs=[],ctx=null,unlocked=false,items=[];
+window.addEventListener('pointerdown',function(){unlocked=true;try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)()}catch(e){}},{once:true});
+function ring(){
+  if(unlocked&&ctx){try{[880,1175].forEach(function(f,i){var o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=f;o.connect(g);g.connect(ctx.destination);var t=ctx.currentTime+i*0.18;g.gain.setValueAtTime(0.2,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.17);o.start(t);o.stop(t+0.18)})}catch(e){}}
+  if(navigator.vibrate)navigator.vibrate([200,100,200]);
+}
+function ts(d){var v=d.createdAt||d.ts||d.date;try{if(v&&v.toMillis)return v.toMillis();if(typeof v==='number')return v}catch(e){}return 0}
+var btn=document.createElement('button');
+btn.type='button';btn.setAttribute('aria-label','Notifications');
+btn.style.cssText='position:fixed;top:10px;right:10px;z-index:9998;display:none;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:#12142b;color:#fff;font-size:20px;cursor:pointer';
+btn.textContent='\uD83D\uDD14';
+var bd=document.createElement('span');
+bd.style.cssText='position:absolute;top:-4px;right:-4px;min-width:18px;border-radius:9px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;line-height:18px;padding:0 4px;display:none';
+btn.appendChild(bd);
+var pn=document.createElement('div');
+pn.style.cssText='position:fixed;top:60px;right:8px;z-index:9999;width:300px;max-width:94vw;max-height:70vh;overflow-y:auto;background:#12142b;color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:8px;display:none;font-size:14px';
+function mount(){document.body.appendChild(btn);document.body.appendChild(pn)}
+if(document.body)mount();else document.addEventListener('DOMContentLoaded',mount);
+btn.onclick=function(){pn.style.display=pn.style.display==='none'?'block':'none'};
+function render(){
+  var un=items.filter(function(a){return read.indexOf(a.id)<0});
+  bd.textContent=un.length>99?'99+':un.length;bd.style.display=un.length?'block':'none';
+  pn.textContent='';
+  var h=document.createElement('div');h.style.cssText='display:flex;justify-content:space-between;padding:4px 6px 8px';
+  var t=document.createElement('b');t.textContent='Notifications';h.appendChild(t);
+  if(un.length){var m=document.createElement('a');m.href='#';m.textContent='Tout marquer lu';m.style.color='#9fd';m.onclick=function(e){e.preventDefault();items.forEach(function(a){if(read.indexOf(a.id)<0)read.push(a.id)});sr(read);render()};h.appendChild(m)}
+  pn.appendChild(h);
+  if(!items.length){var e0=document.createElement('p');e0.style.opacity='.7';e0.textContent='Rien de nouveau.';pn.appendChild(e0)}
+  items.forEach(function(a){
+    var isU=read.indexOf(a.id)<0,r=document.createElement('div');
+    r.style.cssText='padding:8px;border-radius:8px;margin-bottom:4px;cursor:pointer;'+(isU?'background:rgba(255,255,255,.1);font-weight:600':'opacity:.6');
+    var l1=document.createElement('div');l1.textContent=a.title;
+    var l2=document.createElement('div');l2.style.cssText='font-size:12px;font-weight:400;opacity:.8';l2.textContent=a.body;
+    r.appendChild(l1);r.appendChild(l2);
+    r.onclick=function(){if(read.indexOf(a.id)<0){read.push(a.id);sr(read)}render()};
+    pn.appendChild(r);
+  });
+}
+function stop(){offs.forEach(function(o){try{o()}catch(e){}});offs=[];per={};seen={};known=null;items=[];btn.style.display='none';pn.style.display='none'}
+function start(user){
+  var DB=(typeof db!=="undefined")?db:firebase.firestore();
+  DB.collection('admins').doc(user.uid).get().then(function(s){
+    if(!s.exists)return;
+    btn.style.display='block';
+    var srcs=[
+      {q:DB.collection('demandes').where('status','==','nouveau').limit(50),m:function(id,d){return{id:'dem-'+id,title:'Nouvelle demande de projet',body:d.nom||'',at:ts(d)}}},
+      {q:DB.collection('projets').where('statut','==','en_attente').limit(50),m:function(id,d){return{id:'proj-'+id,title:'Projet \u00e0 valider',body:d.titre||'',at:ts(d)}}}
+    ];
+    srcs.forEach(function(sc,i){
+      offs.push(sc.q.onSnapshot(function(snap){
+        per[i]=snap.docs.map(function(d){return sc.m(d.id,d.data())});seen[i]=1;
+        items=[].concat(per[0]||[],per[1]||[]).sort(function(a,b){return b.at-a.at});
+        if(Object.keys(seen).length<srcs.length){render();return}
+        if(known===null){known={};items.forEach(function(a){known[a.id]=1});render();return}
+        items.forEach(function(a){if(!known[a.id]){known[a.id]=1;if(read.indexOf(a.id)<0)ring()}});
+        render();
+      },function(){}));
+    });
+  }).catch(function(){});
+}
+function boot(){firebase.auth().onAuthStateChanged(function(u){stop();if(u)start(u)})}
+if(window.firebase&&firebase.auth)boot();else window.addEventListener('load',function(){if(window.firebase)boot()});
+})();
+</script>
 <script src="qr-widget.js"></script>
 <script src="pwd-eye.js"></script>
 <script>
