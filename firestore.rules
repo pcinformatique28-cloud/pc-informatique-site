@@ -115,6 +115,16 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Jetons d'alertes telephone : chacun cree/supprime les siens, personne ne lit.
+    // Le relais Cloudflare lit via le compte de service (hors regles).
+    match /pushTokens/{token} {
+      allow create, update: if isSignedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid','createdAt']);
+      allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow read: if false;
+    }
+
     // Visites (tracking) : creation publique strictement bornee, lecture admin
     match /visites/{id} {
       allow create: if request.resource.data.keys().hasOnly(['vid','nom','ts','jour','heure','ville','pays','page','lang','appareil','ref'])
