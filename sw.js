@@ -1,5 +1,5 @@
-const CACHE_NAME = "pc-informatique-v1791646832";
-const CORE_ASSETS = [
+const CACHE_NAME = "pc-informatique-v1791703912";
+const CORE_ASSETS = ["./guide-widget.js", 
   "./index.html",
   "./images/icon-192.png",
   "./images/icon-512.png"
