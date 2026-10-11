@@ -79,7 +79,7 @@
       '.gw-toast.gw-hide{opacity:0;transform:translateY(8px)}' +
       '.gw-fab{left:12px;bottom:calc(96px + env(safe-area-inset-bottom,0px));border-radius:999px;padding:8px 16px;font-size:14px;font-weight:600;cursor:pointer}' +
       '.gw-round{width:36px;height:36px;border-radius:50%;border:1px solid ' + gold60 + ';background:none;color:' + C.gold + ';cursor:pointer;font-size:16px;flex-shrink:0}' +
-      '.gw-ov{position:fixed;inset:0;z-index:99995;overflow-y:auto;background:linear-gradient(rgba(6,12,38,.92),rgba(6,12,38,.95));font-family:inherit;-webkit-overflow-scrolling:touch}' +
+      '.gw-ov{position:fixed;inset:0;z-index:99995;overflow-y:auto;background:#0b1230;font-family:inherit;-webkit-overflow-scrolling:touch}' +
       '.gw-box{max-width:448px;margin:0 auto;padding:20px 16px 40px;color:' + C.ivory + '}' +
       '.gw-head{display:flex;align-items:center;gap:8px;margin-bottom:16px}' +
       '.gw-title{flex:1;padding-left:36px;text-align:center;font-size:24px;font-weight:500;color:' + C.gold + ';margin:0}' +
@@ -164,7 +164,8 @@
   }
 
   function showToast() {
-    if (CONFIG.toast.oncePerSession) {
+    var forced = /[?&]guide=1/.test(location.search);
+    if (CONFIG.toast.oncePerSession && !forced) {
       try {
         if (sessionStorage.getItem('gwSeen')) return;
         sessionStorage.setItem('gwSeen', '1');
@@ -182,6 +183,24 @@
     var t = toastEl;
     setTimeout(function () { if (t === toastEl && t) t.classList.add('gw-hide'); }, CONFIG.toast.durationMs);
     setTimeout(function () { if (t === toastEl) hideToast(); }, CONFIG.toast.durationMs + 500);
+  }
+
+  function splashVisible() {
+    var e = document.querySelector('[id*="splash"],[class*="splash"]');
+    if (!e) return false;
+    var cs = getComputedStyle(e);
+    return cs.display !== 'none' && cs.visibility !== 'hidden' && parseFloat(cs.opacity) > 0.05 && e.offsetHeight > 0;
+  }
+
+  function scheduleToast() {
+    var waited = 0;
+    function go() { setTimeout(showToast, CONFIG.toast.delayMs); }
+    function wait() {
+      if (splashVisible() && waited < 12000) { waited += 300; setTimeout(wait, 300); }
+      else go();
+    }
+    if (document.readyState === 'complete') wait();
+    else window.addEventListener('load', wait);
   }
 
   function addMenuLine() {
@@ -218,7 +237,7 @@
       fab.addEventListener('click', function () { open(CONFIG.adminRole); });
       document.body.appendChild(fab);
     } else if (isHome) {
-      setTimeout(showToast, CONFIG.toast.delayMs);
+      scheduleToast();
     }
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeGuide(); });
   }
