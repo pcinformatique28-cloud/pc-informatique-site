@@ -96,6 +96,10 @@ nav{background:linear-gradient(120deg,#12142b 0%,#1b1e3d 60%,#12142b 100%)!impor
 /* ===== PATCH v8 : cercles parfaitement ronds ===== */
 .brand img{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.icon-btn{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.drawer .d-user img{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.drawer a.d-link .ic{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.about-creator .ac-avatar{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.success .tick{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.d-user img{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}.d-link .ic{flex-shrink:0!important;aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;}
 </style>
+<script>
+function escA(x){return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function safeUrl(u){u=String(u==null?'':u).trim();return /^https?:\/\//i.test(u)?escA(u):'#'}
+</script>
 </head>
 <body>
 <div id="pcp-wait" style="text-align:center;padding:48px 16px;color:#9aa0b4;font-family:system-ui,sans-serif">Chargement...</div>
@@ -315,7 +319,7 @@ function openSheet(d){
     <div class="row"><b>Nom commercial :</b> ${d.nomCommercial||'-'} · <b>Slogan :</b> ${d.slogan||'-'}</div>
     <div class="row"><b>Devise :</b> ${d.devise||'-'} · <b>Couleurs :</b> ${d.couleur1||''} / ${d.couleur2||''}</div>
     <div class="row"><b>Textes fournis :</b> ${d.textes ? d.textes : '—'}</div>
-    <div class="thumbs">${(d.images||[]).map(i=>`<img src="${i}">`).join('')}</div>
+    <div class="thumbs">${(d.images||[]).map(i=>`<img src="${escA(i)}">`).join('')}</div>
     <div class="plan"><h4>🛠️ Feuille de route (outils gratuits)</h4><ol>${plan.map(s=>`<li>${s}</li>`).join('')}</ol></div>
     ${d.status==='nouveau' ? `
       <div class="actions">
@@ -380,13 +384,13 @@ function renderProjets(){
   const items = filterP==='all' ? ALLP : ALLP.filter(p=>p.statut===filterP);
   if(!items.length){ list.innerHTML = '<div class="empty">Aucun projet ici pour le moment.</div>'; return; }
   list.innerHTML = items.map(p=>`
-    <div class="card ${p.statut==='en_attente'?'card-new':''}" data-id="${p.id}">
+    <div class="card ${p.statut==='en_attente'?'card-new':''}" data-id="${escA(p.id)}">
       <span class="badge b-${p.statut}">${p.statut}</span>
       <h4>${p.titre||'Sans titre'}</h4>
       <p>${p.type||'-'}</p>
       <p>${p.description||''}</p>
-      ${p.imageURL ? `<div class="thumbs"><img src="${p.imageURL}"></div>` : ''}
-      ${p.lien ? `<p><a href="${p.lien}" target="_blank" style="color:var(--teal)">${p.lien}</a></p>` : ''}
+      ${p.imageURL ? `<div class="thumbs"><img src="${escA(p.imageURL)}"></div>` : ''}
+      ${p.lien ? `<p><a href="${safeUrl(p.lien)}" target="_blank" style="color:var(--teal)">${escA(p.lien)}</a></p>` : ''}
       ${p.statut==='en_attente' ? `
         <div class="actions">
           <button class="btn primary" onclick="decideProjet('${p.id}','valide')">Valider</button>
@@ -676,7 +680,7 @@ function goToProjet(id){
   var data=[],map={},started=false,month=new Date().toISOString().slice(0,7);
   function ok(d){return d.status==="valide"||d.statut==="valide";}
   function inM(d){return !month||String(d.createdAt||"").slice(0,7)===month;}
-  function esc(x){return String(x).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
+  function esc(x){return escA(x)}function esc_old(x){return String(x).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
   function count(list,kf){var m={};list.forEach(function(d){kf(d).forEach(function(k){m[k]=m[k]||{a:0,v:0};m[k].a++;if(ok(d))m[k].v++;});});return m;}
   function sorted(m){return Object.keys(m).sort(function(a,b){return m[b].a-m[a].a;});}
   function bars(m,ks,color){

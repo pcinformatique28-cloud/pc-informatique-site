@@ -99,6 +99,10 @@ header{background:var(--surface)!important;border-bottom:1px solid var(--border)
 header button{background:none!important;color:var(--muted)!important;border-color:var(--border)!important;}
 input,textarea,select{background:#232748!important;color:#f2f3fa!important;border-color:var(--border)!important;}
 </style>
+<script>
+function escA(x){return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function safeUrl(u){u=String(u==null?'':u).trim();return /^https?:\/\//i.test(u)?escA(u):'#'}
+</script>
 </head>
 <body>
 <header>
@@ -159,7 +163,7 @@ function gateMsg(text, ok){
   el.textContent = text;
   el.className = 'gmsg ' + (ok ? 'ok' : 'err');
 }
-function escapeHtml(str){
+function escapeHtml(str){return escA(str);
   return (str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
@@ -211,18 +215,18 @@ function renderProjets(){
     const membre = membresIndex[p.membreId] || {};
     return `
     <div class="row">
-      <img class="avatar" src="${membre.photoURL || DEFAULT_AVATAR}" alt="">
+      <img class="avatar" src="${escA(membre.photoURL || DEFAULT_AVATAR)}" alt="">
       <div class="body">
         <div class="title">${escapeHtml(p.titre)} <span class="badge type">${typeLabel[p.type]||p.type}</span></div>
         <div class="sub">Par ${escapeHtml(membre.nom || 'Membre inconnu')} · <span class="badge ${p.statut}">${statutLabel[p.statut]||p.statut}</span></div>
         ${p.description ? `<div class="desc">${escapeHtml(p.description)}</div>` : ''}
-        ${p.imageURL ? `<img class="thumb" src="${p.imageURL}" alt="">` : ''}
-        ${p.lien ? `<div class="sub"><a href="${escapeHtml(p.lien)}" target="_blank" rel="noopener">${escapeHtml(p.lien)}</a></div>` : ''}
+        ${p.imageURL ? `<img class="thumb" src="${escA(p.imageURL)}" alt="">` : ''}
+        ${p.lien ? `<div class="sub"><a href="${safeUrl(p.lien)}" target="_blank" rel="noopener">${escapeHtml(p.lien)}</a></div>` : ''}
       </div>
       <div class="actions">
-        <button class="btn-sm ok" data-action="valider" data-id="${p.id}">Valider</button>
-        <button class="btn-sm no" data-action="refuser" data-id="${p.id}">Refuser</button>
-        <button class="btn-sm no" data-action="supprimer" data-id="${p.id}">Suppr.</button>
+        <button class="btn-sm ok" data-action="valider" data-id="${escA(p.id)}">Valider</button>
+        <button class="btn-sm no" data-action="refuser" data-id="${escA(p.id)}">Refuser</button>
+        <button class="btn-sm no" data-action="supprimer" data-id="${escA(p.id)}">Suppr.</button>
       </div>
     </div>`;
   }).join('');
@@ -278,17 +282,17 @@ async function loadMembres(){
 
   list.innerHTML = membres.map(m => `
     <div class="row">
-      <img class="avatar" src="${m.photoURL || DEFAULT_AVATAR}" alt="">
+      <img class="avatar" src="${escA(m.photoURL || DEFAULT_AVATAR)}" alt="">
       <div class="body">
         <div class="title">${escapeHtml(m.nom || 'Sans nom')} ${m.actif === false ? '<span class="badge refuse">Désactivé</span>' : ''}</div>
         <div class="sub">${escapeHtml(m.email || '')}</div>
         ${m.bio ? `<div class="desc">${escapeHtml(m.bio)}</div>` : ''}
       </div>
       <div class="actions">
-        <button class="btn-sm ${m.actif === false ? 'ok' : 'no'}" data-action="toggle" data-id="${m.id}" data-actif="${m.actif !== false}">
+        <button class="btn-sm ${m.actif === false ? 'ok' : 'no'}" data-action="toggle" data-id="${escA(m.id)}" data-actif="${m.actif !== false}">
           ${m.actif === false ? 'Réactiver' : 'Désactiver'}
         </button>
-        <button class="btn-sm no" data-action="supprimer" data-id="${m.id}">Suppr.</button>
+        <button class="btn-sm no" data-action="supprimer" data-id="${escA(m.id)}">Suppr.</button>
       </div>
     </div>
   `).join('');

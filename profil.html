@@ -118,6 +118,10 @@ input,textarea,select{background:#232748!important;color:#f2f3fa!important;borde
 .badge.refuse{background:rgba(220,38,38,.15)!important;color:#f87171!important;}
 .badge.type{background:rgba(224,38,111,.15)!important;color:#ff8fc0!important;}
 </style>
+<script>
+function escA(x){return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function safeUrl(u){u=String(u==null?'':u).trim();return /^https?:\/\//i.test(u)?escA(u):'#'}
+</script>
 </head>
 <body>
 <header>
@@ -208,7 +212,7 @@ function showMsg(el, text, ok){
   el.className = 'msg ' + (ok ? 'ok' : 'err');
 }
 
-function escapeHtml(str){
+function escapeHtml(str){return escA(str);
   return (str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
@@ -342,10 +346,10 @@ async function loadProjets(){
         <span class="badge ${p.statut}">${statutLabel[p.statut]||p.statut}</span>
       </div>
       ${p.description ? `<div class="proj-desc">${escapeHtml(p.description)}</div>` : ''}
-      ${p.imageURL ? `<img src="${p.imageURL}" alt="" style="cursor:pointer;" data-edit-id="${p.id}">` : ''}
-      ${p.lien ? `<a class="lien" href="${escapeHtml(p.lien)}" target="_blank" rel="noopener">${escapeHtml(p.lien)}</a><br>` : ''}
-      <button class="btn-danger" data-id="${p.id}">Supprimer</button>
-      ${p.statut === 'en_attente' ? `<button class="btn-edit-projet" data-id="${p.id}" style="background:#2dd4bf;color:#0d0f16;font-weight:700;border:none;border-radius:8px;padding:8px 14px;margin-left:8px;cursor:pointer;">Modifier</button>` : ''}
+      ${p.imageURL ? `<img src="${escA(p.imageURL)}" alt="" style="cursor:pointer;" data-edit-id="${escA(p.id)}">` : ''}
+      ${p.lien ? `<a class="lien" href="${safeUrl(p.lien)}" target="_blank" rel="noopener">${escapeHtml(p.lien)}</a><br>` : ''}
+      <button class="btn-danger" data-id="${escA(p.id)}">Supprimer</button>
+      ${p.statut === 'en_attente' ? `<button class="btn-edit-projet" data-id="${escA(p.id)}" style="background:#2dd4bf;color:#0d0f16;font-weight:700;border:none;border-radius:8px;padding:8px 14px;margin-left:8px;cursor:pointer;">Modifier</button>` : ''}
     </div>
   `).join('');
 
