@@ -32,9 +32,31 @@ service cloud.firestore {
     // Désactivée pour l'instant (create: if false).
     // ------------------------------------------------------------------
     match /demandes/{id} {
-      allow create: if request.resource.data.nom is string
-        && request.resource.data.nom.size() > 0 && request.resource.data.nom.size() <= 100 && request.resource.data.keys().size() <= 40
-        && request.resource.data.status == 'nouveau';
+      allow create: if request.resource.data.keys().hasOnly(['nom','email','tel','structure','secteur','ville','type','features','description','budget','delai','nomCommercial','slogan','devise','couleur1','couleur2','textes','images','status','createdAt','lat','lng','precision'])
+        && request.resource.data.keys().hasAll(['nom','tel','status','createdAt'])
+        && request.resource.data.nom is string && request.resource.data.nom.size() > 0 && request.resource.data.nom.size() <= 100
+        && request.resource.data.tel is string && request.resource.data.tel.size() <= 40
+        && request.resource.data.status == 'nouveau'
+        && request.resource.data.createdAt is string && request.resource.data.createdAt.size() <= 40
+        && (!('email' in request.resource.data) || (request.resource.data.email is string && request.resource.data.email.size() <= 200))
+        && (!('structure' in request.resource.data) || (request.resource.data.structure is string && request.resource.data.structure.size() <= 150))
+        && (!('secteur' in request.resource.data) || (request.resource.data.secteur is string && request.resource.data.secteur.size() <= 80))
+        && (!('ville' in request.resource.data) || (request.resource.data.ville is string && request.resource.data.ville.size() <= 80))
+        && (!('type' in request.resource.data) || (request.resource.data.type is string && request.resource.data.type.size() <= 80))
+        && (!('description' in request.resource.data) || (request.resource.data.description is string && request.resource.data.description.size() <= 5000))
+        && (!('budget' in request.resource.data) || (request.resource.data.budget is string && request.resource.data.budget.size() <= 80))
+        && (!('delai' in request.resource.data) || (request.resource.data.delai is string && request.resource.data.delai.size() <= 80))
+        && (!('nomCommercial' in request.resource.data) || (request.resource.data.nomCommercial is string && request.resource.data.nomCommercial.size() <= 150))
+        && (!('slogan' in request.resource.data) || (request.resource.data.slogan is string && request.resource.data.slogan.size() <= 200))
+        && (!('devise' in request.resource.data) || (request.resource.data.devise is string && request.resource.data.devise.size() <= 30))
+        && (!('couleur1' in request.resource.data) || (request.resource.data.couleur1 is string && request.resource.data.couleur1.size() <= 12))
+        && (!('couleur2' in request.resource.data) || (request.resource.data.couleur2 is string && request.resource.data.couleur2.size() <= 12))
+        && (!('textes' in request.resource.data) || (request.resource.data.textes is string && request.resource.data.textes.size() <= 10000))
+        && (!('features' in request.resource.data) || (request.resource.data.features is list && request.resource.data.features.size() <= 30))
+        && (!('images' in request.resource.data) || (request.resource.data.images is list && request.resource.data.images.size() <= 12))
+        && (!('lat' in request.resource.data) || (request.resource.data.lat is number && request.resource.data.lat >= -90 && request.resource.data.lat <= 90))
+        && (!('lng' in request.resource.data) || (request.resource.data.lng is number && request.resource.data.lng >= -180 && request.resource.data.lng <= 180))
+        && (!('precision' in request.resource.data) || (request.resource.data.precision is number && request.resource.data.precision >= 0 && request.resource.data.precision <= 100000));
       allow read, update, delete: if isAdmin();
     }
 
