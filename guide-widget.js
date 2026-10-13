@@ -233,9 +233,21 @@
     injectCss();
     if (!addMenuLine()) setTimeout(addMenuLine, 1500);
     if (isAdminPage) {
-      var fab = h('button', { type: 'button', 'class': 'gw-pill gw-fab', text: CONFIG.fab.text });
-      fab.addEventListener('click', function () { open(CONFIG.adminRole); });
-      document.body.appendChild(fab);
+      var forcedA = /[?&]guide=1/.test(location.search), skipA = false;
+      try { if (!forcedA && sessionStorage.getItem('gwSeenAdmin')) skipA = true; else sessionStorage.setItem('gwSeenAdmin', '1'); } catch (e) {}
+      if (!skipA) {
+        var xA = h('button', { type: 'button', 'class': 'gw-round', 'aria-label': 'Fermer', style: 'width:28px;height:28px', text: '\u2715' });
+        var fab = h('div', { 'class': 'gw-pill', role: 'status', style: 'left:12px;right:12px;margin:0 auto;max-width:360px;top:45%;border-radius:16px;padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:opacity .4s' }, [
+          h('span', { 'aria-hidden': 'true', text: '\u2753' }),
+          h('b', { style: 'flex:1;font-weight:500', text: CONFIG.toast.text }),
+          xA
+        ]);
+        fab.addEventListener('click', function () { fab.remove(); open(CONFIG.adminRole); });
+        xA.addEventListener('click', function (e) { e.stopPropagation(); fab.remove(); });
+        document.body.appendChild(fab);
+        setTimeout(function () { fab.style.opacity = '0'; }, 8000);
+        setTimeout(function () { if (fab.parentNode) fab.remove(); }, 8500);
+      }
     } else if (isHome) {
       scheduleToast();
     }
