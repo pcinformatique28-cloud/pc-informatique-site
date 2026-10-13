@@ -651,7 +651,7 @@ async function submitForm(){
       if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const ref = await firebase.firestore().collection('demandes').add(d);
       id = ref.id; saved = true;
-    }catch(e){ console.error(e); alert('ERREUR: '+(e&&e.code)+' / '+(e&&e.message)); }
+    }catch(e){ console.error(e); }
   }
   const fiche = whatsappFiche(d, id);
   if(saved){
