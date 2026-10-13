@@ -896,7 +896,7 @@ render();
     function unread(){ return visible().filter(function(a){ return read.indexOf(a.id) < 0; }); }
     function render(){
       var un = unread();
-      if(un.length>0){ badge.textContent = un.length>99?'99+':un.length; badge.style.display='inline-block'; } else { badge.style.display='none'; }
+      if(un.length>0){ badge.textContent = un.length>9?'9+':un.length; badge.style.display='flex'; } else { badge.style.display='none'; }
       var p = nbPanel(); p.textContent='';
       var h=document.createElement('div'); h.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:4px 6px 8px';
       var t=document.createElement('b'); t.textContent='Notifications'; h.appendChild(t);
@@ -1835,6 +1835,7 @@ document.addEventListener("DOMContentLoaded", function () {
 .pcp-star{color:#facc15}
 .pcp-s{margin:0 26px;flex:none;color:#facc15;font-size:1.05rem;opacity:.9}
 .pcp-t{font-weight:800;flex:none;white-space:nowrap;color:#facc15}
+#notif-bell{overflow:visible!important;}#notif-bell-badge{min-width:16px;height:16px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;top:-5px!important;right:-5px!important;padding:0 4px!important;font-size:.62rem!important;z-index:2;}
 </style>
 <script>/*PATCH-PARTNERS-3*/
 (function(){
