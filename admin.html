@@ -333,13 +333,13 @@ function openSheet(d){
   overlay.classList.add('on');
   (function(){
     var old=overlay.querySelector('#btn-del-demande'); if(old) old.remove();
-    var note=overlay.querySelector('.note'); if(!note) return;
+    var note=overlay.querySelector('h2,h3'); if(!note) return;
     var bt=document.createElement('button');
     bt.id='btn-del-demande'; bt.type='button';
     bt.textContent='\uD83D\uDDD1\uFE0F Supprimer cette demande';
     bt.style.cssText='display:block;width:100%;margin:14px 0 6px;padding:12px;border-radius:12px;border:1px solid #ef4444;background:rgba(239,68,68,.12);color:#ef4444;font-weight:700;font-size:15px;cursor:pointer';
     bt.addEventListener('click',function(){ deleteDemande(d.id); });
-    note.insertAdjacentElement('afterend',bt);
+    note.insertAdjacentElement('afterend',bt); overlay.style.paddingBottom='120px';
   })();
   if(d.status!=='nouveau'){
     const msg = d.status==='valide' ? clientMsgOk(d) : clientMsgRefuse(d);
