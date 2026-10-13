@@ -331,11 +331,31 @@ function openSheet(d){
     <p class="note">La notification WhatsApp au client s'ouvre en un tap dans WhatsApp (le numéro client n'étant pas relié à un compte professionnel automatisé, l'envoi se confirme manuellement). L'e-mail, lui, part automatiquement si un e-mail est renseigné.</p>
   `;
   overlay.classList.add('on');
+  (function(){
+    var old=overlay.querySelector('#btn-del-demande'); if(old) old.remove();
+    var note=overlay.querySelector('.note'); if(!note) return;
+    var bt=document.createElement('button');
+    bt.id='btn-del-demande'; bt.type='button';
+    bt.textContent='\uD83D\uDDD1\uFE0F Supprimer cette demande';
+    bt.style.cssText='display:block;width:100%;margin:14px 0 6px;padding:12px;border-radius:12px;border:1px solid #ef4444;background:rgba(239,68,68,.12);color:#ef4444;font-weight:700;font-size:15px;cursor:pointer';
+    bt.addEventListener('click',function(){ deleteDemande(d.id); });
+    note.insertAdjacentElement('afterend',bt);
+  })();
   if(d.status!=='nouveau'){
     const msg = d.status==='valide' ? clientMsgOk(d) : clientMsgRefuse(d);
     document.getElementById('wa-resend').href = `https://wa.me/${cleanTel(d.tel)}?text=${encodeURIComponent(msg)}`;
   }
   window._current = d;
+}
+function deleteDemande(id){
+  var d = ALL.find(function(x){return x.id===id;});
+  if(!d) return;
+  if(!confirm('Supprimer definitivement la demande de "'+(d.nom||'Sans nom')+'" ('+(d.structure||'-')+') ? Cette action est irreversible.')) return;
+  db.collection('demandes').doc(id).delete().then(function(){
+    closeSheet();
+  }).catch(function(e){
+    alert('Suppression impossible : '+(e&&e.code||'')+' '+(e&&e.message||e));
+  });
 }
 function closeSheet(){ document.getElementById('overlay').classList.remove('on'); history.replaceState(null,'','admin.html'); }
 document.getElementById('overlay').addEventListener('click', e=>{ if(e.target.id==='overlay') closeSheet(); });
