@@ -195,3 +195,25 @@ body::after{
   line-height:1.2 !important;
 }
 .card-head .chevron{ right:14px !important; font-size:13px !important; }
+
+/* === Tuiles plus larges, textes sur une ligne et centrés === */
+.card.pcinfo-self, #card-gfc, #card-gsc, .card.gsc, .card.ambi, .card.mage,
+.card.malaga, .card.lework, .card.bijou, .card.troc, .card.lav, .card.aneg, .card.neoferme{
+  margin-left:6px !important;
+  margin-right:6px !important;
+  width:auto !important;
+  max-width:none !important;
+}
+.card.pcinfo-self .card-head, #card-gfc .card-head, #card-gsc .card-head, .card.gsc .card-head,
+.card.ambi .card-head, .card.mage .card-head, .card.malaga .card-head, .card.lework .card-head,
+.card.bijou .card-head, .card.troc .card-head, .card.lav .card-head, .card.aneg .card-head,
+.card.neoferme .card-head{
+  padding:0 30px !important;
+  justify-content:center !important;
+  text-align:center !important;
+}
+.card-head h3, .card-head b, .card-head span:not(.chevron):not(.badge){
+  white-space:nowrap !important;
+  text-wrap:balance;
+}
+.card-head .chevron{ right:12px !important; }
