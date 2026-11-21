@@ -351,3 +351,41 @@ body.apps-grid-on .card.neoferme, body.apps-grid-on .pc-partners{
   border:0 !important; text-shadow:none !important;
 }
 .apps-sheet-box .visit-btn *{ color:#0d0f16 !important; text-shadow:none !important; }
+
+/* === Tuile "Nouvelle demande de projet" : animation d'appel === */
+#demande .section-title, #demande.section-title{
+  position:relative;
+  overflow:hidden !important;
+  cursor:pointer;
+  animation:pcCta 2.2s ease-in-out infinite;
+}
+#demande .section-title::before, #demande.section-title::before{
+  content:"";
+  position:absolute; top:0; bottom:0; left:-60%;
+  width:45%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent);
+  transform:skewX(-20deg);
+  animation:pcShine 3.2s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes pcCta{
+  0%,100%{
+    border-color:#2dd4bf;
+    box-shadow:0 0 0 0 rgba(45,212,191,.55),0 6px 24px rgba(0,0,0,.45);
+    transform:scale(1);
+  }
+  50%{
+    border-color:#ff4fa3;
+    box-shadow:0 0 0 9px rgba(255,79,163,0),0 0 26px rgba(255,79,163,.55);
+    transform:scale(1.025);
+  }
+}
+@keyframes pcShine{
+  0%{left:-60%}
+  55%,100%{left:130%}
+}
+#wizard{ scroll-margin-top:170px; }
+@media (prefers-reduced-motion:reduce){
+  #demande .section-title, #demande.section-title,
+  #demande .section-title::before, #demande.section-title::before{ animation:none; }
+}
