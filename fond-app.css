@@ -217,3 +217,47 @@ body::after{
   text-wrap:balance;
 }
 .card-head .chevron{ right:12px !important; }
+
+/* === Applications en grille de logos === */
+.apps-grid-on [id^="card-"], .apps-grid-on .card.pcinfo-self, .apps-grid-on .card:has(.card), .apps-grid-on .pc-partners{
+  display:none !important;
+}
+.apps-grid-box{
+  margin:14px 6px; padding:18px 12px;
+  border:2px solid #ffd21f; border-radius:28px;
+  background:rgba(24,27,58,.96);
+  box-shadow:0 0 14px rgba(255,210,31,.6),0 0 30px rgba(255,190,0,.3);
+  animation:pcGlow 3s ease-in-out infinite;
+}
+.apps-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px 10px; justify-items:center; align-items:center;}
+.apps-tile{
+  width:74px; height:74px; padding:0; cursor:pointer;
+  border-radius:50%; overflow:hidden;
+  background:#0d1230; border:2px solid rgba(255,210,31,.85);
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:11px; font-weight:700;
+}
+.apps-tile img{width:100%; height:100%; object-fit:contain; border-radius:50%;}
+.apps-tile:active{transform:scale(.94);}
+.apps-sheet{
+  position:fixed; inset:0; z-index:2147482000;
+  background:rgba(4,6,16,.78);
+  display:flex; align-items:center; justify-content:center; padding:16px;
+}
+.apps-sheet-box{
+  position:relative; width:100%; max-width:480px; max-height:82vh; overflow:auto;
+  background:#171b3d; border:2px solid #2dd4bf; border-radius:24px;
+  padding:22px 18px 18px; color:#fff; text-align:center;
+  box-shadow:0 10px 40px rgba(0,0,0,.6);
+}
+.apps-sheet-box h3{margin:0 0 12px; font-size:20px;}
+.apps-sheet-box .card-details, .apps-sheet-box .card-body{
+  display:block !important; max-height:none !important; height:auto !important;
+  opacity:1 !important; visibility:visible !important;
+}
+.apps-sheet-box img{max-width:100%; border-radius:14px; margin-bottom:10px;}
+.apps-sheet-x{
+  position:absolute; top:8px; right:12px; width:34px; height:34px;
+  border:0; border-radius:50%; background:rgba(255,255,255,.12);
+  color:#fff; font-size:22px; line-height:1; cursor:pointer;
+}
