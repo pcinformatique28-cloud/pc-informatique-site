@@ -39,3 +39,24 @@ h1,h2,h3,p,a,span,label,small{
   text-shadow:0 1px 3px rgba(0,0,0,.85);
 }
 button, input, select, textarea{ text-shadow:none; }
+
+/* === Cadres type "Vos informations" === */
+body::after{
+  background:linear-gradient(180deg,rgba(6,8,20,.25) 0%,rgba(6,8,20,.35) 100%) !important;
+}
+.hero, .section-title, .about-btn-wrap{
+  background:rgba(24,27,58,.93) !important;
+  border:2px solid #2dd4bf !important;
+  border-radius:28px !important;
+  padding:20px 18px !important;
+  margin:18px 12px !important;
+  box-shadow:0 6px 24px rgba(0,0,0,.45);
+  -webkit-backdrop-filter:blur(6px);
+  backdrop-filter:blur(6px);
+  text-shadow:none !important;
+}
+.hero .contact{
+  background:none !important; border:0 !important;
+  padding:0 !important; margin:12px 0 0 !important;
+}
+.section-title{ text-align:center; }
