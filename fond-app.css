@@ -87,3 +87,17 @@ body::after{
 .pc-partners .pcp-i{
   background:transparent !important;
 }
+
+/* Titre en jaune */
+.hero-title, .hero-title *{
+  color:#ffd21f !important;
+  -webkit-text-fill-color:#ffd21f !important;
+  background:none !important;
+  -webkit-background-clip:border-box !important;
+  background-clip:border-box !important;
+  text-shadow:0 2px 6px rgba(0,0,0,.6) !important;
+}
+/* Pas d'ombre sur les boutons */
+.nav-btns *, .btn, .btn *, button *, .visit-btn *{
+  text-shadow:none !important;
+}
