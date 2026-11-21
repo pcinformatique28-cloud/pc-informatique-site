@@ -296,11 +296,15 @@ html, body{ overflow-x:hidden !important; max-width:100% !important; }
   max-width:none !important; margin:0 !important;
   object-fit:cover !important; border-radius:50% !important;
 }
-/* Masque les anciennes tuiles (identifiants = priorité maximale) */
-body.apps-grid-on #card-gfc, body.apps-grid-on #card-gsc, body.apps-grid-on #card-ambi,
-body.apps-grid-on #card-mage, body.apps-grid-on #card-malaga, body.apps-grid-on #card-lework,
-body.apps-grid-on #card-bijou, body.apps-grid-on #card-troc, body.apps-grid-on #card-lav,
-body.apps-grid-on #card-aneg, body.apps-grid-on #card-neoferme,
-body.apps-grid-on :has(> #card-gfc), body.apps-grid-on :has(> #card-gsc){
+
+/* Masquage des anciennes tuiles (sans toucher au reste de la page) */
+body.apps-grid-on .card.gsc, body.apps-grid-on #card-gsc, body.apps-grid-on #card-gfc,
+body.apps-grid-on .card.pcinfo-self, body.apps-grid-on #card-ambi, body.apps-grid-on #card-mage,
+body.apps-grid-on #card-malaga, body.apps-grid-on #card-lework, body.apps-grid-on #card-bijou,
+body.apps-grid-on #card-troc, body.apps-grid-on #card-lav, body.apps-grid-on #card-aneg,
+body.apps-grid-on #card-neoferme, body.apps-grid-on .card.ambi, body.apps-grid-on .card.mage,
+body.apps-grid-on .card.malaga, body.apps-grid-on .card.lework, body.apps-grid-on .card.bijou,
+body.apps-grid-on .card.troc, body.apps-grid-on .card.lav, body.apps-grid-on .card.aneg,
+body.apps-grid-on .card.neoferme, body.apps-grid-on .pc-partners{
   display:none !important;
 }
