@@ -308,3 +308,46 @@ body.apps-grid-on .card.troc, body.apps-grid-on .card.lav, body.apps-grid-on .ca
 body.apps-grid-on .card.neoferme, body.apps-grid-on .pc-partners{
   display:none !important;
 }
+
+/* === Fenêtre de présentation : tient sur un écran === */
+.apps-sheet{ padding:12px !important; }
+.apps-sheet-box{
+  display:flex !important; flex-direction:column; align-items:center;
+  max-height:calc(100vh - 24px) !important;
+  max-height:calc(100dvh - 24px) !important;
+  overflow:hidden !important;
+  padding:14px 14px 14px !important;
+}
+.apps-sheet-box h3{ font-size:18px !important; margin:0 34px 8px !important; }
+.apps-sheet-box .badge{ display:none !important; }
+.apps-sheet-box .card-details, .apps-sheet-box .card-body{
+  display:flex !important; flex-direction:column; align-items:center;
+  width:100%; margin:0 !important; padding:0 !important;
+  max-height:none !important; overflow:visible !important;
+}
+.apps-sheet-box .shot{
+  width:100% !important; height:auto !important; aspect-ratio:auto !important;
+  margin:0 0 8px !important; padding:0 !important; background:none !important;
+  display:flex !important; justify-content:center; border:0 !important;
+}
+.apps-sheet-box .shot a{ display:flex; justify-content:center; }
+.apps-sheet-box .shot img, .apps-sheet-box img{
+  width:auto !important; height:auto !important;
+  max-width:100% !important; max-height:30vh !important; max-height:30dvh !important;
+  object-fit:contain !important; border-radius:12px !important;
+  margin:0 !important; display:block !important;
+}
+.apps-sheet-box p{
+  font-size:13.5px !important; line-height:1.4 !important;
+  margin:0 0 10px !important; text-align:center !important;
+}
+.apps-sheet-box a.visit-btn, .apps-sheet-box .visit-btn{
+  display:block !important; width:100%; box-sizing:border-box;
+  padding:11px 14px !important; margin:0 !important; text-align:center;
+  border-radius:14px !important; text-decoration:none !important;
+  font-weight:800 !important; font-size:15px !important;
+  color:#0d0f16 !important;
+  background:linear-gradient(90deg,#2dd4bf,#ff4fa3) !important;
+  border:0 !important; text-shadow:none !important;
+}
+.apps-sheet-box .visit-btn *{ color:#0d0f16 !important; text-shadow:none !important; }
