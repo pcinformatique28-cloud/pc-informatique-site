@@ -74,3 +74,16 @@ body::after{
   text-align:center;
   text-shadow:none !important;
 }
+
+/* Bandeau partenaires : fond opaque */
+.pc-partners{
+  background:rgba(24,27,58,.96) !important;
+  border-radius:28px !important;
+  overflow:hidden;
+  text-shadow:none !important;
+}
+.pc-partners .pcp-track,
+.pc-partners .pcp-half,
+.pc-partners .pcp-i{
+  background:transparent !important;
+}
