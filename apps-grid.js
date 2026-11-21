@@ -55,7 +55,7 @@
     });
     box.appendChild(g);
     w.parentNode.insertBefore(box,w);
-    document.body.classList.add('apps-grid-on');
+    document.body.classList.add('apps-grid-on');document.documentElement.classList.remove('apps-pre');
     setTimeout(function(){
       if(document.documentElement.scrollHeight<1200){document.body.classList.remove('apps-grid-on');box.remove();}
     },700);
