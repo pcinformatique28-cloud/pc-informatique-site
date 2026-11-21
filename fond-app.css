@@ -1,0 +1,17 @@
+/* PC-INFORMATIQUE – fond d'arrière-plan (bannière 2) */
+html { background:#0d0f16; }
+body { background:transparent !important; }
+body::before{
+  content:"";
+  position:fixed; inset:0; z-index:-2;
+  background:#0d0f16 url("images/fond-app-small.jpg") center top / cover no-repeat;
+}
+@media (min-width:700px){
+  body::before{ background-image:url("images/fond-app.jpg"); }
+}
+/* voile sombre pour garder les textes lisibles */
+body::after{
+  content:"";
+  position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:linear-gradient(180deg,rgba(8,10,24,.35) 0%,rgba(8,10,24,.55) 100%);
+}
