@@ -476,3 +476,12 @@ html.apps-pre .card:has(.card){
   background:rgba(12,16,52,.50) !important; color:#fff !important;
 }
 .formbox input::placeholder,.formbox textarea::placeholder{ color:rgba(255,255,255,.55) !important; }
+
+/* === Formulaire : contour jaune, titre centré, libellés jaunes === */
+body .formbox{ border-color:#ffd43b !important; border-width:2px !important; }
+body .formbox h2, body .formbox h3, body .formbox h4, body .formbox legend{
+  text-align:center !important; width:100% !important;
+}
+body .formbox p{ text-align:center !important; }
+body .formbox label{ color:#ffd43b !important; font-weight:700 !important; text-align:left !important; }
+body .formbox input, body .formbox textarea, body .formbox select{ border-color:var(--logo-teal,#2dd4bf) !important; }
