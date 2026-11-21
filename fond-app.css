@@ -406,3 +406,26 @@ body.apps-grid-on .card.neoferme, body.apps-grid-on .pc-partners{
   margin:0 auto !important; display:block !important;
   border-radius:12px !important; position:static !important;
 }
+
+/* === Cadre image IDENTIQUE pour toutes les fenêtres === */
+.apps-sheet-box .shot{
+  width:100% !important; height:34vh !important; height:34dvh !important;
+  min-height:0 !important; max-height:none !important; flex:0 0 auto !important;
+  margin:0 0 10px !important; padding:0 !important;
+  background:transparent !important; border:0 !important;
+  display:flex !important; justify-content:center !important; align-items:center !important;
+  overflow:hidden !important;
+}
+.apps-sheet-box .shot a{
+  width:100% !important; height:100% !important;
+  display:flex !important; justify-content:center !important; align-items:center !important;
+}
+.apps-sheet-box .shot img, .apps-sheet-box .card-details img, .apps-sheet-box .card-body img{
+  width:100% !important; height:34vh !important; height:34dvh !important;
+  max-width:100% !important; max-height:34dvh !important;
+  min-width:0 !important; min-height:0 !important;
+  object-fit:contain !important; object-position:center !important;
+  background:transparent !important; margin:0 auto !important;
+  display:block !important; position:static !important;
+  transform:none !important; zoom:1 !important; border-radius:12px !important;
+}
