@@ -455,16 +455,6 @@ body.apps-grid-on .card.neoferme, body.apps-grid-on .pc-partners{
   margin:0 !important; border-radius:0 !important;
 }
 
-/* === Pas de flash de l'ancienne interface au chargement === */
-html.apps-pre .pc-partners,
-html.apps-pre [id^="card-"],
-html.apps-pre .card.pcinfo-self,
-html.apps-pre .card:has(.card){
-  opacity:0 !important; pointer-events:none !important;
-  max-height:0 !important; min-height:0 !important; overflow:hidden !important;
-  margin:0 !important; padding:0 !important; border-width:0 !important;
-}
-
 /* === Tuile formulaire : couleur plus claire et moderne === */
 .formbox{
   background:linear-gradient(145deg,#3556b8 0%,#5b3fb5 100%) !important;
@@ -485,3 +475,41 @@ body .formbox h2, body .formbox h3, body .formbox h4, body .formbox legend{
 body .formbox p{ text-align:center !important; }
 body .formbox label{ color:#ffd43b !important; font-weight:700 !important; text-align:left !important; }
 body .formbox input, body .formbox textarea, body .formbox select{ border-color:var(--logo-teal,#2dd4bf) !important; }
+
+/* === Masquage doux de l'ancien affichage au chargement === */
+@keyframes appsPreOff{ to{ visibility:visible; } }
+html.apps-pre .pc-partners,
+html.apps-pre [id^="card-"],
+html.apps-pre .card.pcinfo-self,
+html.apps-pre .card:has(.card){
+  visibility:hidden; animation:appsPreOff 0s linear 5s forwards;
+}
+
+/* === Fenêtres des apps : plein écran avec bouton de fermeture === */
+.apps-sheet{
+  position:fixed !important; inset:0 !important; z-index:10000 !important;
+  padding:0 !important; display:flex !important;
+  align-items:stretch !important; justify-content:stretch !important;
+}
+.apps-sheet-box{
+  position:relative !important; width:100% !important; max-width:none !important;
+  height:100% !important; max-height:none !important; margin:0 !important;
+  border-radius:0 !important; border-width:0 !important;
+  padding:max(18px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom)) !important;
+  overflow-y:auto !important; justify-content:flex-start !important;
+}
+.apps-sheet-box h3{ margin:0 56px 14px !important; font-size:21px !important; text-align:center !important; }
+.apps-sheet-x{
+  position:fixed !important; top:max(12px,env(safe-area-inset-top)) !important; right:14px !important;
+  width:46px !important; height:46px !important; border-radius:50% !important;
+  font-size:30px !important; line-height:1 !important; z-index:5 !important;
+  display:flex !important; align-items:center !important; justify-content:center !important;
+}
+.apps-sheet-box .card-details{ flex:1 1 auto !important; min-height:0 !important; width:100% !important; }
+.apps-sheet-box .card-body{ flex:1 1 auto !important; display:flex !important; flex-direction:column !important; width:100% !important; }
+.apps-sheet-box .shot{
+  height:46vh !important; height:46dvh !important; width:auto !important;
+  aspect-ratio:9/19 !important; max-width:80% !important; margin:0 auto 14px !important;
+}
+.apps-sheet-box p{ font-size:15px !important; line-height:1.5 !important; margin:0 0 18px !important; }
+.apps-sheet-box .visit-btn{ margin-top:auto !important; }

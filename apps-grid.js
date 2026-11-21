@@ -57,7 +57,7 @@
     w.parentNode.insertBefore(box,w);
     document.body.classList.add('apps-grid-on');document.documentElement.classList.remove('apps-pre');
     setTimeout(function(){
-      if(document.documentElement.scrollHeight<1200){document.body.classList.remove('apps-grid-on');box.remove();}
+      if(box.offsetHeight<20){document.body.classList.remove('apps-grid-on');box.remove();}
     },700);
   }
   var tries=0,t=setInterval(function(){
