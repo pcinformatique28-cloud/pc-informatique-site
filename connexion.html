@@ -248,6 +248,7 @@ body{align-items:stretch!important;justify-content:flex-start!important;padding-
 body{align-items:center!important;justify-content:center!important;padding-bottom:90px!important;}
 </style>
 <link rel="stylesheet" href="fond-app.css">
+<link rel="stylesheet" href="connexion-ui.css?v=1">
 </head>
 <body>
 <div class="drawer-overlay" id="drawer-overlay"></div>
@@ -282,7 +283,7 @@ body{align-items:center!important;justify-content:center!important;padding-botto
 
 
 
-  <div class="card">
+  <div class="card login-screen">
     <h1>Connexion</h1>
     <p class="sub">Accède à ton espace membre PC-INFORMATIQUE.</p>
 
@@ -290,7 +291,7 @@ body{align-items:center!important;justify-content:center!important;padding-botto
     <input id="email" type="email" autocomplete="username" placeholder="vous@exemple.com">
 
     <label for="pass">Mot de passe</label>
-    <input id="pass" type="password" autocomplete="current-password" placeholder="Votre mot de passe">
+    <div class="pw-wrap"><input id="pass" type="password" autocomplete="current-password" placeholder="Votre mot de passe"><button type="button" class="pw-toggle" id="pw-toggle" aria-label="Afficher le mot de passe">&#128065;</button></div>
     <div class="link-row"><a href="#" id="btn-reset">Mot de passe oublié ?</a></div>
 
     <button id="btn-submit">Se connecter</button>
@@ -349,7 +350,8 @@ auth.onAuthStateChanged(user=>{
   if(user) location.href = (function(){try{var u=firebase.auth().currentUser;return (u&&u.email&&u.email.toLowerCase()==="pcinformatique28@gmail.com")?"index.html":"profil.html";}catch(e){return "profil.html";}})();
 });
 </script>
-<script src="pwd-eye.js"></script>
+
+<script>(function(){var b=document.getElementById('pw-toggle'),i=document.getElementById('pass');if(b&&i)b.addEventListener('click',function(){var h=i.type==='password';i.type=h?'text':'password';b.innerHTML=h?'&#128584;':'&#128065;';b.setAttribute('aria-label',h?'Masquer le mot de passe':'Afficher le mot de passe');});})();</script>
 </body>
 
 <script>
