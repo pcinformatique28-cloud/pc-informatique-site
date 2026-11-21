@@ -100,6 +100,7 @@ nav{background:linear-gradient(120deg,#12142b 0%,#1b1e3d 60%,#12142b 100%)!impor
 function escA(x){return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function safeUrl(u){u=String(u==null?'':u).trim();return /^https?:\/\//i.test(u)?escA(u):'#'}
 </script>
+<link rel="stylesheet" href="fond-app.css">
 </head>
 <body>
 <div id="pcp-wait" style="text-align:center;padding:48px 16px;color:#9aa0b4;font-family:system-ui,sans-serif">Chargement...</div>

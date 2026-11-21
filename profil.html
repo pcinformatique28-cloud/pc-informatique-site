@@ -122,6 +122,7 @@ input,textarea,select{background:#232748!important;color:#f2f3fa!important;borde
 function escA(x){return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function safeUrl(u){u=String(u==null?'':u).trim();return /^https?:\/\//i.test(u)?escA(u):'#'}
 </script>
+<link rel="stylesheet" href="fond-app.css">
 </head>
 <body>
 <header>
