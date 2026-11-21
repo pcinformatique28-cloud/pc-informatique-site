@@ -261,3 +261,46 @@ body::after{
   border:0; border-radius:50%; background:rgba(255,255,255,.12);
   color:#fff; font-size:22px; line-height:1; cursor:pointer;
 }
+
+/* === Correctif grille d'applications === */
+html, body{ overflow-x:hidden !important; max-width:100% !important; }
+.apps-grid-box{
+  box-sizing:border-box !important;
+  width:auto !important;
+  max-width:calc(100% - 12px) !important;
+  margin:14px 6px !important;
+  padding:16px 10px !important;
+}
+.apps-grid{
+  box-sizing:border-box !important;
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:14px 6px !important;
+  justify-items:center !important;
+  width:100% !important;
+}
+.apps-tile{
+  box-sizing:border-box !important;
+  width:68px !important; height:68px !important;
+  min-width:0 !important; min-height:0 !important;
+  max-width:68px !important; max-height:68px !important;
+  flex:none !important; margin:0 !important; padding:0 !important;
+  border-radius:50% !important;
+  border:2px solid rgba(255,210,31,.9) !important;
+  background:#0d1230 !important;
+  overflow:hidden !important;
+  display:flex !important; align-items:center; justify-content:center;
+}
+.apps-tile img{
+  width:100% !important; height:100% !important;
+  max-width:none !important; margin:0 !important;
+  object-fit:cover !important; border-radius:50% !important;
+}
+/* Masque les anciennes tuiles (identifiants = priorité maximale) */
+body.apps-grid-on #card-gfc, body.apps-grid-on #card-gsc, body.apps-grid-on #card-ambi,
+body.apps-grid-on #card-mage, body.apps-grid-on #card-malaga, body.apps-grid-on #card-lework,
+body.apps-grid-on #card-bijou, body.apps-grid-on #card-troc, body.apps-grid-on #card-lav,
+body.apps-grid-on #card-aneg, body.apps-grid-on #card-neoferme,
+body.apps-grid-on :has(> #card-gfc), body.apps-grid-on :has(> #card-gsc){
+  display:none !important;
+}
