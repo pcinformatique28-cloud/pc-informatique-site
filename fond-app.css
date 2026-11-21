@@ -389,3 +389,20 @@ body.apps-grid-on .card.neoferme, body.apps-grid-on .pc-partners{
   #demande .section-title, #demande.section-title,
   #demande .section-title::before, #demande.section-title::before{ animation:none; }
 }
+
+/* === Correctif images GFC / PC-INFORMATIQUE : centrées, taille imposée === */
+.apps-sheet-box .shot, .apps-sheet-box .shot *:not(img){
+  background:transparent !important; background-image:none !important;
+  width:auto !important; height:auto !important; min-height:0 !important;
+  aspect-ratio:auto !important; padding:0 !important; border:0 !important;
+  display:flex !important; justify-content:center !important; align-items:center !important;
+}
+.apps-sheet-box .shot{ width:100% !important; }
+.apps-sheet-box .shot img, .apps-sheet-box .card-details img, .apps-sheet-box .card-body img{
+  height:30vh !important; height:30dvh !important; width:auto !important;
+  max-width:100% !important; min-width:0 !important; min-height:0 !important;
+  object-fit:contain !important; object-position:center !important;
+  background:transparent !important; transform:none !important; zoom:1 !important;
+  margin:0 auto !important; display:block !important;
+  border-radius:12px !important; position:static !important;
+}
