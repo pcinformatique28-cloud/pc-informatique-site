@@ -437,3 +437,20 @@ body.apps-grid-on .card.neoferme, body.apps-grid-on .pc-partners{
 }
 .apps-sheet-box .shot{ justify-content:center !important; align-items:center !important; text-align:center !important; }
 .apps-sheet-box .shot img{ margin:0 auto !important; }
+
+/* === Cadre image unique : même largeur, même hauteur, image entière === */
+.apps-sheet-box .shot{
+  width:62% !important; max-width:240px !important;
+  height:34vh !important; height:34dvh !important;
+  margin:0 auto 10px !important; flex:0 0 auto !important;
+  background:rgba(255,255,255,.06) !important; border-radius:14px !important;
+  overflow:hidden !important; display:flex !important;
+  justify-content:center !important; align-items:center !important;
+}
+.apps-sheet-box .shot a{ width:100% !important; height:100% !important; display:flex !important; justify-content:center !important; align-items:center !important; }
+.apps-sheet-box .shot img{
+  width:100% !important; height:100% !important;
+  max-width:100% !important; max-height:100% !important;
+  object-fit:contain !important; object-position:center !important;
+  margin:0 !important; border-radius:0 !important;
+}
