@@ -1,4 +1,4 @@
-/* PC-INFORMATIQUE – fond d'arrière-plan (bannière 2) */
+/* PC-INFORMATIQUE – fond d'arrière-plan (bannière complète) */
 html { background:#0d0f16; }
 body { background:transparent !important; }
 body::before{
@@ -9,20 +9,24 @@ body::before{
 @media (min-width:700px){
   body::before{ background-image:url("images/fond-app.jpg"); }
 }
-/* voile sombre pour garder les textes lisibles */
+/* voile léger pour garder les textes lisibles */
 body::after{
   content:"";
   position:fixed; inset:0; z-index:-1; pointer-events:none;
-  background:linear-gradient(180deg,rgba(8,10,24,.35) 0%,rgba(8,10,24,.55) 100%);
+  background:linear-gradient(180deg,rgba(8,10,24,.25) 0%,rgba(8,10,24,.35) 100%);
 }
 
-/* Fond visible en bas */
-body::after{
-  background:linear-gradient(180deg,rgba(8,10,24,.45) 0%,rgba(8,10,24,.2) 60%,rgba(8,10,24,0) 100%) !important;
+/* En-tête transparent */
+header, .header, [class*="header"], [class*="topbar"], [class*="top-bar"], [class*="appbar"], [class*="app-bar"], [class*="navbar-top"]{
+  background:rgba(13,15,22,.18) !important;
+  -webkit-backdrop-filter:blur(6px);
+  backdrop-filter:blur(6px);
+  box-shadow:none !important;
 }
-body::before{ background-position:center bottom !important; }
+
+/* Barre du bas transparente */
 nav[class*="bottom"], [class*="bottom-nav"], [class*="bottomnav"], [class*="tabbar"], [class*="tab-bar"], [class*="navbar-bottom"]{
-  background:rgba(13,15,22,.35) !important;
+  background:rgba(13,15,22,.30) !important;
   -webkit-backdrop-filter:blur(8px);
   backdrop-filter:blur(8px);
 }
